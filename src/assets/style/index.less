@@ -1,0 +1,249 @@
+/**
+ * Licensed Materials - Property of tenxcloud.com
+ * (C) Copyright 2017 TenxCloud. All Rights Reserved.
+ */
+
+/**
+ * Site common style
+ *
+ * 2017-08-16
+ * @author zhangpc
+ */
+@import './core/index.less';
+@import './core/overwrite.less';
+
+@namespace-switch-height: 30px;
+@content-margin-top: @header-height + @namespace-switch-height + @padding-medium;
+
+body {
+  // background-color: @background-color-body;
+  // background-color: #f6f7fb;
+
+  .menu-icon {
+    height: 14px;
+    width: 14px;
+    vertical-align: text-bottom;
+    margin-right: 10px;
+    fill: rgba(0, 0, 0, 0.65);
+  }
+  .txt-of-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+  }
+  .loading {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .float-right {
+    float: right;
+  }
+  .select {
+    height: 14px;
+    width: 14px;
+    vertical-align: text-bottom;
+    margin-right: 10px;
+    fill: #fff;
+  }
+
+  .first-title {
+    height: 18px;
+    font-size: 16px;
+    line-height: 18px;
+    border-left: 5px solid @primary-color;
+    padding-left: 8px;
+  }
+  .second-title {
+    height: 16px;
+    font-size: 14px;
+    line-height: 16px;
+    border-left: 3px solid @primary-color;
+    padding-left: @padding-base;
+    color: @primary-color;
+  }
+
+  /* colors */
+  .success-status {
+    color: @success-color;
+  }
+  .error-status {
+    color: @error-color;
+  }
+  .warning-status {
+    color: @warning-color;
+  }
+  .primary-color {
+    color: @primary-color;
+  }
+  .empty-text,
+  .desc-text {
+    color: @font-color-3;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
+  .hide {
+    display: none;
+  }
+
+  .reset-modal-incloud-form {
+    .ant-modal-body {
+      padding-bottom: 0;
+    }
+  }
+
+  .row-table {
+    border: 1px @border-style-base @border-color-base;
+    border-radius: @border-radius-base;
+    & > .ant-row {
+      height: 40px;
+      line-height: 40px;
+      &:not(:last-child) {
+        border-bottom: 1px @border-style-base @border-color-split;
+      }
+      & > div {
+        padding: 0 @padding-base;
+        &:not(:last-child) {
+          border-right: 1px @border-style-base @border-color-split;
+        }
+        &:first-child,
+        &:nth-child(3) {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+      }
+    }
+  }
+  .running {
+    color: @primary-color;
+    .ant-badge-status-dot {
+      background-color: @primary-color;
+    }
+  }
+  .waiting,
+  .pendingForApproval {
+    color: @warning-color;
+    .ant-badge-status-dot {
+      background-color: @warning-color;
+    }
+  }
+  .success {
+    color: @success-color;
+    .ant-badge-status-dot {
+      background-color: @success-color;
+    }
+  }
+  .failed,
+  .approvalTtimeout,
+  .refusedToExecute,
+  .abort {
+    color: @error-color;
+    .ant-badge-status-dot {
+      background-color: @error-color;
+    }
+  }
+
+  .layout-content {
+    &-btns {
+      width: 100%;
+      padding-bottom: 20px;
+      & > *:not(:last-child) {
+        margin-right: 12px;
+      }
+      .search-style {
+        width: 180px;
+      }
+      .ant-pagination {
+        float: right;
+        height: 32px;
+        line-height: 32px;
+      }
+      .ant-input-affix-wrapper {
+        vertical-align: bottom;
+      }
+    }
+    &-body {
+      clear: both;
+      min-height: 200px;
+      margin-bottom: @padding-medium;
+    }
+  }
+
+  .Moreoperations {
+    span {
+      display: inline-block;
+      padding: 0 46px;
+      max-width: 135px;
+    }
+  }
+  .BorderIcon {
+    display: flex;
+    margin-top: 4px;
+    height: 16px;
+    width: 16px;
+    font-size: 10px;
+    border-radius: 8px;
+    border: 1px solid @success-color;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    background-color: @success-color;
+    user-select: none;
+    > div {
+      height: 10px;
+      font-size: 10px;
+      line-height: 10px;
+    }
+  }
+
+  .alertsSuccessTips {
+    padding: 8px 16px;
+    background-color: #f6ffed;
+    border: 1px dashed #b7eb8f;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, 0.65);
+    .tenx-icon {
+      color: @success-color;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+  }
+  .alertsInfoTips {
+    .alertsSuccessTips;
+    background-color: #d9edf6;
+    border-color: @primary-color;
+    .tenx-icon {
+      color: @primary-color;
+    }
+  }
+  .alertsWarningTips {
+    .alertsSuccessTips;
+    background-color: #fffaf6;
+    border-color: @warning-color;
+    .tenx-icon {
+      color: @warning-color;
+    }
+  }
+  .text-circle-icon {
+    background: @primary-color;
+    height: 16px;
+    color: #fff;
+    display: flex;
+    width: 16px;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 1px;
+    & > span {
+      font-size: 16px;
+      transform: scale(0.625);
+      display: flex;
+      align-items: center;
+    }
+  }
+  .rc-dialog {
+    overflow: hidden;
+  }
+}
