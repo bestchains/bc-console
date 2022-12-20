@@ -43,7 +43,9 @@ export default defineConfig({
   codeSplitting: {
     jsStrategy: 'granularChunks',
   },
-  antd: {},
+  antd: {
+    import: false,
+  },
   layout: {},
   dva: {
     immer: {},

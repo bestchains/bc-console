@@ -9,9 +9,9 @@
  * @author zhangpc
  * @date 2018-05-24
  */
-import 'moment/locale/zh-cn';
+import 'dayjs/locale/zh-cn';
 
-moment.updateLocale('zh-cn', {
+dayjs.updateLocale('zh-cn', {
   relativeTime: {
     future: '%s内',
     past: '%s前',
