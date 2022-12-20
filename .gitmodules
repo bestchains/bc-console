@@ -1,0 +1,4 @@
+[submodule "shared"]
+	path = shared
+	url = https://gitlab.dev.21vianet.com/zhang.pengcheng3/shared.git
+	branch = dev-branch
