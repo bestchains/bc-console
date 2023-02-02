@@ -464,15 +464,25 @@ const i18nConfig = {
   },
 };
 
-let locale =
-  typeof navigator === "object" && typeof navigator.language === "string"
-    ? navigator.language
-    : "zh-CN";
+const LOCALE_KEY = "intl_locale";
+let locale = window.localStorage.getItem(LOCALE_KEY);
+if (!locale) {
+  locale =
+    typeof navigator === "object" && typeof navigator.language === "string"
+      ? navigator.language
+      : "zh-CN";
+}
+if (locale.startsWith("en")) {
+  locale = "en-US";
+} else {
+  locale = "zh-CN";
+}
 
 const getLocale = () => locale;
 
 const setLocale = (target) => {
   locale = target;
+  window.localStorage.setItem(LOCALE_KEY, target);
 };
 
 const isEmptyVariables = (variables) =>
