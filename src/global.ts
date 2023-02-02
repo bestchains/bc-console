@@ -9,3 +9,28 @@
  * @author zhangpc
  * @date 2020-01-15
  */
+
+import 'antd/es/modal/style/index.js';
+import dayjs from 'dayjs';
+import updateLocale from 'dayjs/plugin/updateLocale';
+import 'dayjs/locale/zh-cn';
+
+dayjs.locale('zh-cn');
+dayjs.extend(updateLocale);
+dayjs.updateLocale('zh-cn', {
+  relativeTime: {
+    future: '%s内',
+    past: '%s前',
+    s: '%d 秒',
+    m: '1 分钟',
+    mm: '%d 分钟',
+    h: '1 小时',
+    hh: '%d 小时',
+    d: '1 天',
+    dd: '%d 天',
+    M: '1 个月',
+    MM: '%d 个月',
+    y: '1 年',
+    yy: '%d 年',
+  },
+});

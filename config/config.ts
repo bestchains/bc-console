@@ -12,8 +12,8 @@
 
 import { defineConfig } from '@umijs/max';
 import routes from './routes';
-import theme from './theme';
 import { execSync } from 'child_process';
+import theme from './theme';
 
 /**
  * get last commit hash
@@ -45,13 +45,13 @@ export default defineConfig({
   },
   antd: {
     import: false,
+    theme,
   },
   layout: {},
-  dva: {
-    immer: {},
-  },
   lessLoader: {
-    modifyVars: theme,
+    modifyVars: {
+      '@ant-prefix': 'ant',
+    },
     javascriptEnabled: true,
     strictMath: false,
     math: 'parens-division',
@@ -74,7 +74,6 @@ export default defineConfig({
   },
   ignoreMomentLocale: true,
   favicons: ['/favicon.ico'],
-  theme,
   base: '/',
   publicPath: '/',
   define: {
@@ -82,45 +81,6 @@ export default defineConfig({
   },
   chainWebpack() {
     const [memo, { env, webpack }]: any = arguments;
-    // node_modules => vendors
-    if (env === 'production') {
-      memo.merge({
-        optimization: {
-          minimize: true,
-          splitChunks: {
-            chunks: 'all',
-            minSize: 30000,
-            minChunks: 3,
-            automaticNameDelimiter: '.',
-            cacheGroups: {
-              common: {
-                name: 'vendors',
-                test({ resource }: any) {
-                  return /[\\/]node_modules[\\/]/.test(resource);
-                },
-                priority: 10,
-              },
-              // 比较大的依赖且首屏（/tenant_manage/overview 页面）不需要的单独打成一个 vendor，按需加载
-              large: {
-                name: 'vendors-large',
-                test({ resource }: any) {
-                  const largeModules = [
-                    '/node_modules/monaco-editor',
-                    '/node_modules/jointjs',
-                    '/node_modules/bizcharts',
-                    '/node_modules/@antv/data-set',
-                    '/node_modules/brace',
-                    '/node_modules/jquery',
-                  ];
-                  return largeModules.some(m => resource && resource.includes(m));
-                },
-                priority: 20,
-              },
-            },
-          },
-        },
-      });
-    }
     // add copyright banner
     memo.plugin('banner').use(webpack.BannerPlugin, [
       {
@@ -134,7 +94,6 @@ export default defineConfig({
         return args;
       });
     }
-    // return memo;
     // console.log('webpack config: \n', memo.toString())
   },
 });

@@ -2,5 +2,4 @@ node_modules
 logs
 *.out
 *.log
-dist
 mock
