@@ -11,15 +11,14 @@
  */
 import React from 'react';
 import { RunTimeLayoutConfig } from '@umijs/max';
-import { setAutoFreeze } from 'immer';
-import { IS_PROD } from './utils/constants';
-import { getDvaApp, setCreateHistoryOptions, useSelector, getS } from 'umi';
+import { Typography, Modal } from 'antd';
+import { history } from '@umijs/max';
 import logo from '@/assets/img/logo.png';
 import theme from '../config/theme';
+import { initUnifiedLinkHistory } from '@tenx-ui/utils/es/UnifiedLink';
+import utils from './utils';
 
-// 默认禁用冻结对象
-setAutoFreeze(false);
-
+// const IS_PROD = process.env.NODE_ENV === 'production';
 const qiankunState = Object.create({
   slave: {},
 });
@@ -28,33 +27,21 @@ export const modifyContextOpts = {
   historyOpts: {},
 };
 
-// 自定义 dva 配置
-let alertHasBeenDisplayed = false;
-export const dva = {
-  config: {
-    initialState: {
-      app: undefined,
-    },
-    // handle global error here
-    onError(e) {
-      // 必须有 onError 这个配置，否则无法捕获 dispatch 中的报错
-    },
-  },
-  plugins: [
-    //
-  ],
-};
-
 const Title = ({ icon }: any) => {
-  const store: any = useSelector((store: any) => store);
-  const { app } = store;
+  const authData = utils.getAuthData();
+  const userName = authData?.user?.name || 'N/A';
   if (icon) {
-    return <div style={{ lineHeight: '30px' }}>{app?.user?.userName?.split('')?.[0]}</div>;
+    return <div style={{ lineHeight: '30px' }}>{userName.split('')?.[0]}</div>;
   }
-  return <div>{app?.user?.userName}</div>;
+  return <div>{userName}</div>;
 };
 
 export const layout: RunTimeLayoutConfig = () => {
+  initUnifiedLinkHistory({
+    goBack: history.back,
+    ...history,
+  });
+
   return {
     title: 'devops-manager-portal',
     logo: <img src={logo} />,
@@ -64,16 +51,37 @@ export const layout: RunTimeLayoutConfig = () => {
       icon: <Title icon />,
       size: 'default',
     },
+    actionsRender: () => {
+      return [
+        <Typography.Link
+          key="logout"
+          onClick={() => {
+            utils.removeAuthData();
+            Modal.info({
+              title: '退出成功',
+              content: '点击确定重新登录',
+              okText: '确定',
+              onOk: () => window.location.reload(),
+            });
+          }}
+        >
+          退出
+        </Typography.Link>,
+      ];
+    },
     headerRender: (_, HeaderView) => {
-      return !IS_PROD ? HeaderView : null;
+      // return !IS_PROD ? HeaderView : null;
+      return HeaderView;
     },
     menuRender: (_, menuView) => {
-      return !IS_PROD ? menuView : null;
+      // return !IS_PROD ? menuView : null;
+      return menuView;
     },
     menuHeaderRender: (logo: React.ReactNode) => {
       return null;
     },
-    layout: !IS_PROD ? 'mix' : 'side',
+    // layout: !IS_PROD ? 'mix' : 'side',
+    layout: 'mix',
     headerTitleRender: () => {
       return <img style={{ height: '32px' }} src={logo} />;
     },
@@ -91,7 +99,7 @@ export const layout: RunTimeLayoutConfig = () => {
     headerTheme: 'dark',
     settings: {
       navTheme: 'dark',
-      primaryColor: theme['@primary-color'],
+      primaryColor: theme?.token?.colorPrimary,
     },
     footerRender: () => {
       return null;

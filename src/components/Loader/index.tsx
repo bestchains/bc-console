@@ -9,10 +9,17 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import './index.less';
 
-const Loader = ({ spinning, fullScreen, text }) => {
+export interface LoaderProps {
+  spinning?: boolean;
+  fullScreen?: boolean;
+  text?: string;
+}
+
+const Loader: React.FC<LoaderProps> = props => {
+  const { spinning, fullScreen, text } = props;
   return (
     <div
       className={classNames('loader', {

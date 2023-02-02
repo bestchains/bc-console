@@ -1,0 +1,64 @@
+@ant-collapse-header-color: rgba(0, 0, 0, 0.7);
+
+.tenx-notification {
+  max-width: 520px;
+  min-width: 360px;
+  width: auto;
+  .@{ant-prefix}-notification-notice-message {
+    font-weight: 500;
+  }
+  .@{ant-prefix}-notification-notice-description {
+    max-height: ~'calc(100vh - 160px)';
+    overflow: auto;
+  }
+  &-collapse {
+    &-expand-icon {
+      font-size: 14px !important;
+    }
+    &.@{ant-prefix}-collapse > .@{ant-prefix}-collapse-item {
+      & > .@{ant-prefix}-collapse-header {
+        padding: 6px 16px 6px 24px;
+        & > span {
+          color: @ant-collapse-header-color;
+        }
+        &:hover {
+          .tenx-notification-collapse-expand-icon {
+            color: #4461eb;
+          }
+        }
+        .@{ant-prefix}-collapse-arrow {
+          line-height: 0;
+          text-align: center;
+          text-transform: none;
+          vertical-align: -0.125em;
+          text-rendering: optimizeLegibility;
+          position: absolute;
+          top: 3.429px;
+          display: inline-block;
+          padding: 6px 0;
+          left: 0;
+        }
+        & > .@{ant-prefix}-collapse-header-text {
+          width: 100%;
+        }
+      }
+      & > .@{ant-prefix}-collapse-content > .@{ant-prefix}-collapse-content-box {
+        padding: 0;
+      }
+    }
+    &-content-p {
+      position: relative;
+      & > pre {
+        padding-right: 24px;
+        margin: 0;
+        height: 166px;
+      }
+      & > .@{ant-prefix}-typography-copy {
+        position: absolute;
+        right: 16px;
+        bottom: 8px;
+        font-size: 14px;
+      }
+    }
+  }
+}
