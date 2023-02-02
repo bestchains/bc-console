@@ -17,6 +17,24 @@ import logo from '@/assets/img/logo.png';
 import theme from '../config/theme';
 import { initUnifiedLinkHistory } from '@tenx-ui/utils/es/UnifiedLink';
 import utils from './utils';
+import { getLocale, setLocale } from './i18n';
+import { Tooltip } from 'antd';
+import { GlobalOutlined } from '@ant-design/icons';
+
+const LOCALE_MAP = {
+  'en-US': {
+    key: 'en-US', // 低代码编译器
+    tooltip: '切换为中文',
+    change: 'zh-CN',
+  },
+  'zh-CN': {
+    key: 'zh-CN',
+    tooltip: 'Chang to English',
+    change: 'en-US',
+  },
+};
+const locale = getLocale();
+const langInfo = LOCALE_MAP[locale];
 
 // const IS_PROD = process.env.NODE_ENV === 'production';
 const qiankunState = Object.create({
@@ -67,6 +85,14 @@ export const layout: RunTimeLayoutConfig = () => {
         >
           退出
         </Typography.Link>,
+        <Tooltip key="locale" title={langInfo.tooltip}>
+          <GlobalOutlined
+            onClick={() => {
+              setLocale(langInfo.change);
+              window.location.reload();
+            }}
+          />
+        </Tooltip>,
       ];
     },
     headerRender: (_, HeaderView) => {
