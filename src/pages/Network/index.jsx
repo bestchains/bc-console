@@ -214,7 +214,11 @@ class Network$$Page extends React.Component {
     return (
       <Page>
         <Row __component_name="Row" wrap={true}>
-          <Col __component_name="Col" span={24}>
+          <Col
+            __component_name="Col"
+            span={24}
+            style={{ paddingBottom: "12px" }}
+          >
             <Typography.Title
               __component_name="Typography.Title"
               bold={true}
@@ -434,13 +438,7 @@ class Network$$Page extends React.Component {
               gridEnable={true}
               itemLayout="horizontal"
               loading={__$$eval(() => this.props.useGetNetworks?.loading)}
-              pagination={{
-                position: "top",
-                showQuickJumper: false,
-                showSizeChanger: false,
-                simple: false,
-                size: "default",
-              }}
+              pagination={false}
               renderItem={(item) =>
                 ((__$$context) => (
                   <List.Item __component_name="List.Item">

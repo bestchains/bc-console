@@ -254,6 +254,12 @@ class FederationDetail$$Page extends React.Component {
     });
   }
 
+  paginationShowTotal(total, range) {
+    return `${this.i18n("i18n-5xl7aihzcuy")} ${total} ${this.i18n(
+      "i18n-v7xu122b9o"
+    )}`;
+  }
+
   componentDidMount() {
     const getOrganizations = async () => {
       var _res$organizations;
@@ -283,7 +289,11 @@ class FederationDetail$$Page extends React.Component {
         style={{ height: "100%" }}
       >
         <Row __component_name="Row" wrap={true}>
-          <Col __component_name="Col" span={24}>
+          <Col
+            __component_name="Col"
+            span={24}
+            style={{ paddingBottom: "12px" }}
+          >
             <Button.Back
               __component_name="Button.Back"
               title={this._i18nText({
@@ -886,6 +896,14 @@ class FederationDetail$$Page extends React.Component {
                                 pageSize: __$$eval(() => this.state.userSize),
                                 showQuickJumper: false,
                                 showSizeChanger: false,
+                                showTotal: function () {
+                                  return this.paginationShowTotal.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([])
+                                  );
+                                }.bind(this),
                                 simple: false,
                                 size: "default",
                                 total: __$$eval(
@@ -900,6 +918,7 @@ class FederationDetail$$Page extends React.Component {
                               scroll={{ scrollToFirstRowOnChange: true }}
                               showHeader={true}
                               size="default"
+                              style={{ marginTop: "-10px" }}
                             />
                           </Col>
                         </Row>
@@ -914,6 +933,7 @@ class FederationDetail$$Page extends React.Component {
                   },
                 ]}
                 size="large"
+                style={{ marginTop: "-20px" }}
                 tabPosition="top"
                 type="line"
               />
@@ -1245,6 +1265,12 @@ class FederationDetail$$Page extends React.Component {
                   pageSize: __$$eval(() => this.state.size),
                   showQuickJumper: false,
                   showSizeChanger: false,
+                  showTotal: function () {
+                    return this.paginationShowTotal.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                   simple: false,
                   size: "default",
                   total: __$$eval(
@@ -1276,6 +1302,7 @@ class FederationDetail$$Page extends React.Component {
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
                 size="default"
+                style={{ marginTop: "-20px" }}
               />
             </Card>
           </Col>
