@@ -192,6 +192,12 @@ class ProposalDetail$$Page extends React.Component {
     });
   }
 
+  paginationShowTotal(total, range) {
+    return `${this.i18n("i18n-5xl7aihzcuy")} ${total} ${this.i18n(
+      "i18n-v7xu122b9o"
+    )}`;
+  }
+
   componentDidMount() {}
 
   render() {
@@ -203,7 +209,11 @@ class ProposalDetail$$Page extends React.Component {
         style={{ height: "100%" }}
       >
         <Row __component_name="Row" wrap={true}>
-          <Col __component_name="Col" span={24}>
+          <Col
+            __component_name="Col"
+            span={24}
+            style={{ paddingBottom: "12px" }}
+          >
             <Button.Back
               __component_name="Button.Back"
               title={this._i18nText({
@@ -273,6 +283,20 @@ class ProposalDetail$$Page extends React.Component {
                       "en-US": "Proposal type",
                       key: "i18n-6bj0f7fay8",
                       "zh-CN": "提议类型",
+                    }),
+                    span: 1,
+                  },
+                  {
+                    children: __$$eval(
+                      () =>
+                        this.props.useGetProposal?.data?.proposal?.federation ||
+                        "-"
+                    ),
+                    key: "fh1j44o9bpr",
+                    label: this._i18nText({
+                      "en-US": "Related federation",
+                      key: "i18n-h05l2cens9w",
+                      "zh-CN": "相关联盟",
                     }),
                     span: 1,
                   },
@@ -396,13 +420,21 @@ class ProposalDetail$$Page extends React.Component {
                     }),
                     span: 1,
                   },
+                  {
+                    _unsafe_MixedSetter_children_select: "SlotSetter",
+                    children: null,
+                    key: "h44w5btrr16",
+                    label: this._i18nText({
+                      "en-US": "content",
+                      key: "i18n-pair5ijzb3j",
+                      "zh-CN": "内容",
+                    }),
+                    span: 1,
+                  },
                 ]}
                 labelStyle={{ width: 100 }}
                 layout="horizontal"
                 size="default"
-                title={__$$eval(
-                  () => this.props.useGetProposal?.data?.proposal?.name
-                )}
               >
                 <Descriptions.Item
                   __component_name="Descriptions.Item"
@@ -454,6 +486,22 @@ class ProposalDetail$$Page extends React.Component {
                           item.value ===
                           this.props.useGetProposal?.data?.proposal?.type
                       )?.text || "-"
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  __component_name="Descriptions.Item"
+                  key="fh1j44o9bpr"
+                  label={this._i18nText({
+                    "en-US": "Related federation",
+                    key: "i18n-h05l2cens9w",
+                    "zh-CN": "相关联盟",
+                  })}
+                  span={1}
+                >
+                  {__$$eval(
+                    () =>
+                      this.props.useGetProposal?.data?.proposal?.federation ||
+                      "-"
                   )}
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -579,6 +627,33 @@ class ProposalDetail$$Page extends React.Component {
                         },
                       ]}
                     />
+                  }
+                </Descriptions.Item>
+                <Descriptions.Item
+                  __component_name="Descriptions.Item"
+                  key="h44w5btrr16"
+                  label={this._i18nText({
+                    "en-US": "content",
+                    key: "i18n-pair5ijzb3j",
+                    "zh-CN": "内容",
+                  })}
+                  span={1}
+                >
+                  {
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: "" }}
+                    >
+                      {__$$eval(() =>
+                        JSON.stringify(
+                          this.props.useGetProposal?.data?.proposal
+                            ?.information || {}
+                        )
+                      )}
+                    </Typography.Text>
                   }
                 </Descriptions.Item>
               </Descriptions>
@@ -1024,6 +1099,12 @@ class ProposalDetail$$Page extends React.Component {
                   pageSize: __$$eval(() => this.state.size),
                   showQuickJumper: false,
                   showSizeChanger: false,
+                  showTotal: function () {
+                    return this.paginationShowTotal.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                   simple: false,
                   size: "default",
                   total: __$$eval(
@@ -1052,10 +1133,11 @@ class ProposalDetail$$Page extends React.Component {
                       ).length
                   ),
                 }}
-                rowKey="voteTime"
+                rowKey="name"
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
                 size="default"
+                style={{ marginTop: "-20px" }}
               />
             </Card>
           </Col>
