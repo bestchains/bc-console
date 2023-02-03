@@ -40,7 +40,7 @@ const routes = [
         component: '@/pages/Network',
       },
       {
-        name: '网络管理-创建网络',
+        // name: '网络管理-创建网络',
         path: '/network/create',
         component: '@/pages/NetworkCreate',
       },

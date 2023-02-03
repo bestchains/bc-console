@@ -13,7 +13,7 @@ import React from 'react';
 import { RunTimeLayoutConfig } from '@umijs/max';
 import { Typography, Modal } from 'antd';
 import { history } from '@umijs/max';
-import logo from '@/assets/img/logo.png';
+import logo from '@/assets/img/logo-title-white.png';
 import theme from '../config/theme';
 import { initUnifiedLinkHistory } from '@tenx-ui/utils/es/UnifiedLink';
 import utils from './utils';
@@ -49,9 +49,9 @@ const Title = ({ icon }: any) => {
   const authData = utils.getAuthData();
   const userName = authData?.user?.name || 'N/A';
   if (icon) {
-    return <div style={{ lineHeight: '30px' }}>{userName.split('')?.[0]}</div>;
+    return <div style={{ lineHeight: '28px' }}>{userName.split('')?.[0]}</div>;
   }
-  return <div>{userName}</div>;
+  return <div style={{ color: '#fff' }}>{userName}</div>;
 };
 
 export const layout: RunTimeLayoutConfig = () => {
@@ -61,8 +61,11 @@ export const layout: RunTimeLayoutConfig = () => {
   });
 
   return {
-    title: 'devops-manager-portal',
-    logo: <img src={logo} />,
+    title: false,
+    logo: <img alt="logo" src={logo} style={{ height: '36px' }} />,
+    siderWidth: 200,
+    fixedHeader: true,
+    fixSiderbar: true,
     rightContentRender: false, // umi !!!
     avatarProps: {
       title: <Title />,
@@ -87,6 +90,7 @@ export const layout: RunTimeLayoutConfig = () => {
         </Typography.Link>,
         <Tooltip key="locale" title={langInfo.tooltip}>
           <GlobalOutlined
+            style={{ color: '#fff' }}
             onClick={() => {
               setLocale(langInfo.change);
               window.location.reload();
@@ -95,22 +99,9 @@ export const layout: RunTimeLayoutConfig = () => {
         </Tooltip>,
       ];
     },
-    headerRender: (_, HeaderView) => {
-      // return !IS_PROD ? HeaderView : null;
-      return HeaderView;
-    },
-    menuRender: (_, menuView) => {
-      // return !IS_PROD ? menuView : null;
-      return menuView;
-    },
-    menuHeaderRender: (logo: React.ReactNode) => {
-      return null;
-    },
+    menuHeaderRender: false,
     // layout: !IS_PROD ? 'mix' : 'side',
     layout: 'mix',
-    headerTitleRender: () => {
-      return <img style={{ height: '32px' }} src={logo} />;
-    },
     menu: {
       flatMenu: true,
       hideMenuWhenCollapsed: true,
@@ -121,17 +112,26 @@ export const layout: RunTimeLayoutConfig = () => {
       type: 'group', // 'sub' | 'group';
       autoClose: false,
     },
-    navTheme: 'dark',
-    headerTheme: 'dark',
     settings: {
-      navTheme: 'dark',
-      primaryColor: theme?.token?.colorPrimary,
+      //
     },
-    footerRender: () => {
-      return null;
-    },
-    menuProps: {
-      // theme: 'dark',
+    footerRender: false,
+    token: {
+      colorPrimary: theme.token.colorPrimary,
+      bgLayout: '#ffffff',
+      header: {
+        colorBgHeader: '#272a32',
+        colorHeaderTitle: '#fff',
+        colorTextMenu: '#fff',
+      },
+      sider: {
+        // #ffffff
+      },
+      pageContainer: {
+        colorBgPageContainer: '#f6f6f6',
+        paddingInlinePageContainerContent: 0,
+        paddingBlockPageContainerContent: 0,
+      },
     },
     // 其他属性见：https://procomponents.ant.design/components/layout#prolayout
   };
