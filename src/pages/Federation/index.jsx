@@ -253,6 +253,12 @@ class Federation$$Page extends React.Component {
     });
   }
 
+  paginationShowTotal(total, range) {
+    return `${this.i18n("i18n-5xl7aihzcuy")} ${total} ${this.i18n(
+      "i18n-v7xu122b9o"
+    )}`;
+  }
+
   componentDidMount() {
     const getOrganizations = async () => {
       var _res$organizations;
@@ -351,7 +357,7 @@ class Federation$$Page extends React.Component {
             componentProps={{
               colon: false,
               labelAlign: "left",
-              labelCol: 5,
+              labelCol: 7,
               layout: "horizontal",
               wrapperCol: 19,
             }}
@@ -387,7 +393,7 @@ class Federation$$Page extends React.Component {
                     message:
                       "大小写字母, 数字, 中划线组成，开头和结尾只能是字母或数字",
                     pattern:
-                      "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+                      "^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?)*$",
                   },
                 ],
               }}
@@ -563,7 +569,7 @@ class Federation$$Page extends React.Component {
                 "x-validator": [
                   {
                     message: "联盟描述由 0 ~ 200 字符组成",
-                    pattern: "^[\\w]{0,200}$",
+                    pattern: "^.{0,200}$",
                   },
                 ],
               }}
@@ -648,7 +654,11 @@ class Federation$$Page extends React.Component {
           />
         </Modal>
         <Row __component_name="Row" wrap={true}>
-          <Col __component_name="Col" span={24}>
+          <Col
+            __component_name="Col"
+            span={24}
+            style={{ paddingBottom: "12px" }}
+          >
             <Typography.Title
               __component_name="Typography.Title"
               bold={true}
@@ -718,7 +728,7 @@ class Federation$$Page extends React.Component {
                   __component_name="Space"
                   align="center"
                   direction="horizontal"
-                  size="large"
+                  size={34}
                 >
                   <Space
                     __component_name="Space"
@@ -1345,6 +1355,12 @@ class Federation$$Page extends React.Component {
                   pageSize: __$$eval(() => this.state.size),
                   showQuickJumper: false,
                   showSizeChanger: false,
+                  showTotal: function () {
+                    return this.paginationShowTotal.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                   simple: false,
                   size: "default",
                   total: __$$eval(
@@ -1384,6 +1400,7 @@ class Federation$$Page extends React.Component {
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
                 size="default"
+                style={{ marginTop: "-20px" }}
               />
             </Card>
           </Col>

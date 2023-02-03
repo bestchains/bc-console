@@ -161,7 +161,11 @@ class NetworkCreate$$Page extends React.Component {
     return (
       <Page>
         <Row __component_name="Row" wrap={true}>
-          <Col __component_name="Col" span={24}>
+          <Col
+            __component_name="Col"
+            span={24}
+            style={{ paddingBottom: "12px" }}
+          >
             <Typography.Title
               __component_name="Typography.Title"
               bold={true}
@@ -584,108 +588,7 @@ class NetworkCreate$$Page extends React.Component {
                       }}
                     />
                   </Col>
-                  <Col __component_name="Col" span={24}>
-                    <Divider
-                      __component_name="Divider"
-                      content={[
-                        <FormilyRadio
-                          __component_name="FormilyRadio"
-                          componentProps={{
-                            "x-component-props": {
-                              buttonStyle: "outline",
-                              disabled: false,
-                              optionType: "button",
-                              size: "middle",
-                            },
-                          }}
-                          fieldProps={{
-                            _unsafe_MixedSetter_default_select: "StringSetter",
-                            default: "1m",
-                            enum: [
-                              {
-                                label: this._i18nText({
-                                  "en-US": "1 month",
-                                  key: "i18n-trhw8lpkemh",
-                                  "zh-CN": "1个月",
-                                }),
-                                value: "1m",
-                              },
-                              {
-                                label: this._i18nText({
-                                  "en-US": "3 month",
-                                  key: "i18n-lie8dycfnu",
-                                  "zh-CN": "3个月",
-                                }),
-                                value: "3",
-                              },
-                              {
-                                children: "未知",
-                                icon: "tenx-ui-icon:Circle",
-                                id: "disabled",
-                                label: this._i18nText({
-                                  "en-US": "6 month",
-                                  key: "i18n-67illnj3hic",
-                                  "zh-CN": "6个月",
-                                }),
-                                type: "disabled",
-                                value: "6",
-                              },
-                              {
-                                children: "未知",
-                                icon: "tenx-ui-icon:Circle",
-                                id: "disabled",
-                                label: this._i18nText({
-                                  "en-US": "1 year",
-                                  key: "i18n-uq1hm9mlcqd",
-                                  "zh-CN": "1年",
-                                }),
-                                type: "disabled",
-                                value: "12",
-                              },
-                              {
-                                children: "未知",
-                                icon: "tenx-ui-icon:Circle",
-                                id: "disabled",
-                                label: this._i18nText({
-                                  "en-US": "2 year",
-                                  key: "i18n-jmam3xzi5le",
-                                  "zh-CN": "2年",
-                                }),
-                                type: "disabled",
-                                value: "24",
-                              },
-                              {
-                                children: "未知",
-                                icon: "tenx-ui-icon:Circle",
-                                id: "disabled",
-                                label: this._i18nText({
-                                  "en-US": "more",
-                                  key: "i18n-2b4dhrz51wu",
-                                  "zh-CN": "更多",
-                                }),
-                                type: "disabled",
-                                value: "more",
-                              },
-                            ],
-                            name: "sc",
-                            title: this._i18nText({
-                              "en-US": "duration",
-                              key: "i18n-g2ktwfqaf0g",
-                              "zh-CN": "时长",
-                            }),
-                            "x-validator": [],
-                          }}
-                        />,
-                      ]}
-                      dashed={true}
-                      defaultOpen={true}
-                      mode="expanded"
-                      orientation="left"
-                      orientationMargin={0}
-                    >
-                      高级配置
-                    </Divider>
-                  </Col>
+                  <Col __component_name="Col" span={24} />
                 </Row>
               </FormilyForm>
               <Divider

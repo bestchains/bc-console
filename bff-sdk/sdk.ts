@@ -1,9 +1,9 @@
 import { GraphQLClient } from 'graphql-request';
+import { ClientError } from 'graphql-request/dist/types';
 import * as Dom from 'graphql-request/dist/types.dom';
 import gql from 'graphql-tag';
-import { ClientError } from 'graphql-request/dist/types';
+import { Key as SWRKeyInterface, SWRConfiguration as SWRConfigInterface } from 'swr';
 import useSWR from './useSWR';
-import { SWRConfiguration as SWRConfigInterface, Key as SWRKeyInterface } from 'swr';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -22,6 +22,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  JSON: any;
+  JSONObject: any;
 };
 
 /** 联盟 */
@@ -49,6 +51,8 @@ export type Federation = {
 
 /** 「联盟」状态 */
 export enum FederationStatus {
+  /** 失败 */
+  Error = 'Error',
   /** 已激活 */
   FederationActivated = 'FederationActivated',
   /** 已解散 */
@@ -255,6 +259,10 @@ export type Proposal = {
   creationTimestamp: Scalars['String'];
   /** 截止时间 */
   endAt?: Maybe<Scalars['String']>;
+  /** 相关联盟 */
+  federation?: Maybe<Scalars['String']>;
+  /** 相关内容 */
+  information?: Maybe<Scalars['JSONObject']>;
   /** 发起者 */
   initiator?: Maybe<Organization>;
   /** name */
@@ -775,6 +783,7 @@ export type GetProposalsQuery = {
     policy?: ProposalPolicy | null;
     status?: ProposalStatus | null;
     voted?: VotePhase | null;
+    federation?: string | null;
     initiator?: {
       __typename?: 'Organization';
       name: string;
@@ -809,6 +818,8 @@ export type GetProposalQuery = {
     policy?: ProposalPolicy | null;
     status?: ProposalStatus | null;
     voted?: VotePhase | null;
+    federation?: string | null;
+    information?: any | null;
     initiator?: {
       __typename?: 'Organization';
       name: string;
@@ -1095,6 +1106,7 @@ export const GetProposalsDocument = gql`
       policy
       status
       voted
+      federation
       initiator {
         name
         admin
@@ -1122,6 +1134,8 @@ export const GetProposalDocument = gql`
       policy
       status
       voted
+      federation
+      information
       initiator {
         name
         admin
