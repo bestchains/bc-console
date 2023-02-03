@@ -37,13 +37,13 @@ const locale = getLocale();
 const langInfo = LOCALE_MAP[locale];
 
 // const IS_PROD = process.env.NODE_ENV === 'production';
-const qiankunState = Object.create({
-  slave: {},
-});
+// const qiankunState = Object.create({
+//   slave: {},
+// });
 
-export const modifyContextOpts = {
-  historyOpts: {},
-};
+// export const modifyContextOpts = {
+//   historyOpts: {},
+// };
 
 const Title = ({ icon }: any) => {
   const authData = utils.getAuthData();
