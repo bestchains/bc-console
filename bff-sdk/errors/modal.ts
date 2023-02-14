@@ -4,7 +4,7 @@ import { removeAuthData } from '../constants';
 
 export const logout = () => {
   removeAuthData();
-  window.location.href = '/';
+  window.location.reload();
 };
 
 let InvalidTokenModal:
