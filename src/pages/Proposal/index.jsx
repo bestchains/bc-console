@@ -657,12 +657,7 @@ class Proposal$$Page extends React.Component {
                           return true;
                         }
                         if (this.state.filter === "voted") {
-                          return votes.some(
-                            (vote) =>
-                              vote.organizationAdmin ===
-                                this.props.authData?.user?.name &&
-                              vote.status === "Voting"
-                          );
+                          return item.voted === "NotVoted";
                         }
                         return (
                           this.props.authData?.user?.name ===

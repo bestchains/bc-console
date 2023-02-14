@@ -386,12 +386,21 @@ class Federation$$Page extends React.Component {
                 }),
                 "x-validator": [
                   {
-                    message: "字符长度为 3 ~ 20",
+                    message: this._i18nText({
+                      "en-US": "The value contains 3 to 20 characters",
+                      key: "i18n-wprl86g5wy",
+                      "zh-CN": "字符长度为 3 ~ 20",
+                    }),
                     pattern: "^[a-zA-Z0-9-\\u4e00-\\u9fa5]{3,20}$",
                   },
                   {
-                    message:
-                      "大小写字母, 数字, 中划线组成，开头和结尾只能是字母或数字",
+                    message: this._i18nText({
+                      "en-US":
+                        "It consists of uppercase and lowercase letters, numbers, and hyphens. The beginning and end can only be a letter or number",
+                      key: "i18n-neccml35hvq",
+                      "zh-CN":
+                        "大小写字母, 数字, 中划线组成，开头和结尾只能是字母或数字",
+                    }),
                     pattern:
                       "^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?)*$",
                   },
@@ -568,7 +577,12 @@ class Federation$$Page extends React.Component {
                 "x-component": "Input.TextArea",
                 "x-validator": [
                   {
-                    message: "联盟描述由 0 ~ 200 字符组成",
+                    message: this._i18nText({
+                      "en-US":
+                        "The association description consists of 0 to 200 characters",
+                      key: "i18n-xr251ak8b2",
+                      "zh-CN": "联盟描述由 0 ~ 200 字符组成",
+                    }),
                     pattern: "^.{0,200}$",
                   },
                 ],
@@ -1139,6 +1153,16 @@ class Federation$$Page extends React.Component {
                               }),
                               icon: "CloseCircleFilled",
                               id: "FederationDissolved",
+                              type: "error",
+                            },
+                            {
+                              children: this._i18nText({
+                                "en-US": "Error",
+                                key: "i18n-xtno2l9qqog",
+                                "zh-CN": "异常",
+                              }),
+                              icon: "CloseCircleFilled",
+                              id: "Error",
                               type: "error",
                             },
                           ]}

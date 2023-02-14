@@ -259,6 +259,7 @@ class NetworkDetail$$Page extends React.Component {
               title={this._i18nText({
                 "en-US": "Network details",
                 key: "i18n-hpj9pfyfpq",
+                use: "en-US",
                 "zh-CN": "网络详情",
               })}
               type="simple"
@@ -302,6 +303,7 @@ class NetworkDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "creator",
                                 key: "i18n-yyexdt18ora",
+                                use: "en-US",
                                 "zh-CN": "创建人",
                               }),
                               span: 1,
@@ -326,6 +328,7 @@ class NetworkDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "Number of members",
                                 key: "i18n-4btnh7pqt1m",
+                                use: "en-US",
                                 "zh-CN": "成员个数",
                               }),
                               span: 1,
@@ -347,6 +350,7 @@ class NetworkDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "create time",
                                 key: "i18n-9ox4rx1wtwv",
+                                use: "en-US",
                                 "zh-CN": "创建时间",
                               }),
                               span: 1,
@@ -368,6 +372,7 @@ class NetworkDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "Update time",
                                 key: "i18n-watjije0jk",
+                                use: "en-US",
                                 "zh-CN": "更新时间",
                               }),
                               span: 1,
@@ -382,6 +387,7 @@ class NetworkDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "Version",
                                 key: "i18n-hbf63hki898",
+                                use: "en-US",
                                 "zh-CN": "版本",
                               }),
                               span: 1,
@@ -400,6 +406,7 @@ class NetworkDetail$$Page extends React.Component {
                                       label: this._i18nText({
                                         "en-US": "Consensus algorithm",
                                         key: "i18n-twykcar3l6l",
+                                        use: "en-US",
                                         "zh-CN": "共识算法",
                                       }),
                                       span: 1,
@@ -410,6 +417,7 @@ class NetworkDetail$$Page extends React.Component {
                                       label: this._i18nText({
                                         "en-US": "Cluster size",
                                         key: "i18n-ax4swl3ryv7",
+                                        use: "en-US",
                                         "zh-CN": "集群大小",
                                       }),
                                       span: 1,
@@ -420,6 +428,7 @@ class NetworkDetail$$Page extends React.Component {
                                       label: this._i18nText({
                                         "en-US": "Node database",
                                         key: "i18n-kqc5q3s99wo",
+                                        use: "en-US",
                                         "zh-CN": "节点数据库",
                                       }),
                                       span: 1,
@@ -436,6 +445,7 @@ class NetworkDetail$$Page extends React.Component {
                                     label={this._i18nText({
                                       "en-US": "Consensus algorithm",
                                       key: "i18n-twykcar3l6l",
+                                      use: "en-US",
                                       "zh-CN": "共识算法",
                                     })}
                                     span={1}
@@ -448,6 +458,7 @@ class NetworkDetail$$Page extends React.Component {
                                     label={this._i18nText({
                                       "en-US": "Cluster size",
                                       key: "i18n-ax4swl3ryv7",
+                                      use: "en-US",
                                       "zh-CN": "集群大小",
                                     })}
                                     span={1}
@@ -460,6 +471,7 @@ class NetworkDetail$$Page extends React.Component {
                                     label={this._i18nText({
                                       "en-US": "Node database",
                                       key: "i18n-kqc5q3s99wo",
+                                      use: "en-US",
                                       "zh-CN": "节点数据库",
                                     })}
                                     span={1}
@@ -472,6 +484,7 @@ class NetworkDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "Consensus component",
                                 key: "i18n-xgyxfdl8q",
+                                use: "en-US",
                                 "zh-CN": "共识组件",
                               }),
                               span: 1,
@@ -490,6 +503,7 @@ class NetworkDetail$$Page extends React.Component {
                                       children: this._i18nText({
                                         "en-US": "NetworkCreated",
                                         key: "i18n-zrowlr7zwx",
+                                        use: "en-US",
                                         "zh-CN": "运行中",
                                       }),
                                       icon: "CheckCircleFilled",
@@ -500,6 +514,7 @@ class NetworkDetail$$Page extends React.Component {
                                       children: this._i18nText({
                                         "en-US": "NetworkDissolved",
                                         key: "i18n-j3czm9su41",
+                                        use: "en-US",
                                         "zh-CN": "已解散",
                                       }),
                                       icon: "CloseCircleFilled",
@@ -510,6 +525,7 @@ class NetworkDetail$$Page extends React.Component {
                                       children: this._i18nText({
                                         "en-US": "Error",
                                         key: "i18n-xtno2l9qqog",
+                                        use: "en-US",
                                         "zh-CN": "异常",
                                       }),
                                       icon: "CloseCircleFilled",
@@ -523,6 +539,7 @@ class NetworkDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "status",
                                 key: "i18n-bik6xl952y6",
+                                use: "en-US",
                                 "zh-CN": "状态",
                               }),
                               span: 1,
@@ -541,6 +558,7 @@ class NetworkDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "creator",
                               key: "i18n-yyexdt18ora",
+                              use: "en-US",
                               "zh-CN": "创建人",
                             })}
                             span={1}
@@ -558,6 +576,7 @@ class NetworkDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "Number of members",
                               key: "i18n-4btnh7pqt1m",
+                              use: "en-US",
                               "zh-CN": "成员个数",
                             })}
                             span={1}
@@ -585,6 +604,7 @@ class NetworkDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "create time",
                               key: "i18n-9ox4rx1wtwv",
+                              use: "en-US",
                               "zh-CN": "创建时间",
                             })}
                             span={1}
@@ -608,6 +628,7 @@ class NetworkDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "Update time",
                               key: "i18n-watjije0jk",
+                              use: "en-US",
                               "zh-CN": "更新时间",
                             })}
                             span={1}
@@ -620,7 +641,7 @@ class NetworkDetail$$Page extends React.Component {
                                 time={__$$eval(
                                   () =>
                                     this.props.useGetNetwork?.data?.network
-                                      ?.joinedAt
+                                      ?.lastHeartbeatTime
                                 )}
                               />
                             }
@@ -631,6 +652,7 @@ class NetworkDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "Version",
                               key: "i18n-hbf63hki898",
+                              use: "en-US",
                               "zh-CN": "版本",
                             })}
                             span={1}
@@ -647,6 +669,7 @@ class NetworkDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "Consensus component",
                               key: "i18n-xgyxfdl8q",
+                              use: "en-US",
                               "zh-CN": "共识组件",
                             })}
                             span={1}
@@ -659,21 +682,33 @@ class NetworkDetail$$Page extends React.Component {
                                 column={1}
                                 items={[
                                   {
-                                    children: null,
+                                    children: __$$eval(
+                                      () =>
+                                        this.props.useGetNetwork?.data?.network
+                                          ?.ordererType
+                                    ),
                                     key: "ufknvxft0u",
                                     label: this._i18nText({
                                       "en-US": "Consensus algorithm",
                                       key: "i18n-twykcar3l6l",
+                                      use: "en-US",
                                       "zh-CN": "共识算法",
                                     }),
                                     span: 1,
                                   },
                                   {
-                                    children: null,
+                                    _unsafe_MixedSetter_children_select:
+                                      "VariableSetter",
+                                    children: __$$eval(
+                                      () =>
+                                        this.props.useGetNetwork?.data?.network
+                                          ?.clusterSize
+                                    ),
                                     key: "81dsq3cni9b",
                                     label: this._i18nText({
                                       "en-US": "Cluster size",
                                       key: "i18n-ax4swl3ryv7",
+                                      use: "en-US",
                                       "zh-CN": "集群大小",
                                     }),
                                     span: 1,
@@ -684,6 +719,7 @@ class NetworkDetail$$Page extends React.Component {
                                     label: this._i18nText({
                                       "en-US": "Node database",
                                       key: "i18n-kqc5q3s99wo",
+                                      use: "en-US",
                                       "zh-CN": "节点数据库",
                                     }),
                                     span: 1,
@@ -700,11 +736,16 @@ class NetworkDetail$$Page extends React.Component {
                                   label={this._i18nText({
                                     "en-US": "Consensus algorithm",
                                     key: "i18n-twykcar3l6l",
+                                    use: "en-US",
                                     "zh-CN": "共识算法",
                                   })}
                                   span={1}
                                 >
-                                  {null}
+                                  {__$$eval(
+                                    () =>
+                                      this.props.useGetNetwork?.data?.network
+                                        ?.ordererType
+                                  )}
                                 </Descriptions.Item>
                                 <Descriptions.Item
                                   __component_name="Descriptions.Item"
@@ -712,11 +753,16 @@ class NetworkDetail$$Page extends React.Component {
                                   label={this._i18nText({
                                     "en-US": "Cluster size",
                                     key: "i18n-ax4swl3ryv7",
+                                    use: "en-US",
                                     "zh-CN": "集群大小",
                                   })}
                                   span={1}
                                 >
-                                  {null}
+                                  {__$$eval(
+                                    () =>
+                                      this.props.useGetNetwork?.data?.network
+                                        ?.clusterSize
+                                  )}
                                 </Descriptions.Item>
                                 <Descriptions.Item
                                   __component_name="Descriptions.Item"
@@ -724,6 +770,7 @@ class NetworkDetail$$Page extends React.Component {
                                   label={this._i18nText({
                                     "en-US": "Node database",
                                     key: "i18n-kqc5q3s99wo",
+                                    use: "en-US",
                                     "zh-CN": "节点数据库",
                                   })}
                                   span={1}
@@ -739,6 +786,7 @@ class NetworkDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "status",
                               key: "i18n-bik6xl952y6",
+                              use: "en-US",
                               "zh-CN": "状态",
                             })}
                             span={1}
@@ -756,6 +804,7 @@ class NetworkDetail$$Page extends React.Component {
                                     children: this._i18nText({
                                       "en-US": "NetworkCreated",
                                       key: "i18n-zrowlr7zwx",
+                                      use: "en-US",
                                       "zh-CN": "运行中",
                                     }),
                                     icon: "CheckCircleFilled",
@@ -766,6 +815,7 @@ class NetworkDetail$$Page extends React.Component {
                                     children: this._i18nText({
                                       "en-US": "NetworkDissolved",
                                       key: "i18n-j3czm9su41",
+                                      use: "en-US",
                                       "zh-CN": "已解散",
                                     }),
                                     icon: "CloseCircleFilled",
@@ -776,11 +826,23 @@ class NetworkDetail$$Page extends React.Component {
                                     children: this._i18nText({
                                       "en-US": "Error",
                                       key: "i18n-xtno2l9qqog",
+                                      use: "en-US",
                                       "zh-CN": "异常",
                                     }),
                                     icon: "CloseCircleFilled",
                                     id: "Error",
                                     type: "error",
+                                  },
+                                  {
+                                    children: this._i18nText({
+                                      "en-US": "Created",
+                                      key: "i18n-1vangoko4yf",
+                                      use: "en-US",
+                                      "zh-CN": "正常",
+                                    }),
+                                    icon: "CheckCircleFilled",
+                                    id: "Created",
+                                    type: "success",
                                   },
                                 ]}
                               />
@@ -793,6 +855,7 @@ class NetworkDetail$$Page extends React.Component {
                     label: this._i18nText({
                       "en-US": "Network information",
                       key: "i18n-y0o0zplhhom",
+                      use: "en-US",
                       "zh-CN": "网络信息",
                     }),
                   },
@@ -864,6 +927,7 @@ class NetworkDetail$$Page extends React.Component {
                               title: this._i18nText({
                                 "en-US": "organization",
                                 key: "i18n-gmx7l7tolvj",
+                                use: "en-US",
                                 "zh-CN": "成员组织",
                               }),
                             },
@@ -882,6 +946,7 @@ class NetworkDetail$$Page extends React.Component {
                                     {this._i18nText({
                                       "en-US": "Real-name authentication",
                                       key: "i18n-1g6cw1w1uv4",
+                                      use: "en-US",
                                       "zh-CN": "实名认证",
                                     })}
                                   </Typography.Text>
@@ -895,6 +960,7 @@ class NetworkDetail$$Page extends React.Component {
                               title: this._i18nText({
                                 "en-US": "infomation",
                                 key: "i18n-th9ag1qgsu",
+                                use: "en-US",
                                 "zh-CN": "认证信息",
                               }),
                             },
@@ -904,6 +970,7 @@ class NetworkDetail$$Page extends React.Component {
                               title: this._i18nText({
                                 "en-US": "Number of added nodes",
                                 key: "i18n-rs16rywzo",
+                                use: "en-US",
                                 "zh-CN": "加入节点个数",
                               }),
                             },
@@ -927,6 +994,7 @@ class NetworkDetail$$Page extends React.Component {
                               title: this._i18nText({
                                 "en-US": "The last time a node was added",
                                 key: "i18n-iku70tej4ja",
+                                use: "en-US",
                                 "zh-CN": "节点最近加入时间",
                               }),
                             },
@@ -1001,6 +1069,7 @@ class NetworkDetail$$Page extends React.Component {
                     label: this._i18nText({
                       "en-US": "Network member",
                       key: "i18n-xinrdc2qk1f",
+                      use: "en-US",
                       "zh-CN": "网络成员",
                     }),
                   },
@@ -1060,6 +1129,7 @@ class NetworkDetail$$Page extends React.Component {
                   {this._i18nText({
                     "en-US": "New channel",
                     key: "i18n-snaon3b2fni",
+                    use: "en-US",
                     "zh-CN": "新建通道",
                   })}
                 </Button>
@@ -1141,6 +1211,7 @@ class NetworkDetail$$Page extends React.Component {
                     placeholder={this._i18nText({
                       "en-US": "Enter a channel name",
                       key: "i18n-ajsvl5v284r",
+                      use: "en-US",
                       "zh-CN": "输入通道名称查询",
                     })}
                   />
@@ -1218,6 +1289,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "Channel name",
                       key: "i18n-6oadzcxin7k",
+                      use: "en-US",
                       "zh-CN": "通道名称",
                     }),
                   },
@@ -1227,6 +1299,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "initiator",
                       key: "i18n-wctt13ld2x",
+                      use: "en-US",
                       "zh-CN": "发起者",
                     }),
                   },
@@ -1254,6 +1327,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "Relevant proposal",
                       key: "i18n-4idd49uxsod",
+                      use: "en-US",
                       "zh-CN": "相关提议",
                     }),
                   },
@@ -1263,6 +1337,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "Number of members",
                       key: "i18n-4btnh7pqt1m",
+                      use: "en-US",
                       "zh-CN": "成员个数",
                     }),
                   },
@@ -1287,6 +1362,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "create time",
                       key: "i18n-9ox4rx1wtwv",
+                      use: "en-US",
                       "zh-CN": "创建时间",
                     }),
                   },
@@ -1310,6 +1386,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "Number of nodes",
                       key: "i18n-kh6e0jr0i7b",
+                      use: "en-US",
                       "zh-CN": "节点数量",
                     }),
                   },
@@ -1319,6 +1396,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "status",
                       key: "i18n-bik6xl952y6",
+                      use: "en-US",
                       "zh-CN": "状态",
                     }),
                   },
@@ -1328,6 +1406,7 @@ class NetworkDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "operation",
                       key: "i18n-k5inn5jmnt9",
+                      use: "en-US",
                       "zh-CN": "操作",
                     }),
                   },
@@ -1483,6 +1562,7 @@ class NetworkDetail$$Page extends React.Component {
           title={this._i18nText({
             "en-US": "New channel",
             key: "i18n-snaon3b2fni",
+            use: "en-US",
             "zh-CN": "新建通道",
           })}
         >
@@ -1505,6 +1585,7 @@ class NetworkDetail$$Page extends React.Component {
                   placeholder: this._i18nText({
                     "en-US": "Please enter a channel name",
                     key: "i18n-ienrgm2j5p9",
+                    use: "en-US",
                     "zh-CN": "请输入通道名称",
                   }),
                 },
@@ -1515,11 +1596,19 @@ class NetworkDetail$$Page extends React.Component {
                 title: this._i18nText({
                   "en-US": "Channel name",
                   key: "i18n-6oadzcxin7k",
+                  use: "en-US",
                   "zh-CN": "通道名称",
                 }),
                 "x-validator": [
                   {
-                    message: "通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成",
+                    message: this._i18nText({
+                      "en-US":
+                        "The channel name contains 3 to 50 letters, digits, and underscores (_)",
+                      key: "i18n-0u5pwt0jtl4",
+                      use: "en-US",
+                      "zh-CN":
+                        "通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成",
+                    }),
                     pattern: "^[a-zA-Z0-9_]{3,10}$",
                     required: true,
                     whitespace: true,
@@ -1536,6 +1625,7 @@ class NetworkDetail$$Page extends React.Component {
                   placeholder: this._i18nText({
                     "en-US": "Select the initiator",
                     key: "i18n-nezb9wehqyh",
+                    use: "en-US",
                     "zh-CN": "请选择发起者",
                   }),
                 },
@@ -1546,6 +1636,7 @@ class NetworkDetail$$Page extends React.Component {
                 title: this._i18nText({
                   "en-US": "Set initiator",
                   key: "i18n-v6gmjbqnol",
+                  use: "en-US",
                   "zh-CN": "设置发起者",
                 }),
                 "x-validator": [],
@@ -1560,6 +1651,7 @@ class NetworkDetail$$Page extends React.Component {
                   placeholder: this._i18nText({
                     "en-US": "Please select a member",
                     key: "i18n-bko8c4ii1ad",
+                    use: "en-US",
                     "zh-CN": "请选择成员",
                   }),
                 },
@@ -1570,6 +1662,7 @@ class NetworkDetail$$Page extends React.Component {
                 title: this._i18nText({
                   "en-US": "Select member",
                   key: "i18n-0bo5igd908x",
+                  use: "en-US",
                   "zh-CN": "选择成员",
                 }),
                 "x-validator": [],
@@ -1582,6 +1675,7 @@ class NetworkDetail$$Page extends React.Component {
                   placeholder: this._i18nText({
                     "en-US": "Please enter a discription",
                     key: "i18n-rw0h41prk6",
+                    use: "en-US",
                     "zh-CN": "请输入描述",
                   }),
                 },
@@ -1593,13 +1687,20 @@ class NetworkDetail$$Page extends React.Component {
                 title: this._i18nText({
                   "en-US": "Channel description",
                   key: "i18n-k3l0vmchhq",
+                  use: "en-US",
                   "zh-CN": "通道描述",
                 }),
                 "x-component": "Input.TextArea",
                 "x-validator": [
                   {
-                    message: "组织描述由 0 ~ 200 字符组成",
-                    pattern: "^[\\w]{0,200}$",
+                    message: this._i18nText({
+                      "en-US":
+                        "The channel description consists of 0 to 200 characters",
+                      key: "i18n-5eitggraalr",
+                      use: "en-US",
+                      "zh-CN": "通道描述由 0 ~ 200 字符组成",
+                    }),
+                    pattern: "^.{0,200}$",
                   },
                 ],
               }}

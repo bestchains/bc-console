@@ -834,7 +834,13 @@ class Organization$$Page extends React.Component {
                 }),
                 "x-validator": [
                   {
-                    message: "组织名称由 3 ~ 10 个大小写字母, 数字, 下划线组成",
+                    message: this._i18nText({
+                      "en-US":
+                        "The organization name contains 3 to 10 uppercase and lowercase letters, digits, and underscores",
+                      key: "i18n-iiub6ybv6ms",
+                      "zh-CN":
+                        "组织名称由 3 ~ 10 个大小写字母, 数字, 下划线组成",
+                    }),
                     pattern: "^[a-zA-Z0-9_]{3,10}$",
                     required: true,
                     whitespace: true,
@@ -862,7 +868,12 @@ class Organization$$Page extends React.Component {
                 }),
                 "x-validator": [
                   {
-                    message: "展示名由 0 ~ 20 个中英文、数字组成",
+                    message: this._i18nText({
+                      "en-US":
+                        "The display name consists of 0 ~ 20 Chinese and English numbers",
+                      key: "i18n-de6rhkx2m7v",
+                      "zh-CN": "展示名由 0 ~ 20 个中英文、数字组成",
+                    }),
                     pattern: "^[a-zA-Z0-9_\\u4e00-\\u9fa5]{0,20}$",
                   },
                 ],
@@ -889,7 +900,12 @@ class Organization$$Page extends React.Component {
                 "x-component": "Input.TextArea",
                 "x-validator": [
                   {
-                    message: "组织描述由 0 ~ 200 字符组成",
+                    message: this._i18nText({
+                      "en-US":
+                        "The organization description consists of 0 to 200 characters",
+                      key: "i18n-brvipauy4t4",
+                      "zh-CN": "组织描述由 0 ~ 200 字符组成",
+                    }),
                     pattern: "^.{0,200}$",
                   },
                 ],

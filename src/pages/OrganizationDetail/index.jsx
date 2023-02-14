@@ -1194,7 +1194,13 @@ class OrganizationDetail$$Page extends React.Component {
                 }),
                 "x-validator": [
                   {
-                    message: "用户名称由 3 ~ 20组成",
+                    message: this._i18nText({
+                      "en-US":
+                        "The user name contains 3 to 20 letters, digits, and underscores",
+                      key: "i18n-ch5wgxkhdhs",
+                      "zh-CN":
+                        "用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成",
+                    }),
                     pattern: "^[a-zA-Z0-9_]{3,10}$",
                     required: true,
                     whitespace: true,
@@ -1329,7 +1335,13 @@ class OrganizationDetail$$Page extends React.Component {
                 }),
                 "x-validator": [
                   {
-                    message: "用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成",
+                    message: this._i18nText({
+                      "en-US":
+                        "The user name contains 3 to 20 letters, digits, and underscores",
+                      key: "i18n-ch5wgxkhdhs",
+                      "zh-CN":
+                        "用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成",
+                    }),
                     pattern: "^[a-zA-Z0-9_]{3,10}$",
                     required: true,
                     whitespace: true,

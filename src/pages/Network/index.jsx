@@ -229,6 +229,7 @@ class Network$$Page extends React.Component {
               {this._i18nText({
                 "en-US": "network",
                 key: "i18n-xb2o10tue1m",
+                use: "zh-CN",
                 "zh-CN": "网络",
               })}
             </Typography.Title>
@@ -274,6 +275,7 @@ class Network$$Page extends React.Component {
                     {this._i18nText({
                       "en-US": "create network",
                       key: "i18n-kwbu3vyst6",
+                      use: "zh-CN",
                       "zh-CN": "新建网络",
                     })}
                   </Button>
@@ -347,6 +349,7 @@ class Network$$Page extends React.Component {
                     placeholder={this._i18nText({
                       "en-US": "Please enter a name search",
                       key: "i18n-94e6orcx5ms",
+                      use: "zh-CN",
                       "zh-CN": "请输入名称搜索",
                     })}
                   />
@@ -392,6 +395,7 @@ class Network$$Page extends React.Component {
                     {this._i18nText({
                       "en-US": "refresh",
                       key: "i18n-71sxvlf0d98",
+                      use: "zh-CN",
                       "zh-CN": "刷新",
                     })}
                   </Button>
@@ -481,6 +485,7 @@ class Network$$Page extends React.Component {
                                     label: this._i18nText({
                                       "en-US": "View details",
                                       key: "i18n-4t70z9gdf8u",
+                                      use: "zh-CN",
                                       "zh-CN": "查看详情",
                                     }),
                                   },
@@ -489,6 +494,7 @@ class Network$$Page extends React.Component {
                                     label: this._i18nText({
                                       "en-US": "Disband network",
                                       key: "i18n-hlh9eenb9wn",
+                                      use: "zh-CN",
                                       "zh-CN": "解散网络",
                                     }),
                                   },
@@ -528,6 +534,7 @@ class Network$$Page extends React.Component {
                                     {this._i18nText({
                                       "en-US": "more",
                                       key: "i18n-2b4dhrz51wu",
+                                      use: "zh-CN",
                                       "zh-CN": "更多",
                                     })}
                                   </Typography.Text>,
@@ -606,6 +613,7 @@ class Network$$Page extends React.Component {
                                       {this._i18nText({
                                         "en-US": "My node/total node",
                                         key: "i18n-4m04opydvf9",
+                                        use: "zh-CN",
                                         "zh-CN": "我的节点/总节点",
                                       })}
                                     </Typography.Text>
@@ -662,6 +670,7 @@ class Network$$Page extends React.Component {
                                       {this._i18nText({
                                         "en-US": "My channel/Total channel",
                                         key: "i18n-0l8kit6a2d3",
+                                        use: "zh-CN",
                                         "zh-CN": "我的通道/总通道",
                                       })}
                                     </Typography.Text>
@@ -716,6 +725,7 @@ class Network$$Page extends React.Component {
                                       {this._i18nText({
                                         "en-US": "Organization number",
                                         key: "i18n-18ncsld69pu",
+                                        use: "zh-CN",
                                         "zh-CN": "组织数",
                                       })}
                                     </Typography.Text>
@@ -764,6 +774,7 @@ class Network$$Page extends React.Component {
                             label: this._i18nText({
                               "en-US": "Network ID",
                               key: "i18n-vxubih1pqa",
+                              use: "zh-CN",
                               "zh-CN": "网络 ID",
                             }),
                             span: 1,
@@ -774,6 +785,7 @@ class Network$$Page extends React.Component {
                             label: this._i18nText({
                               "en-US": "affiliate",
                               key: "i18n-dlxiuotq6z4",
+                              use: "zh-CN",
                               "zh-CN": "所属联盟",
                             }),
                             span: 1,
@@ -812,6 +824,7 @@ class Network$$Page extends React.Component {
                                     {this._i18nText({
                                       "en-US": "expire",
                                       key: "i18n-9v1fm4itv3m",
+                                      use: "zh-CN",
                                       "zh-CN": "过期",
                                     })}
                                   </Typography.Text>
@@ -822,6 +835,7 @@ class Network$$Page extends React.Component {
                             label: this._i18nText({
                               "en-US": "Maturity time",
                               key: "i18n-pra1gymtjol",
+                              use: "zh-CN",
                               "zh-CN": "到期时间",
                             }),
                             span: 1,
@@ -862,6 +876,7 @@ class Network$$Page extends React.Component {
                                     children: this._i18nText({
                                       "en-US": "NetworkCreated",
                                       key: "i18n-zrowlr7zwx",
+                                      use: "zh-CN",
                                       "zh-CN": "运行中",
                                     }),
                                     icon: "CheckCircleFilled",
@@ -872,6 +887,7 @@ class Network$$Page extends React.Component {
                                     children: this._i18nText({
                                       "en-US": "NetworkDissolved",
                                       key: "i18n-j3czm9su41",
+                                      use: "zh-CN",
                                       "zh-CN": "已解散",
                                     }),
                                     icon: "CloseCircleFilled",
@@ -882,11 +898,23 @@ class Network$$Page extends React.Component {
                                     children: this._i18nText({
                                       "en-US": "Error",
                                       key: "i18n-xtno2l9qqog",
+                                      use: "zh-CN",
                                       "zh-CN": "异常",
                                     }),
                                     icon: "CloseCircleFilled",
                                     id: "Error",
                                     type: "error",
+                                  },
+                                  {
+                                    children: this._i18nText({
+                                      "en-US": "Created",
+                                      key: "i18n-1vangoko4yf",
+                                      use: "zh-CN",
+                                      "zh-CN": "正常",
+                                    }),
+                                    icon: "CheckCircleFilled",
+                                    id: "Created",
+                                    type: "success",
                                   },
                                 ]}
                               />
@@ -900,6 +928,7 @@ class Network$$Page extends React.Component {
                           label={this._i18nText({
                             "en-US": "Network ID",
                             key: "i18n-vxubih1pqa",
+                            use: "zh-CN",
                             "zh-CN": "网络 ID",
                           })}
                           span={1}
@@ -912,6 +941,7 @@ class Network$$Page extends React.Component {
                           label={this._i18nText({
                             "en-US": "affiliate",
                             key: "i18n-dlxiuotq6z4",
+                            use: "zh-CN",
                             "zh-CN": "所属联盟",
                           })}
                           span={1}
@@ -924,6 +954,7 @@ class Network$$Page extends React.Component {
                           label={this._i18nText({
                             "en-US": "Maturity time",
                             key: "i18n-pra1gymtjol",
+                            use: "zh-CN",
                             "zh-CN": "到期时间",
                           })}
                           span={1}
@@ -931,6 +962,7 @@ class Network$$Page extends React.Component {
                           {
                             <Row
                               __component_name="Row"
+                              align="middle"
                               gutter={[0, 0]}
                               h-gutter={0}
                               v-gutter={0}
@@ -961,6 +993,7 @@ class Network$$Page extends React.Component {
                                   {this._i18nText({
                                     "en-US": "expire",
                                     key: "i18n-9v1fm4itv3m",
+                                    use: "zh-CN",
                                     "zh-CN": "过期",
                                   })}
                                 </Typography.Text>
@@ -1040,6 +1073,7 @@ class Network$$Page extends React.Component {
           title={this._i18nText({
             "en-US": "Disband network",
             key: "i18n-hlh9eenb9wn",
+            use: "zh-CN",
             "zh-CN": "解散网络",
           })}
         >
@@ -1050,6 +1084,7 @@ class Network$$Page extends React.Component {
               "en-US":
                 "The network will disband after the proposal is approved, whether to continue",
               key: "i18n-c3oheknv0lu",
+              use: "zh-CN",
               "zh-CN": "网络将在提议通过后解散，是否继续",
             })}
             showIcon={true}
