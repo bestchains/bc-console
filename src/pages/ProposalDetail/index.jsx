@@ -715,7 +715,7 @@ class ProposalDetail$$Page extends React.Component {
                         key: "i18n-tu47rri2uk",
                         "zh-CN": "未投票",
                       }),
-                      value: "Created",
+                      value: "NotVoted",
                     },
                   ]}
                   size="middle"
@@ -1059,8 +1059,8 @@ class ProposalDetail$$Page extends React.Component {
                         if (this.state.filter === "ALL") {
                           return true;
                         }
-                        if (this.state.filter === "Created") {
-                          return item.status === "Created";
+                        if (this.state.filter === "NotVoted") {
+                          return item.status === "NotVoted";
                         }
                         if (this.state.filter === "Voted") {
                           return item.status === "Voted";
@@ -1115,8 +1115,8 @@ class ProposalDetail$$Page extends React.Component {
                             if (this.state.filter === "ALL") {
                               return true;
                             }
-                            if (this.state.filter === "Created") {
-                              return item.status === "Created";
+                            if (this.state.filter === "NotVoted") {
+                              return item.status === "NotVoted";
                             }
                             if (this.state.filter === "Voted") {
                               return item.status === "Voted";
@@ -1233,14 +1233,7 @@ class ProposalDetail$$Page extends React.Component {
                   "zh-CN": "提议名称",
                 }),
                 "x-pattern": "disabled",
-                "x-validator": [
-                  {
-                    message: "组织名称由 3 ~ 10 个大小写字母, 数字, 下划线组成",
-                    pattern: "^[a-zA-Z0-9_]{3,10}$",
-                    required: true,
-                    whitespace: true,
-                  },
-                ],
+                "x-validator": [],
               }}
             />
             <FormilyInput
@@ -1268,14 +1261,7 @@ class ProposalDetail$$Page extends React.Component {
                   "zh-CN": "提议类型",
                 }),
                 "x-pattern": "disabled",
-                "x-validator": [
-                  {
-                    message: "组织名称由 3 ~ 10 个大小写字母, 数字, 下划线组成",
-                    pattern: "^[a-zA-Z0-9_]{3,10}$",
-                    required: true,
-                    whitespace: true,
-                  },
-                ],
+                "x-validator": [],
               }}
             />
             <FormilySelect
@@ -1327,8 +1313,13 @@ class ProposalDetail$$Page extends React.Component {
                 "x-component": "Input.TextArea",
                 "x-validator": [
                   {
-                    message: "组织描述由 0 ~ 200 字符组成",
-                    pattern: "^[\\w]{0,200}$",
+                    message: this._i18nText({
+                      "en-US":
+                        "The cause description consists of 0 to 200 characters",
+                      key: "i18n-l0t1y311yy",
+                      "zh-CN": "原因描述由 0 ~ 200 字符组成",
+                    }),
+                    pattern: "^.{0,200}$",
                   },
                 ],
               }}

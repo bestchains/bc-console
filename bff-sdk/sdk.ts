@@ -171,6 +171,8 @@ export type Network = {
   federation?: Maybe<Scalars['String']>;
   /** 网络发起者（组织） */
   initiator?: Maybe<Organization>;
+  /** 更新时间 */
+  lastHeartbeatTime?: Maybe<Scalars['String']>;
   /** name */
   name: Scalars['ID'];
   /** 引擎类型 */
@@ -362,7 +364,7 @@ export type QueryProposalsArgs = {
 
 /** IBPCR 状态 */
 export enum StatusType {
-  /** Created is the status when component is created successfully */
+  /** 正常 */
   Created = 'Created',
   /** Deployed is the status when the component's deployment is done successfully */
   Deployed = 'Deployed',
@@ -380,7 +382,7 @@ export enum StatusType {
   FederationPending = 'FederationPending',
   /** Initializing is the status when a component is initializing */
   Initializing = 'Initializing',
-  /** 运行中 */
+  /** 正常 */
   NetworkCreated = 'NetworkCreated',
   /** 已解散 */
   NetworkDissolved = 'NetworkDissolved',
@@ -449,6 +451,8 @@ export enum VotePhase {
   Created = 'Created',
   /** The proposal has been finished. */
   Finished = 'Finished',
+  /** 未投票 */
+  NotVoted = 'NotVoted',
   /** The organization administrator has vote for the proposal. */
   Voted = 'Voted',
 }
@@ -606,6 +610,7 @@ export type GetNetworksQuery = {
     __typename?: 'Network';
     name: string;
     creationTimestamp?: string | null;
+    lastHeartbeatTime?: string | null;
     expiredTime?: string | null;
     federation?: string | null;
     clusterSize?: number | null;
@@ -634,6 +639,7 @@ export type GetNetworkQuery = {
     __typename?: 'Network';
     name: string;
     creationTimestamp?: string | null;
+    lastHeartbeatTime?: string | null;
     expiredTime?: string | null;
     federation?: string | null;
     clusterSize?: number | null;
@@ -662,6 +668,7 @@ export type CreateNetworkMutation = {
     __typename?: 'Network';
     name: string;
     creationTimestamp?: string | null;
+    lastHeartbeatTime?: string | null;
     expiredTime?: string | null;
     federation?: string | null;
     clusterSize?: number | null;
@@ -977,6 +984,7 @@ export const GetNetworksDocument = gql`
     networks {
       name
       creationTimestamp
+      lastHeartbeatTime
       expiredTime
       federation
       clusterSize
@@ -998,6 +1006,7 @@ export const GetNetworkDocument = gql`
     network(name: $name) {
       name
       creationTimestamp
+      lastHeartbeatTime
       expiredTime
       federation
       clusterSize
@@ -1019,6 +1028,7 @@ export const CreateNetworkDocument = gql`
     networkCreate(network: $network) {
       name
       creationTimestamp
+      lastHeartbeatTime
       expiredTime
       federation
       clusterSize
