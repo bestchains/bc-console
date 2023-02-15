@@ -358,10 +358,6 @@ export type QueryProposalArgs = {
   name?: InputMaybe<Scalars['String']>;
 };
 
-export type QueryProposalsArgs = {
-  type?: InputMaybe<ProposalType>;
-};
-
 /** IBPCR 状态 */
 export enum StatusType {
   /** 正常 */
@@ -775,9 +771,7 @@ export type UpdateOrganizationMutation = {
   };
 };
 
-export type GetProposalsQueryVariables = Exact<{
-  type?: InputMaybe<ProposalType>;
-}>;
+export type GetProposalsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetProposalsQuery = {
   __typename?: 'Query';
@@ -1107,8 +1101,8 @@ export const UpdateOrganizationDocument = gql`
   }
 `;
 export const GetProposalsDocument = gql`
-  query getProposals($type: ProposalType) {
-    proposals(type: $type) {
+  query getProposals {
+    proposals {
       name
       creationTimestamp
       endAt
