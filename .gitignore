@@ -24,4 +24,4 @@
 .idea/
 /config/api.ts
 
-/Dockerfile.base
+public/menu.json

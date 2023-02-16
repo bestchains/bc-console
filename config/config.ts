@@ -84,9 +84,13 @@ export default defineConfig({
    * @doc https://umijs.org/docs/api/config#ignoremomentlocale
    */
   ignoreMomentLocale: true,
+  base: '/',
   historyWithQuery: {},
   history: {
     type: 'browser',
+  },
+  qiankun: {
+    slave: {},
   },
   codeSplitting: {
     jsStrategy: 'granularChunks',

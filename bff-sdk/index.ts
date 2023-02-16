@@ -36,7 +36,7 @@ function responseMiddleware(response: Response<unknown> | Error) {
 }
 
 const devEndpoint = '/bff';
-const prodEndpoint = (window as any).__INITIAL_CONFIG__?.bffServerGraphQLUrl || '/bff';
+const prodEndpoint = (window as any).__INITIAL_CONFIG__?.bffServerGraphQLUrl || '/bc-apis/bff';
 const endpoint = isProd ? prodEndpoint : devEndpoint;
 
 export const client = new GraphQLClient(endpoint, {

@@ -1,7 +1,7 @@
 export default {
   components: {
     Page: {
-      pageBackground: "#ecf0f4",
+      pageBackground: "transparent",
       pagePadding: 20,
       pagePaddingBottom: 32,
       pagePaddingTop: 20,

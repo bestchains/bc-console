@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Outlet, useLocation, history } from 'umi';
 import utils from '../utils';
+import { IS_PROD, isQiankun } from '../constants';
 import { getLocale } from '../i18n';
 import Request from '@tenx-ui/utils/es/request';
 import queryString from '@tenx-ui/utils/es/queryString';
@@ -38,14 +39,16 @@ const Layout: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (query.code) {
-      getToken(query.code);
-      return;
-    }
-    if (utils.isTokenExpired()) {
-      window.location.href = `/login?redirect_uri=${redirect_uri}`;
-      // window.location.href = `https://bc.172.22.50.142.nip.io/login?redirect_uri=${redirect_uri}`;
-      return;
+    if (!IS_PROD || !isQiankun) {
+      if (query.code) {
+        getToken(query.code);
+        return;
+      }
+      if (utils.isTokenExpired()) {
+        window.location.href = `/login?redirect_uri=${redirect_uri}`;
+        // window.location.href = `https://bc.172.22.50.142.nip.io/login?redirect_uri=${redirect_uri}`;
+        return;
+      }
     }
     setLoading(false);
     if (location.pathname === '/') {

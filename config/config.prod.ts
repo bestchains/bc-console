@@ -12,7 +12,7 @@
 
 import { defineConfig } from '@umijs/max';
 
-const publicPath = '/';
+const publicPath = '/bc-public/';
 
 export default defineConfig({
   hash: true,
