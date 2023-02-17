@@ -102,6 +102,8 @@ export type Mutation = {
   networkDissolve: Scalars['Boolean'];
   /** 新增组织 */
   organizationCreate: Organization;
+  /** 删除组织 */
+  organizationDelete: K8sV1Status;
   /** 修改组织 */
   organizationUpdate: Organization;
   /** 更新投票 */
@@ -145,6 +147,10 @@ export type MutationNetworkDissolveArgs = {
 
 export type MutationOrganizationCreateArgs = {
   organization: NewOrganizationInput;
+};
+
+export type MutationOrganizationDeleteArgs = {
+  name: Scalars['String'];
 };
 
 export type MutationOrganizationUpdateArgs = {
@@ -241,12 +247,16 @@ export type Organization = {
   description?: Maybe<Scalars['String']>;
   /** 名称 */
   displayName?: Maybe<Scalars['String']>;
+  /** 所在联盟 */
+  federations?: Maybe<Array<Scalars['String']>>;
   /** 加入时间（只在联盟中使用） */
   joinedAt?: Maybe<Scalars['String']>;
   /** 更新时间 */
   lastHeartbeatTime?: Maybe<Scalars['String']>;
   /** name */
   name: Scalars['ID'];
+  /** 所在网络 */
+  networks?: Maybe<Array<Scalars['String']>>;
   /** 原因（状态为非Deplyed时） */
   reason?: Maybe<Scalars['String']>;
   /** 状态 */
@@ -700,6 +710,8 @@ export type GetOrganizationsQuery = {
     admin?: string | null;
     status?: StatusType | null;
     reason?: string | null;
+    networks?: Array<string> | null;
+    federations?: Array<string> | null;
   }>;
 };
 
@@ -719,6 +731,8 @@ export type GetOrganizationQuery = {
     admin?: string | null;
     status?: StatusType | null;
     reason?: string | null;
+    networks?: Array<string> | null;
+    federations?: Array<string> | null;
     users?: Array<{
       __typename?: 'User';
       name: string;
@@ -768,6 +782,21 @@ export type UpdateOrganizationMutation = {
       name: string;
       isOrganizationAdmin?: boolean | null;
     }> | null;
+  };
+};
+
+export type DeleteOrganizationMutationVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type DeleteOrganizationMutation = {
+  __typename?: 'Mutation';
+  organizationDelete: {
+    __typename?: 'K8sV1Status';
+    code?: number | null;
+    status?: string | null;
+    reason?: string | null;
+    message?: string | null;
   };
 };
 
@@ -1047,6 +1076,8 @@ export const GetOrganizationsDocument = gql`
       admin
       status
       reason
+      networks
+      federations
     }
   }
 `;
@@ -1061,6 +1092,8 @@ export const GetOrganizationDocument = gql`
       admin
       status
       reason
+      networks
+      federations
       users {
         name
         isOrganizationAdmin
@@ -1097,6 +1130,16 @@ export const UpdateOrganizationDocument = gql`
         name
         isOrganizationAdmin
       }
+    }
+  }
+`;
+export const DeleteOrganizationDocument = gql`
+  mutation deleteOrganization($name: String!) {
+    organizationDelete(name: $name) {
+      code
+      status
+      reason
+      message
     }
   }
 `;
@@ -1391,6 +1434,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
             ...wrappedRequestHeaders,
           }),
         'updateOrganization',
+        'mutation'
+      );
+    },
+    deleteOrganization(
+      variables: DeleteOrganizationMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<DeleteOrganizationMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<DeleteOrganizationMutation>(DeleteOrganizationDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'deleteOrganization',
         'mutation'
       );
     },

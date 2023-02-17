@@ -606,6 +606,62 @@ class Organization$$Page extends React.Component {
                     }),
                   },
                   {
+                    dataIndex: "federations",
+                    key: "federations",
+                    render: (text, record, index) =>
+                      ((__$$context) => (
+                        <Typography.Text
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: "" }}
+                        >
+                          {__$$eval(() =>
+                            text?.length > 0 ? text?.join(",") : "-"
+                          )}
+                        </Typography.Text>
+                      ))(
+                        __$$createChildContext(__$$context, {
+                          text,
+                          record,
+                          index,
+                        })
+                      ),
+                    title: this._i18nText({
+                      "en-US": "affiliate",
+                      key: "i18n-ely1ij2y",
+                      "zh-CN": "所在联盟",
+                    }),
+                  },
+                  {
+                    dataIndex: "networks",
+                    key: "networks",
+                    render: (text, record, index) =>
+                      ((__$$context) => (
+                        <Typography.Text
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: "" }}
+                        >
+                          {__$$eval(() =>
+                            text?.length > 0 ? text?.join(",") : "-"
+                          )}
+                        </Typography.Text>
+                      ))(
+                        __$$createChildContext(__$$context, {
+                          text,
+                          record,
+                          index,
+                        })
+                      ),
+                    title: this._i18nText({
+                      "en-US": "Local network",
+                      key: "i18n-386epq7m",
+                      "zh-CN": "所在网络",
+                    }),
+                  },
+                  {
                     dataIndex: "op",
                     key: "op",
                     render: (text, record, index) =>
