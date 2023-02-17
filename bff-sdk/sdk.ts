@@ -256,7 +256,7 @@ export type Organization = {
   /** name */
   name: Scalars['ID'];
   /** 所在网络 */
-  networks?: Maybe<Array<Scalars['String']>>;
+  networks?: Maybe<Array<Network>>;
   /** 原因（状态为非Deplyed时） */
   reason?: Maybe<Scalars['String']>;
   /** 状态 */
@@ -710,8 +710,8 @@ export type GetOrganizationsQuery = {
     admin?: string | null;
     status?: StatusType | null;
     reason?: string | null;
-    networks?: Array<string> | null;
     federations?: Array<string> | null;
+    networks?: Array<{ __typename?: 'Network'; name: string }> | null;
   }>;
 };
 
@@ -731,8 +731,19 @@ export type GetOrganizationQuery = {
     admin?: string | null;
     status?: StatusType | null;
     reason?: string | null;
-    networks?: Array<string> | null;
     federations?: Array<string> | null;
+    networks?: Array<{
+      __typename?: 'Network';
+      name: string;
+      creationTimestamp?: string | null;
+      lastHeartbeatTime?: string | null;
+      expiredTime?: string | null;
+      clusterSize?: number | null;
+      organizations?: Array<{
+        __typename?: 'Organization';
+        name: string;
+      }> | null;
+    }> | null;
     users?: Array<{
       __typename?: 'User';
       name: string;
@@ -1076,7 +1087,9 @@ export const GetOrganizationsDocument = gql`
       admin
       status
       reason
-      networks
+      networks {
+        name
+      }
       federations
     }
   }
@@ -1092,7 +1105,16 @@ export const GetOrganizationDocument = gql`
       admin
       status
       reason
-      networks
+      networks {
+        name
+        creationTimestamp
+        lastHeartbeatTime
+        expiredTime
+        clusterSize
+        organizations {
+          name
+        }
+      }
       federations
       users {
         name
