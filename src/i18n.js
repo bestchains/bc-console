@@ -22,6 +22,7 @@ const i18nConfig = {
     "i18n-2b4dhrz51wu": "more",
     "i18n-2tfq4ggp9cv": "Federation deletion failure",
     "i18n-2vzrxdpca5": "FederationActivated",
+    "i18n-386epq7m": "Local network",
     "i18n-3cphsjan5d2": "Choose your own organization",
     "i18n-3g6iq8ncfsh": "Version details",
     "i18n-3ja6wz9xvoh":
@@ -106,6 +107,7 @@ const i18nConfig = {
     "i18n-e6ttl8tm6f": "detail",
     "i18n-eirr55ndhxk": "vote",
     "i18n-ej048sy57c": "FederationFailed",
+    "i18n-ely1ij2y": "affiliate",
     "i18n-esf1s7w7tv":
       "Tip: If the type of the new user is admin, all administrator rights will be transferred to the new admin user",
     "i18n-f83f1t03e": "Please select a proposal type",
@@ -272,6 +274,7 @@ const i18nConfig = {
     "i18n-2b4dhrz51wu": "更多",
     "i18n-2tfq4ggp9cv": "删除联盟失败",
     "i18n-2vzrxdpca5": "已激活",
+    "i18n-386epq7m": "所在网络",
     "i18n-3cphsjan5d2": "选择自己拥有的组织",
     "i18n-3g6iq8ncfsh": "版本详细介绍",
     "i18n-3ja6wz9xvoh": "提示：确认后，管理员权限将全部转移给新用户",
@@ -349,6 +352,7 @@ const i18nConfig = {
     "i18n-e6ttl8tm6f": "管理联盟",
     "i18n-eirr55ndhxk": "投票",
     "i18n-ej048sy57c": "组建失败",
+    "i18n-ely1ij2y": "所在联盟",
     "i18n-esf1s7w7tv":
       "提示：如果新增用户类型为 admin， 管理员权限将全部转移给新的 admin 用户",
     "i18n-f83f1t03e": "请选择提议类型",
