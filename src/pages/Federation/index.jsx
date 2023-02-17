@@ -20,7 +20,6 @@ import {
   Input,
   Card,
   Table,
-  UnifiedLink,
   Status,
   Dropdown,
 } from "@tenx-ui/materials";
@@ -946,13 +945,21 @@ class Federation$$Page extends React.Component {
                     key: "name",
                     render: (text, record, index) =>
                       ((__$$context) => (
-                        <UnifiedLink
-                          __component_name="UnifiedLink"
-                          target="_self"
-                          to={__$$eval(() => "/federation/" + record.name)}
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={__$$eval(
+                            () => record.status !== "FederationActivated"
+                          )}
+                          ghost={false}
+                          href={__$$eval(() => "/federation/" + record.name)}
+                          icon=""
+                          shape="default"
+                          type="link"
                         >
                           {__$$eval(() => record.name)}
-                        </UnifiedLink>
+                        </Button>
                       ))(
                         __$$createChildContext(__$$context, {
                           text,

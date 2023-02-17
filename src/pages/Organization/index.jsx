@@ -14,7 +14,6 @@ import {
   Input,
   Card,
   Table,
-  UnifiedLink,
   Status,
   Modal,
   FormilyForm,
@@ -470,13 +469,24 @@ class Organization$$Page extends React.Component {
                     key: "name",
                     render: (text, record, index) =>
                       ((__$$context) => (
-                        <UnifiedLink
-                          __component_name="UnifiedLink"
-                          target="_self"
-                          to={__$$eval(() => "/organization/" + record.name)}
+                        <Button
+                          __component_name="Button"
+                          block={false}
+                          danger={false}
+                          disabled={__$$eval(() =>
+                            record?.admin ===
+                            __$$context.props.authData?.user?.name
+                              ? undefined
+                              : "disabled"
+                          )}
+                          ghost={false}
+                          href={__$$eval(() => "/organization/" + record.name)}
+                          icon=""
+                          shape="default"
+                          type="link"
                         >
                           {__$$eval(() => record.name)}
-                        </UnifiedLink>
+                        </Button>
                       ))(
                         __$$createChildContext(__$$context, {
                           text,
