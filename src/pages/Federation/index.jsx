@@ -64,6 +64,7 @@ class Federation$$Page extends React.Component {
       searchKey: "name",
       searchValue: undefined,
       size: 10,
+      createLoading: false,
     };
   }
 
@@ -97,6 +98,9 @@ class Federation$$Page extends React.Component {
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
       delete v.displayName;
+      this.setState({
+        createLoading: true,
+      });
       try {
         await this.props.appHelper.utils.bff.createFederation({
           federation: v,
@@ -106,8 +110,14 @@ class Federation$$Page extends React.Component {
           message: this.i18n("i18n-d4bbvp00v5t"),
         });
         this.props.useGetFederations.mutate();
+        this.setState({
+          createLoading: false,
+        });
       } catch (error) {
         var _error$response;
+        this.setState({
+          createLoading: false,
+        });
         this.utils.notification.warnings({
           message: this.i18n("i18n-n58z07yheg"),
           errors:
@@ -324,7 +334,7 @@ class Federation$$Page extends React.Component {
             ],
           }}
           centered={false}
-          confirmLoading={false}
+          confirmLoading={__$$eval(() => this.state.createLoading || false)}
           destroyOnClose={true}
           forceRender={false}
           keyboard={true}
