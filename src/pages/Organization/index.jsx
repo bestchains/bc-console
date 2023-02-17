@@ -655,7 +655,9 @@ class Organization$$Page extends React.Component {
                           style={{ fontSize: "" }}
                         >
                           {__$$eval(() =>
-                            text?.length > 0 ? text?.join(",") : "-"
+                            text?.length > 0
+                              ? text?.map((item) => item.name)?.join(",")
+                              : "-"
                           )}
                         </Typography.Text>
                       ))(
