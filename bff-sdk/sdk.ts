@@ -111,7 +111,6 @@ export type Mutation = {
 };
 
 export type MutationFederationAddOrganizationArgs = {
-  initiator: Scalars['String'];
   name: Scalars['String'];
   organizations: Array<Scalars['String']>;
 };
@@ -125,12 +124,10 @@ export type MutationFederationDeleteArgs = {
 };
 
 export type MutationFederationDissolveArgs = {
-  initiator: Scalars['String'];
   name: Scalars['String'];
 };
 
 export type MutationFederationRemoveOrganizationArgs = {
-  initiator: Scalars['String'];
   name: Scalars['String'];
   organization: Scalars['String'];
 };
@@ -564,7 +561,6 @@ export type CreateFederationMutation = {
 export type AddOrganizationToFederationMutationVariables = Exact<{
   name: Scalars['String'];
   organizations: Array<Scalars['String']> | Scalars['String'];
-  initiator: Scalars['String'];
 }>;
 
 export type AddOrganizationToFederationMutation = {
@@ -574,7 +570,6 @@ export type AddOrganizationToFederationMutation = {
 
 export type RemoveOrganizationToFederationMutationVariables = Exact<{
   name: Scalars['String'];
-  initiator: Scalars['String'];
   organization: Scalars['String'];
 }>;
 
@@ -585,7 +580,6 @@ export type RemoveOrganizationToFederationMutation = {
 
 export type DissolveFederationMutationVariables = Exact<{
   name: Scalars['String'];
-  initiator: Scalars['String'];
 }>;
 
 export type DissolveFederationMutation = {
@@ -981,26 +975,18 @@ export const CreateFederationDocument = gql`
   }
 `;
 export const AddOrganizationToFederationDocument = gql`
-  mutation addOrganizationToFederation(
-    $name: String!
-    $organizations: [String!]!
-    $initiator: String!
-  ) {
-    federationAddOrganization(name: $name, organizations: $organizations, initiator: $initiator)
+  mutation addOrganizationToFederation($name: String!, $organizations: [String!]!) {
+    federationAddOrganization(name: $name, organizations: $organizations)
   }
 `;
 export const RemoveOrganizationToFederationDocument = gql`
-  mutation removeOrganizationToFederation(
-    $name: String!
-    $initiator: String!
-    $organization: String!
-  ) {
-    federationRemoveOrganization(name: $name, initiator: $initiator, organization: $organization)
+  mutation removeOrganizationToFederation($name: String!, $organization: String!) {
+    federationRemoveOrganization(name: $name, organization: $organization)
   }
 `;
 export const DissolveFederationDocument = gql`
-  mutation dissolveFederation($name: String!, $initiator: String!) {
-    federationDissolve(name: $name, initiator: $initiator)
+  mutation dissolveFederation($name: String!) {
+    federationDissolve(name: $name)
   }
 `;
 export const DeleteFederationDocument = gql`
