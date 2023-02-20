@@ -109,7 +109,6 @@ class FederationDetail$$Page extends React.Component {
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
       try {
-        var _federation$initiator;
         const res =
           await this.props.appHelper.utils.bff.addOrganizationToFederation({
             name:
@@ -117,13 +116,6 @@ class FederationDetail$$Page extends React.Component {
                 ? void 0
                 : federation.name,
             organizations: v.organizations,
-            initiator:
-              federation === null || federation === void 0
-                ? void 0
-                : (_federation$initiator = federation.initiator) === null ||
-                  _federation$initiator === void 0
-                ? void 0
-                : _federation$initiator.name,
           });
         this.closeModal();
         this.utils.notification.success({
@@ -157,7 +149,7 @@ class FederationDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetFed2.federation) || {};
     try {
-      var _this$state$userRecor, _federation$initiator;
+      var _this$state$userRecor;
       await this.props.appHelper.utils.bff.removeOrganizationToFederation({
         name:
           federation === null || federation === void 0
@@ -168,13 +160,6 @@ class FederationDetail$$Page extends React.Component {
           _this$state$userRecor === void 0
             ? void 0
             : _this$state$userRecor.name,
-        initiator:
-          federation === null || federation === void 0
-            ? void 0
-            : (_federation$initiator = federation.initiator) === null ||
-              _federation$initiator === void 0
-            ? void 0
-            : _federation$initiator.name,
       });
       this.closeModal();
       this.utils.notification.success({
@@ -299,7 +284,6 @@ class FederationDetail$$Page extends React.Component {
               title={this._i18nText({
                 "en-US": "federation detail",
                 key: "i18n-abe4gir44un",
-                use: "zh-CN",
                 "zh-CN": "联盟详情",
               })}
               type="simple"
@@ -343,7 +327,6 @@ class FederationDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "federation description",
                                 key: "i18n-8weq4mfy9lf",
-                                use: "zh-CN",
                                 "zh-CN": "联盟描述",
                               }),
                               span: 1,
@@ -368,7 +351,6 @@ class FederationDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "creator",
                                 key: "i18n-yyexdt18ora",
-                                use: "zh-CN",
                                 "zh-CN": "创建人",
                               }),
                               span: 1,
@@ -385,7 +367,6 @@ class FederationDetail$$Page extends React.Component {
                                   {this._i18nText({
                                     "en-US": "Real-name authentication",
                                     key: "i18n-1g6cw1w1uv4",
-                                    use: "zh-CN",
                                     "zh-CN": "实名认证",
                                   })}
                                 </Typography.Text>
@@ -394,7 +375,6 @@ class FederationDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "members",
                                 key: "i18n-21z9nbkoohk",
-                                use: "zh-CN",
                                 "zh-CN": "成员限制",
                               }),
                               span: 1,
@@ -416,7 +396,6 @@ class FederationDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "create time",
                                 key: "i18n-9ox4rx1wtwv",
-                                use: "zh-CN",
                                 "zh-CN": "创建时间",
                               }),
                               span: 1,
@@ -438,7 +417,6 @@ class FederationDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "join time",
                                 key: "i18n-c0d66z03kpk",
-                                use: "zh-CN",
                                 "zh-CN": "加入时间",
                               }),
                               span: 1,
@@ -453,7 +431,6 @@ class FederationDetail$$Page extends React.Component {
                               label: this._i18nText({
                                 "en-US": "propsoal",
                                 key: "i18n-g8rbmvh04cd",
-                                use: "zh-CN",
                                 "zh-CN": "提议策略",
                               }),
                               span: 1,
@@ -474,7 +451,6 @@ class FederationDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "federation description",
                               key: "i18n-8weq4mfy9lf",
-                              use: "zh-CN",
                               "zh-CN": "联盟描述",
                             })}
                             span={1}
@@ -492,7 +468,6 @@ class FederationDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "creator",
                               key: "i18n-yyexdt18ora",
-                              use: "zh-CN",
                               "zh-CN": "创建人",
                             })}
                             span={1}
@@ -520,7 +495,6 @@ class FederationDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "members",
                               key: "i18n-21z9nbkoohk",
-                              use: "zh-CN",
                               "zh-CN": "成员限制",
                             })}
                             span={1}
@@ -536,7 +510,6 @@ class FederationDetail$$Page extends React.Component {
                                 {this._i18nText({
                                   "en-US": "Real-name authentication",
                                   key: "i18n-1g6cw1w1uv4",
-                                  use: "zh-CN",
                                   "zh-CN": "实名认证",
                                 })}
                               </Typography.Text>
@@ -548,7 +521,6 @@ class FederationDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "create time",
                               key: "i18n-9ox4rx1wtwv",
-                              use: "zh-CN",
                               "zh-CN": "创建时间",
                             })}
                             span={1}
@@ -572,7 +544,6 @@ class FederationDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "join time",
                               key: "i18n-c0d66z03kpk",
-                              use: "zh-CN",
                               "zh-CN": "加入时间",
                             })}
                             span={1}
@@ -596,7 +567,6 @@ class FederationDetail$$Page extends React.Component {
                             label={this._i18nText({
                               "en-US": "propsoal",
                               key: "i18n-g8rbmvh04cd",
-                              use: "zh-CN",
                               "zh-CN": "提议策略",
                             })}
                             span={1}
@@ -614,7 +584,6 @@ class FederationDetail$$Page extends React.Component {
                     label: this._i18nText({
                       "en-US": "federation infomation",
                       key: "i18n-a7fnfkzqkks",
-                      use: "zh-CN",
                       "zh-CN": "联盟信息",
                     }),
                   },
@@ -673,7 +642,6 @@ class FederationDetail$$Page extends React.Component {
                               {this._i18nText({
                                 "en-US": "add member",
                                 key: "i18n-gwumlhyv4ub",
-                                use: "zh-CN",
                                 "zh-CN": "邀请成员",
                               })}
                             </Button>
@@ -741,7 +709,6 @@ class FederationDetail$$Page extends React.Component {
                                   title: this._i18nText({
                                     "en-US": "organization",
                                     key: "i18n-gmx7l7tolvj",
-                                    use: "zh-CN",
                                     "zh-CN": "成员组织",
                                   }),
                                 },
@@ -760,7 +727,6 @@ class FederationDetail$$Page extends React.Component {
                                         {this._i18nText({
                                           "en-US": "Real-name authentication",
                                           key: "i18n-1g6cw1w1uv4",
-                                          use: "zh-CN",
                                           "zh-CN": "实名认证",
                                         })}
                                       </Typography.Text>
@@ -774,7 +740,6 @@ class FederationDetail$$Page extends React.Component {
                                   title: this._i18nText({
                                     "en-US": "infomation",
                                     key: "i18n-th9ag1qgsu",
-                                    use: "zh-CN",
                                     "zh-CN": "认证信息",
                                   }),
                                 },
@@ -798,7 +763,6 @@ class FederationDetail$$Page extends React.Component {
                                   title: this._i18nText({
                                     "en-US": "join time",
                                     key: "i18n-c0d66z03kpk",
-                                    use: "zh-CN",
                                     "zh-CN": "加入时间",
                                   }),
                                 },
@@ -868,7 +832,6 @@ class FederationDetail$$Page extends React.Component {
                                         {this._i18nText({
                                           "en-US": "delete",
                                           key: "i18n-ias68eipm18",
-                                          use: "zh-CN",
                                           "zh-CN": "删除",
                                         })}
                                       </Button>
@@ -882,7 +845,6 @@ class FederationDetail$$Page extends React.Component {
                                   title: this._i18nText({
                                     "en-US": "operation",
                                     key: "i18n-k5inn5jmnt9",
-                                    use: "zh-CN",
                                     "zh-CN": "操作",
                                   }),
                                   width: 100,
@@ -969,7 +931,6 @@ class FederationDetail$$Page extends React.Component {
                     label: this._i18nText({
                       "en-US": "federation members",
                       key: "i18n-8vybx9itd3n",
-                      use: "zh-CN",
                       "zh-CN": "联盟成员",
                     }),
                   },
@@ -1006,7 +967,6 @@ class FederationDetail$$Page extends React.Component {
                   {this._i18nText({
                     "en-US": "create network",
                     key: "i18n-kwbu3vyst6",
-                    use: "zh-CN",
                     "zh-CN": "新建网络",
                   })}
                 </Button>
@@ -1088,7 +1048,6 @@ class FederationDetail$$Page extends React.Component {
                     placeholder={this._i18nText({
                       "en-US": "search",
                       key: "i18n-mrdb0wulhmc",
-                      use: "zh-CN",
                       "zh-CN": "输入资源ID或网络名",
                     })}
                   />
@@ -1166,7 +1125,6 @@ class FederationDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "id/name",
                       key: "i18n-03e0p0acqmaf",
-                      use: "zh-CN",
                       "zh-CN": "资源ID/网络名称",
                     }),
                   },
@@ -1176,7 +1134,6 @@ class FederationDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "type",
                       key: "i18n-oi2oqdfkq6i",
-                      use: "zh-CN",
                       "zh-CN": "引擎类型",
                     }),
                   },
@@ -1204,7 +1161,6 @@ class FederationDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "organization",
                       key: "i18n-18ncsld69pu",
-                      use: "zh-CN",
                       "zh-CN": "组织数",
                     }),
                   },
@@ -1214,7 +1170,6 @@ class FederationDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "node number",
                       key: "i18n-fg85es7zp8",
-                      use: "zh-CN",
                       "zh-CN": "我的节点总数",
                     }),
                   },
@@ -1239,7 +1194,6 @@ class FederationDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "create time",
                       key: "i18n-9ox4rx1wtwv",
-                      use: "zh-CN",
                       "zh-CN": "创建时间",
                     }),
                   },
@@ -1263,7 +1217,6 @@ class FederationDetail$$Page extends React.Component {
                     title: this._i18nText({
                       "en-US": "time",
                       key: "i18n-scjygs4e08n",
-                      use: "zh-CN",
                       "zh-CN": "过期时间",
                     }),
                   },
@@ -1418,7 +1371,6 @@ class FederationDetail$$Page extends React.Component {
           title={this._i18nText({
             "en-US": "add member",
             key: "i18n-gwumlhyv4ub",
-            use: "zh-CN",
             "zh-CN": "邀请成员",
           })}
         >
@@ -1447,7 +1399,6 @@ class FederationDetail$$Page extends React.Component {
                   placeholder: this._i18nText({
                     "en-US": "name",
                     key: "i18n-ihfepbwjnv",
-                    use: "zh-CN",
                     "zh-CN": "被邀请的成员/组织名称",
                   }),
                 },
@@ -1460,7 +1411,6 @@ class FederationDetail$$Page extends React.Component {
                 title: this._i18nText({
                   "en-US": "Member organization",
                   key: "i18n-gmx7l7tolvj",
-                  use: "zh-CN",
                   "zh-CN": "成员组织",
                 }),
                 "x-validator": [],
@@ -1529,7 +1479,6 @@ class FederationDetail$$Page extends React.Component {
           title={this._i18nText({
             "en-US": "Delete a user",
             key: "i18n-h52hay1ld2s",
-            use: "zh-CN",
             "zh-CN": "删除用户",
           })}
         >
@@ -1539,7 +1488,6 @@ class FederationDetail$$Page extends React.Component {
             message={this._i18nText({
               "en-US": "Confirm user deletion",
               key: "i18n-mmk8cikrrw",
-              use: "zh-CN",
               "zh-CN": "确定删除用户",
             })}
             showIcon={true}

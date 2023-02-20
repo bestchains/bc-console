@@ -161,24 +161,16 @@ class Federation$$Page extends React.Component {
       });
     }
   }
-
+  
   async confirmDissolveModal(e, payload) {
     try {
-      var _this$state$record, _this$state$record2, _this$state$record2$i;
+      var _this$state$record;
       await this.props.appHelper.utils.bff.dissolveFederation({
         name:
           (_this$state$record = this.state.record) === null ||
           _this$state$record === void 0
             ? void 0
             : _this$state$record.name,
-        initiator:
-          (_this$state$record2 = this.state.record) === null ||
-          _this$state$record2 === void 0
-            ? void 0
-            : (_this$state$record2$i = _this$state$record2.initiator) ===
-                null || _this$state$record2$i === void 0
-            ? void 0
-            : _this$state$record2$i.name,
       });
       this.closeModal();
       this.utils.notification.success({
