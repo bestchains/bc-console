@@ -88,7 +88,10 @@ export const layout: RunTimeLayoutConfig = () => {
     fixSiderbar: true,
     rightContentRender: false, // umi !!!
     headerRender: notProdOrQiankun ? undefined : false,
-    menuRender: notProdOrQiankun ? undefined : false,
+    // 如果不渲染menu，布局会发生变化，导致 bc-console 无法自动占满页面高度
+    // 所以 qiankun 或 prod 下，应该渲染，但要自定义返回空内容，即 () => <></>
+    // https://github.com/bestchains/bc-console/issues/52
+    menuRender: notProdOrQiankun ? undefined : () => <></>,
     footerRender: false,
     avatarProps: {
       title: <Title />,
