@@ -7,18 +7,20 @@ import {
   Row,
   Col,
   Button,
-  Card,
   Tabs,
   Spin,
+  Card,
   Descriptions,
   Typography,
   Icon,
   Table,
+  Status,
   Space,
   Input,
   Modal,
   FormilyForm,
   FormilySelect,
+  UnifiedLink,
   Alert,
 } from '@tenx-ui/materials';
 
@@ -108,7 +110,6 @@ class FederationDetail$$Page extends React.Component {
         ? void 0
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
-      console.log(v, 'vvvvvvvvvvv');
       try {
         const res =
           await this.props.appHelper.utils.bff.addOrganizationToFederation({
@@ -118,10 +119,11 @@ class FederationDetail$$Page extends React.Component {
                 : federation.name,
             organizations: v.organizations,
           });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-x26twb9oy0l'),
-        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-x26twb9oy0l'),
+        // })
+        this.openAddUserSuccessModal();
         this.props.useGetFederation.mutate();
       } catch (error) {
         var _error$response;
@@ -162,10 +164,11 @@ class FederationDetail$$Page extends React.Component {
             ? void 0
             : _this$state$userRecor.name,
       });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-yy3f9rxigm'),
-      });
+      this.openDeleteUserSuccessModal();
+      // this.closeModal()
+      // this.utils.notification.success({
+      //   message: this.i18n('i18n-yy3f9rxigm'),
+      // })
       this.props.useGetFederation.mutate();
     } catch (error) {
       var _error$response;
@@ -231,12 +234,26 @@ class FederationDetail$$Page extends React.Component {
     });
   }
 
+  openAddUserSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addusersuccess',
+    });
+  }
+
   openDeleteUserModal(e, payload) {
     this.setState({
       isOpenModal: true,
       modalType: 'delete',
       userRecord:
         payload === null || payload === void 0 ? void 0 : payload.record,
+    });
+  }
+
+  openDeleteUserSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'deletesuccess',
     });
   }
 
@@ -287,42 +304,60 @@ class FederationDetail$$Page extends React.Component {
             />
           </Col>
           <Col __component_name="Col" span={24}>
-            <Card
-              __component_name="Card"
-              actions={[]}
-              bordered={false}
-              hoverable={false}
-              loading={false}
-              size="default"
-              type="default"
-            >
-              <Tabs
-                __component_name="Tabs"
-                destroyInactiveTabPane="true"
-                items={[
-                  {
-                    children: (
-                      <Spin
-                        __component_name="Spin"
-                        spinning={__$$eval(
-                          () => this.props.useGetFederation?.loading
-                        )}
+            <Tabs
+              __component_name="Tabs"
+              destroyInactiveTabPane="true"
+              items={[
+                {
+                  children: (
+                    <Spin
+                      __component_name="Spin"
+                      spinning={__$$eval(
+                        () => this.props.useGetFederation?.loading
+                      )}
+                    >
+                      <Card
+                        actions={[]}
+                        bordered={false}
+                        hoverable={false}
+                        loading={false}
+                        size="default"
+                        style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                        type="default"
                       >
                         <Descriptions
                           __component_name="Descriptions"
                           bordered={false}
                           colon={false}
-                          column={1}
+                          column={2}
                           items={[
                             {
                               children: __$$eval(
                                 () =>
                                   this.props.useGetFederation?.data?.federation
-                                    ?.description || '-'
+                                    ?.name || '-'
                               ),
-                              key: 'r4gchd14zz',
+                              key: 'd0kakhls3fk',
                               label:
-                                this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */,
+                                this.i18n('i18n-fvcps4edx44') /* 联盟名称 */,
+                              span: 1,
+                            },
+                            {
+                              children: (
+                                <Typography.Time
+                                  __component_name="Typography.Time"
+                                  format=""
+                                  relativeTime={false}
+                                  time={__$$eval(
+                                    () =>
+                                      this.props.useGetFederation?.data
+                                        ?.federation?.creationTimestamp
+                                  )}
+                                />
+                              ),
+                              key: 'o0cvbxwkrj',
+                              label:
+                                this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                               span: 1,
                             },
                             {
@@ -347,41 +382,6 @@ class FederationDetail$$Page extends React.Component {
                             },
                             {
                               children: (
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '' }}
-                                >
-                                  {this.i18n('i18n-1g6cw1w1uv4') /* 实名认证 */}
-                                </Typography.Text>
-                              ),
-                              key: 'lu5nygtudhq',
-                              label:
-                                this.i18n('i18n-21z9nbkoohk') /* 成员限制 */,
-                              span: 1,
-                            },
-                            {
-                              children: (
-                                <Typography.Time
-                                  __component_name="Typography.Time"
-                                  format=""
-                                  relativeTime={false}
-                                  time={__$$eval(
-                                    () =>
-                                      this.props.useGetFederation?.data
-                                        ?.federation?.creationTimestamp
-                                  )}
-                                />
-                              ),
-                              key: 'o0cvbxwkrj',
-                              label:
-                                this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
-                              span: 1,
-                            },
-                            {
-                              children: (
                                 <Typography.Time
                                   __component_name="Typography.Time"
                                   format=""
@@ -399,6 +399,34 @@ class FederationDetail$$Page extends React.Component {
                               span: 1,
                             },
                             {
+                              children: (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {this.i18n('i18n-1g6cw1w1uv4') /* 实名认证 */}
+                                </Typography.Text>
+                              ),
+                              key: 'lu5nygtudhq',
+                              label:
+                                this.i18n('i18n-21z9nbkoohk') /* 成员限制 */,
+                              span: 1,
+                            },
+                            {
+                              children: __$$eval(
+                                () =>
+                                  this.props.useGetFederation?.data?.federation
+                                    ?.description || '-'
+                              ),
+                              key: 'r4gchd14zz',
+                              label:
+                                this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */,
+                              span: 1,
+                            },
+                            {
                               children: __$$eval(
                                 () =>
                                   this.props.useGetFederation?.data?.federation
@@ -413,24 +441,36 @@ class FederationDetail$$Page extends React.Component {
                           labelStyle={{ width: 100 }}
                           layout="horizontal"
                           size="default"
-                          title={__$$eval(
-                            () =>
-                              this.props.useGetFederation?.data?.federation
-                                ?.name || '-'
-                          )}
                         >
                           <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="r4gchd14zz"
-                            label={this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */}
+                            key="d0kakhls3fk"
+                            label={this.i18n('i18n-fvcps4edx44') /* 联盟名称 */}
                             span={1}
-                            tab=""
                           >
                             {__$$eval(
                               () =>
                                 this.props.useGetFederation?.data?.federation
-                                  ?.description || '-'
+                                  ?.name || '-'
                             )}
+                          </Descriptions.Item>
+                          <Descriptions.Item
+                            __component_name="Descriptions.Item"
+                            key="o0cvbxwkrj"
+                            label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
+                            span={1}
+                          >
+                            {
+                              <Typography.Time
+                                __component_name="Typography.Time"
+                                format=""
+                                relativeTime={false}
+                                time={__$$eval(
+                                  () =>
+                                    this.props.useGetFederation?.data
+                                      ?.federation?.creationTimestamp
+                                )}
+                              />
+                            }
                           </Descriptions.Item>
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
@@ -457,43 +497,6 @@ class FederationDetail$$Page extends React.Component {
                           </Descriptions.Item>
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
-                            key="lu5nygtudhq"
-                            label={this.i18n('i18n-21z9nbkoohk') /* 成员限制 */}
-                            span={1}
-                          >
-                            {
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {this.i18n('i18n-1g6cw1w1uv4') /* 实名认证 */}
-                              </Typography.Text>
-                            }
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="o0cvbxwkrj"
-                            label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
-                            span={1}
-                          >
-                            {
-                              <Typography.Time
-                                __component_name="Typography.Time"
-                                format=""
-                                relativeTime={false}
-                                time={__$$eval(
-                                  () =>
-                                    this.props.useGetFederation?.data
-                                      ?.federation?.creationTimestamp
-                                )}
-                              />
-                            }
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
                             key="8ei6l6dk6xn"
                             label={this.i18n('i18n-c0d66z03kpk') /* 加入时间 */}
                             span={1}
@@ -513,6 +516,37 @@ class FederationDetail$$Page extends React.Component {
                           </Descriptions.Item>
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
+                            key="lu5nygtudhq"
+                            label={this.i18n('i18n-21z9nbkoohk') /* 成员限制 */}
+                            span={1}
+                          >
+                            {
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                disabled={false}
+                                ellipsis={true}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                              >
+                                {this.i18n('i18n-1g6cw1w1uv4') /* 实名认证 */}
+                              </Typography.Text>
+                            }
+                          </Descriptions.Item>
+                          <Descriptions.Item
+                            __component_name="Descriptions.Item"
+                            key="r4gchd14zz"
+                            label={this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */}
+                            span={1}
+                            tab=""
+                          >
+                            {__$$eval(
+                              () =>
+                                this.props.useGetFederation?.data?.federation
+                                  ?.description || '-'
+                            )}
+                          </Descriptions.Item>
+                          <Descriptions.Item
+                            __component_name="Descriptions.Item"
                             key="mljbt4bcmo"
                             label={this.i18n('i18n-g8rbmvh04cd') /* 提议策略 */}
                             span={1}
@@ -524,18 +558,28 @@ class FederationDetail$$Page extends React.Component {
                             )}
                           </Descriptions.Item>
                         </Descriptions>
-                      </Spin>
-                    ),
-                    key: 'tab-item-1',
-                    label: this.i18n('i18n-a7fnfkzqkks') /* 联盟信息 */,
-                  },
-                  {
-                    children: (
-                      <Spin
-                        __component_name="Spin"
-                        spinning={__$$eval(
-                          () => this.props.useGetFederation?.loading
-                        )}
+                      </Card>
+                    </Spin>
+                  ),
+                  key: 'tab-item-1',
+                  label: this.i18n('i18n-a7fnfkzqkks') /* 联盟信息 */,
+                },
+                {
+                  children: (
+                    <Spin
+                      __component_name="Spin"
+                      spinning={__$$eval(
+                        () => this.props.useGetFederation?.loading
+                      )}
+                    >
+                      <Card
+                        actions={[]}
+                        bordered={false}
+                        hoverable={false}
+                        loading={false}
+                        size="default"
+                        style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                        type="default"
                       >
                         <Row __component_name="Row" wrap={true}>
                           <Col __component_name="Col" span={24}>
@@ -676,6 +720,31 @@ class FederationDetail$$Page extends React.Component {
                                     ),
                                   title:
                                     this.i18n('i18n-th9ag1qgsu') /* 认证信息 */,
+                                },
+                                {
+                                  dataIndex: 'status',
+                                  render: (text, record, index) =>
+                                    ((__$$context) => (
+                                      <Status
+                                        id="disabled"
+                                        types={[
+                                          {
+                                            children: '未知',
+                                            icon: 'tenx-ui-icon:Circle',
+                                            id: 'disabled',
+                                            type: 'disabled',
+                                          },
+                                        ]}
+                                      />
+                                    ))(
+                                      __$$createChildContext(__$$context, {
+                                        text,
+                                        record,
+                                        index,
+                                      })
+                                    ),
+                                  title:
+                                    this.i18n('i18n-bik6xl952y6') /* 状态 */,
                                 },
                                 {
                                   dataIndex: 'joinedAt',
@@ -855,18 +924,18 @@ class FederationDetail$$Page extends React.Component {
                             />
                           </Col>
                         </Row>
-                      </Spin>
-                    ),
-                    key: 'tab-item-2',
-                    label: this.i18n('i18n-8vybx9itd3n') /* 联盟成员 */,
-                  },
-                ]}
-                size="large"
-                style={{ marginTop: '-20px' }}
-                tabPosition="top"
-                type="line"
-              />
-            </Card>
+                      </Card>
+                    </Spin>
+                  ),
+                  key: 'tab-item-2',
+                  label: this.i18n('i18n-8vybx9itd3n') /* 联盟成员 */,
+                },
+              ]}
+              size="large"
+              style={{ marginTop: '-20px', paddingLeft: '20px' }}
+              tabPosition="top"
+              type="line"
+            />
           </Col>
           <Col __component_name="Col" span={24}>
             <Row __component_name="Row" justify="space-between" wrap={false}>
@@ -967,9 +1036,7 @@ class FederationDetail$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    placeholder={
-                      this.i18n('i18n-mrdb0wulhmc') /* 输入资源ID或网络名 */
-                    }
+                    placeholder={this.i18n('i18n-mrdb0wulhmc') /* 输入网络名 */}
                   />
                 </Space>
               </Col>
@@ -1042,12 +1109,12 @@ class FederationDetail$$Page extends React.Component {
                   {
                     dataIndex: 'name',
                     key: 'name',
-                    title: this.i18n('i18n-03e0p0acqmaf') /* 资源ID/网络名称 */,
+                    title: this.i18n('i18n-03e0p0acqmaf') /* 网络名称 */,
                   },
                   {
                     dataIndex: 'ordererType',
                     key: 'ordererType',
-                    title: this.i18n('i18n-oi2oqdfkq6i') /* 引擎类型 */,
+                    title: this.i18n('i18n-7ww60oxk') /* 创建者 */,
                   },
                   {
                     dataIndex: 'organizations',
@@ -1075,7 +1142,7 @@ class FederationDetail$$Page extends React.Component {
                   {
                     dataIndex: 'clusterSize',
                     key: 'clusterSize',
-                    title: this.i18n('i18n-fg85es7zp8') /* 我的节点总数 */,
+                    title: this.i18n('i18n-707onz6g') /* 通道数 */,
                   },
                   {
                     dataIndex: 'creationTimestamp',
@@ -1115,6 +1182,52 @@ class FederationDetail$$Page extends React.Component {
                         })
                       ),
                     title: this.i18n('i18n-scjygs4e08n') /* 过期时间 */,
+                  },
+                  {
+                    dataIndex: 'status',
+                    key: 'status',
+                    render: (text, record, index) =>
+                      ((__$$context) => (
+                        <Status
+                          id="disabled"
+                          types={[
+                            {
+                              children: this.i18n('i18n-zrowlr7zwx') /* 正常 */,
+                              icon: 'CheckCircleFilled',
+                              id: 'NetworkCreated',
+                              type: 'success',
+                            },
+                            {
+                              children:
+                                this.i18n('i18n-j3czm9su41') /* 已解散 */,
+                              icon: 'CloseCircleFilled',
+                              id: 'NetworkDissolved',
+                              type: 'error',
+                            },
+                            {
+                              children:
+                                this.i18n('i18n-xtno2l9qqog') /* 异常 */,
+                              icon: 'CloseCircleFilled',
+                              id: 'Error',
+                              type: 'error',
+                            },
+                            {
+                              children:
+                                this.i18n('i18n-1vangoko4yf') /* 正常 */,
+                              icon: 'CheckCircleFilled',
+                              id: 'Created',
+                              type: 'success',
+                            },
+                          ]}
+                        />
+                      ))(
+                        __$$createChildContext(__$$context, {
+                          text,
+                          record,
+                          index,
+                        })
+                      ),
+                    title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
                   },
                 ]}
                 dataSource={__$$eval(() =>
@@ -1304,6 +1417,245 @@ class FederationDetail$$Page extends React.Component {
           </FormilyForm>
         </Modal>
         <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: false,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'addusersuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-riyqjouu') /* 成员邀请已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
+        </Modal>
+        <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: false,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal && this.state.modalType === 'deletesuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-zrvke1ab') /* 成员删除邀请已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
+        </Modal>
+        <Modal
           __component_name="Modal"
           __events={{
             eventDataList: [
@@ -1361,12 +1713,16 @@ class FederationDetail$$Page extends React.Component {
           open={__$$eval(
             () => this.state.isOpenModal && this.state.modalType === 'delete'
           )}
-          title={this.i18n('i18n-h52hay1ld2s') /* 删除用户 */}
+          title={this.i18n('i18n-c0g042oc') /* 确认发起删除成员提议 */}
         >
           <Alert
             __component_name="Alert"
             bordered="none"
-            message={this.i18n('i18n-mmk8cikrrw') /* 确定删除用户 */}
+            message={
+              this.i18n(
+                'i18n-asxi59j4'
+              ) /* 删除成员会同步从联盟下所有网络和通道中删除，请慎重！ */
+            }
             showIcon={true}
             type="warning"
           />
