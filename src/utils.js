@@ -1,7 +1,7 @@
-import { createRef } from "react";
-import { sdk as bff } from "../bff-sdk";
-import { message } from "antd";
-import { notification } from "@tenx-ui/materials";
+import { createRef } from 'react';
+import { sdk as bff } from '../bff-sdk';
+import { message } from 'antd';
+import { notification } from '@tenx-ui/materials';
 
 export class RefsManager {
   constructor() {
@@ -47,14 +47,14 @@ export class RefsManager {
   }
 }
 
-export const AUTH_DATA = "authData";
+export const AUTH_DATA = 'authData';
 
 export const getAuthData = () => {
   try {
-    const authData = JSON.parse(window.localStorage.getItem(AUTH_DATA) || "{}");
+    const authData = JSON.parse(window.localStorage.getItem(AUTH_DATA) || '{}');
     return authData;
   } catch (error) {
-    console.warn("getAuthData failed", error);
+    console.warn('getAuthData failed', error);
     return {};
   }
 };
@@ -70,7 +70,7 @@ export const removeAuthData = () => {
 
 export function parseToken(token) {
   return token
-    .split(".")
+    .split('.')
     .map((str) => {
       try {
         return JSON.parse(atob(str));

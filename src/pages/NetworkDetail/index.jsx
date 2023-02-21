@@ -1,6 +1,6 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
-import React from "react";
+import React from 'react';
 
 import {
   Page,
@@ -22,18 +22,18 @@ import {
   FormilyInput,
   FormilySelect,
   FormilyTextArea,
-} from "@tenx-ui/materials";
+} from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from "umi";
-import DataProvider from "../../components/DataProvider";
+import { useLocation, history, matchPath } from '@umijs/max';
+import DataProvider from '../../components/DataProvider';
 
-import utils, { RefsManager } from "../../utils";
+import utils, { RefsManager } from '../../utils';
 
-import * as __$$i18n from "../../i18n";
+import * as __$$i18n from '../../i18n';
 
-import __$$constants from "../../constants";
+import __$$constants from '../../constants';
 
-import "./index.css";
+import './index.css';
 
 class NetworkDetail$$Page extends React.Component {
   _context = this;
@@ -59,11 +59,11 @@ class NetworkDetail$$Page extends React.Component {
       channelRecord: {},
       channelSize: 10,
       current: 1,
-      filter: "ALL",
+      filter: 'ALL',
       isOpenModal: false,
-      modalType: "addchannel",
+      modalType: 'addchannel',
       organizations: [],
-      searchKey: "name",
+      searchKey: 'name',
       searchValue: undefined,
       size: 10,
     };
@@ -100,7 +100,7 @@ class NetworkDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetNet2.network) || {};
     const form =
-      (_this$$ = this.$("formily_create")) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -119,13 +119,13 @@ class NetworkDetail$$Page extends React.Component {
         // })
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n("i18n-l8fybssesij"),
+          message: this.i18n('i18n-l8fybssesij'),
         });
         this.props.useGetNetwork.mutate();
       } catch (error) {
         var _error$response;
         this.utils.notification.warnings({
-          message: this.i18n("i18n-85kkwp67i5u"),
+          message: this.i18n('i18n-85kkwp67i5u'),
           errors:
             error === null || error === void 0
               ? void 0
@@ -204,22 +204,22 @@ class NetworkDetail$$Page extends React.Component {
   openAddChannelModal() {
     this.setState({
       isOpenModal: true,
-      modalType: "addchannel",
+      modalType: 'addchannel',
     });
   }
 
   openDeleteChannelModal(e, payload) {
     this.setState({
       isOpenModal: true,
-      modalType: "delete",
+      modalType: 'delete',
       channelRecord:
         payload === null || payload === void 0 ? void 0 : payload.record,
     });
   }
 
   paginationShowTotal(total, range) {
-    return `${this.i18n("i18n-5xl7aihzcuy")} ${total} ${this.i18n(
-      "i18n-v7xu122b9o"
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
     )}`;
   }
 
@@ -252,16 +252,11 @@ class NetworkDetail$$Page extends React.Component {
           <Col
             __component_name="Col"
             span={24}
-            style={{ paddingBottom: "12px" }}
+            style={{ paddingBottom: '12px' }}
           >
             <Button.Back
               __component_name="Button.Back"
-              title={this._i18nText({
-                "en-US": "Network details",
-                key: "i18n-hpj9pfyfpq",
-                use: "en-US",
-                "zh-CN": "网络详情",
-              })}
+              title={this.i18n('i18n-hpj9pfyfpq') /* 网络详情 */}
               type="simple"
             />
           </Col>
@@ -297,15 +292,10 @@ class NetworkDetail$$Page extends React.Component {
                               children: __$$eval(
                                 () =>
                                   this.props.useGetNetwork?.data?.network
-                                    ?.initiator?.admin || "-"
+                                    ?.initiator?.admin || '-'
                               ),
-                              key: "r4gchd14zz",
-                              label: this._i18nText({
-                                "en-US": "creator",
-                                key: "i18n-yyexdt18ora",
-                                use: "en-US",
-                                "zh-CN": "创建人",
-                              }),
+                              key: 'r4gchd14zz',
+                              label: this.i18n('i18n-yyexdt18ora') /* 创建人 */,
                               span: 1,
                             },
                             {
@@ -315,22 +305,18 @@ class NetworkDetail$$Page extends React.Component {
                                   disabled={false}
                                   ellipsis={true}
                                   strong={false}
-                                  style={{ fontSize: "" }}
+                                  style={{ fontSize: '' }}
                                 >
                                   {__$$eval(
                                     () =>
                                       this.props.useGetNetwork?.data?.network
-                                        ?.organizations?.length || "0"
+                                        ?.organizations?.length || '0'
                                   )}
                                 </Typography.Text>
                               ),
-                              key: "bdr5go2aun",
-                              label: this._i18nText({
-                                "en-US": "Number of members",
-                                key: "i18n-4btnh7pqt1m",
-                                use: "en-US",
-                                "zh-CN": "成员个数",
-                              }),
+                              key: 'bdr5go2aun',
+                              label:
+                                this.i18n('i18n-4btnh7pqt1m') /* 成员个数 */,
                               span: 1,
                             },
                             {
@@ -346,13 +332,9 @@ class NetworkDetail$$Page extends React.Component {
                                   )}
                                 />
                               ),
-                              key: "o0cvbxwkrj",
-                              label: this._i18nText({
-                                "en-US": "create time",
-                                key: "i18n-9ox4rx1wtwv",
-                                use: "en-US",
-                                "zh-CN": "创建时间",
-                              }),
+                              key: 'o0cvbxwkrj',
+                              label:
+                                this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                               span: 1,
                             },
                             {
@@ -368,28 +350,19 @@ class NetworkDetail$$Page extends React.Component {
                                   )}
                                 />
                               ),
-                              key: "8ei6l6dk6xn",
-                              label: this._i18nText({
-                                "en-US": "Update time",
-                                key: "i18n-watjije0jk",
-                                use: "en-US",
-                                "zh-CN": "更新时间",
-                              }),
+                              key: '8ei6l6dk6xn',
+                              label:
+                                this.i18n('i18n-watjije0jk') /* 更新时间 */,
                               span: 1,
                             },
                             {
                               children: __$$eval(
                                 () =>
                                   this.props.useGetNetwork?.data?.network
-                                    ?.version || "-"
+                                    ?.version || '-'
                               ),
-                              key: "mljbt4bcmo",
-                              label: this._i18nText({
-                                "en-US": "Version",
-                                key: "i18n-hbf63hki898",
-                                use: "en-US",
-                                "zh-CN": "版本",
-                              }),
+                              key: 'mljbt4bcmo',
+                              label: this.i18n('i18n-hbf63hki898') /* 版本 */,
                               span: 1,
                             },
                             {
@@ -402,35 +375,29 @@ class NetworkDetail$$Page extends React.Component {
                                   items={[
                                     {
                                       children: null,
-                                      key: "ufknvxft0u",
-                                      label: this._i18nText({
-                                        "en-US": "Consensus algorithm",
-                                        key: "i18n-twykcar3l6l",
-                                        use: "en-US",
-                                        "zh-CN": "共识算法",
-                                      }),
+                                      key: 'ufknvxft0u',
+                                      label:
+                                        this.i18n(
+                                          'i18n-twykcar3l6l'
+                                        ) /* 共识算法 */,
                                       span: 1,
                                     },
                                     {
                                       children: null,
-                                      key: "81dsq3cni9b",
-                                      label: this._i18nText({
-                                        "en-US": "Cluster size",
-                                        key: "i18n-ax4swl3ryv7",
-                                        use: "en-US",
-                                        "zh-CN": "集群大小",
-                                      }),
+                                      key: '81dsq3cni9b',
+                                      label:
+                                        this.i18n(
+                                          'i18n-ax4swl3ryv7'
+                                        ) /* 集群大小 */,
                                       span: 1,
                                     },
                                     {
                                       children: null,
-                                      key: "634p9mdxipk",
-                                      label: this._i18nText({
-                                        "en-US": "Node database",
-                                        key: "i18n-kqc5q3s99wo",
-                                        use: "en-US",
-                                        "zh-CN": "节点数据库",
-                                      }),
+                                      key: '634p9mdxipk',
+                                      label:
+                                        this.i18n(
+                                          'i18n-kqc5q3s99wo'
+                                        ) /* 节点数据库 */,
                                       span: 1,
                                     },
                                   ]}
@@ -442,12 +409,11 @@ class NetworkDetail$$Page extends React.Component {
                                   <Descriptions.Item
                                     __component_name="Descriptions.Item"
                                     key="ufknvxft0u"
-                                    label={this._i18nText({
-                                      "en-US": "Consensus algorithm",
-                                      key: "i18n-twykcar3l6l",
-                                      use: "en-US",
-                                      "zh-CN": "共识算法",
-                                    })}
+                                    label={
+                                      this.i18n(
+                                        'i18n-twykcar3l6l'
+                                      ) /* 共识算法 */
+                                    }
                                     span={1}
                                   >
                                     {null}
@@ -455,12 +421,11 @@ class NetworkDetail$$Page extends React.Component {
                                   <Descriptions.Item
                                     __component_name="Descriptions.Item"
                                     key="81dsq3cni9b"
-                                    label={this._i18nText({
-                                      "en-US": "Cluster size",
-                                      key: "i18n-ax4swl3ryv7",
-                                      use: "en-US",
-                                      "zh-CN": "集群大小",
-                                    })}
+                                    label={
+                                      this.i18n(
+                                        'i18n-ax4swl3ryv7'
+                                      ) /* 集群大小 */
+                                    }
                                     span={1}
                                   >
                                     {null}
@@ -468,25 +433,19 @@ class NetworkDetail$$Page extends React.Component {
                                   <Descriptions.Item
                                     __component_name="Descriptions.Item"
                                     key="634p9mdxipk"
-                                    label={this._i18nText({
-                                      "en-US": "Node database",
-                                      key: "i18n-kqc5q3s99wo",
-                                      use: "en-US",
-                                      "zh-CN": "节点数据库",
-                                    })}
+                                    label={
+                                      this.i18n(
+                                        'i18n-kqc5q3s99wo'
+                                      ) /* 节点数据库 */
+                                    }
                                     span={1}
                                   >
                                     {null}
                                   </Descriptions.Item>
                                 </Descriptions>
                               ),
-                              key: "i1zeuy7pn4n",
-                              label: this._i18nText({
-                                "en-US": "Consensus component",
-                                key: "i18n-xgyxfdl8q",
-                                use: "en-US",
-                                "zh-CN": "共识组件",
-                              }),
+                              key: 'i1zeuy7pn4n',
+                              label: this.i18n('i18n-xgyxfdl8q') /* 共识组件 */,
                               span: 1,
                             },
                             {
@@ -500,48 +459,37 @@ class NetworkDetail$$Page extends React.Component {
                                   )}
                                   types={[
                                     {
-                                      children: this._i18nText({
-                                        "en-US": "NetworkCreated",
-                                        key: "i18n-zrowlr7zwx",
-                                        use: "en-US",
-                                        "zh-CN": "运行中",
-                                      }),
-                                      icon: "CheckCircleFilled",
-                                      id: "NetworkCreated",
-                                      type: "success",
+                                      children:
+                                        this.i18n(
+                                          'i18n-zrowlr7zwx'
+                                        ) /* 运行中 */,
+                                      icon: 'CheckCircleFilled',
+                                      id: 'NetworkCreated',
+                                      type: 'success',
                                     },
                                     {
-                                      children: this._i18nText({
-                                        "en-US": "NetworkDissolved",
-                                        key: "i18n-j3czm9su41",
-                                        use: "en-US",
-                                        "zh-CN": "已解散",
-                                      }),
-                                      icon: "CloseCircleFilled",
-                                      id: "NetworkDissolved",
-                                      type: "error",
+                                      children:
+                                        this.i18n(
+                                          'i18n-j3czm9su41'
+                                        ) /* 已解散 */,
+                                      icon: 'CloseCircleFilled',
+                                      id: 'NetworkDissolved',
+                                      type: 'error',
                                     },
                                     {
-                                      children: this._i18nText({
-                                        "en-US": "Error",
-                                        key: "i18n-xtno2l9qqog",
-                                        use: "en-US",
-                                        "zh-CN": "异常",
-                                      }),
-                                      icon: "CloseCircleFilled",
-                                      id: "Error",
-                                      type: "error",
+                                      children:
+                                        this.i18n(
+                                          'i18n-xtno2l9qqog'
+                                        ) /* 异常 */,
+                                      icon: 'CloseCircleFilled',
+                                      id: 'Error',
+                                      type: 'error',
                                     },
                                   ]}
                                 />
                               ),
-                              key: "s3t5k3dk449",
-                              label: this._i18nText({
-                                "en-US": "status",
-                                key: "i18n-bik6xl952y6",
-                                use: "en-US",
-                                "zh-CN": "状态",
-                              }),
+                              key: 's3t5k3dk449',
+                              label: this.i18n('i18n-bik6xl952y6') /* 状态 */,
                               span: 1,
                             },
                           ]}
@@ -555,30 +503,20 @@ class NetworkDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="r4gchd14zz"
-                            label={this._i18nText({
-                              "en-US": "creator",
-                              key: "i18n-yyexdt18ora",
-                              use: "en-US",
-                              "zh-CN": "创建人",
-                            })}
+                            label={this.i18n('i18n-yyexdt18ora') /* 创建人 */}
                             span={1}
                             tab=""
                           >
                             {__$$eval(
                               () =>
                                 this.props.useGetNetwork?.data?.network
-                                  ?.initiator?.admin || "-"
+                                  ?.initiator?.admin || '-'
                             )}
                           </Descriptions.Item>
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="bdr5go2aun"
-                            label={this._i18nText({
-                              "en-US": "Number of members",
-                              key: "i18n-4btnh7pqt1m",
-                              use: "en-US",
-                              "zh-CN": "成员个数",
-                            })}
+                            label={this.i18n('i18n-4btnh7pqt1m') /* 成员个数 */}
                             span={1}
                             tab=""
                           >
@@ -588,12 +526,12 @@ class NetworkDetail$$Page extends React.Component {
                                 disabled={false}
                                 ellipsis={true}
                                 strong={false}
-                                style={{ fontSize: "" }}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(
                                   () =>
                                     this.props.useGetNetwork?.data?.network
-                                      ?.organizations?.length || "0"
+                                      ?.organizations?.length || '0'
                                 )}
                               </Typography.Text>
                             }
@@ -601,12 +539,7 @@ class NetworkDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="o0cvbxwkrj"
-                            label={this._i18nText({
-                              "en-US": "create time",
-                              key: "i18n-9ox4rx1wtwv",
-                              use: "en-US",
-                              "zh-CN": "创建时间",
-                            })}
+                            label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
                             span={1}
                           >
                             {
@@ -625,12 +558,7 @@ class NetworkDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="8ei6l6dk6xn"
-                            label={this._i18nText({
-                              "en-US": "Update time",
-                              key: "i18n-watjije0jk",
-                              use: "en-US",
-                              "zh-CN": "更新时间",
-                            })}
+                            label={this.i18n('i18n-watjije0jk') /* 更新时间 */}
                             span={1}
                           >
                             {
@@ -649,29 +577,19 @@ class NetworkDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="mljbt4bcmo"
-                            label={this._i18nText({
-                              "en-US": "Version",
-                              key: "i18n-hbf63hki898",
-                              use: "en-US",
-                              "zh-CN": "版本",
-                            })}
+                            label={this.i18n('i18n-hbf63hki898') /* 版本 */}
                             span={1}
                           >
                             {__$$eval(
                               () =>
                                 this.props.useGetNetwork?.data?.network
-                                  ?.version || "-"
+                                  ?.version || '-'
                             )}
                           </Descriptions.Item>
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="i1zeuy7pn4n"
-                            label={this._i18nText({
-                              "en-US": "Consensus component",
-                              key: "i18n-xgyxfdl8q",
-                              use: "en-US",
-                              "zh-CN": "共识组件",
-                            })}
+                            label={this.i18n('i18n-xgyxfdl8q') /* 共识组件 */}
                             span={1}
                           >
                             {
@@ -687,41 +605,35 @@ class NetworkDetail$$Page extends React.Component {
                                         this.props.useGetNetwork?.data?.network
                                           ?.ordererType
                                     ),
-                                    key: "ufknvxft0u",
-                                    label: this._i18nText({
-                                      "en-US": "Consensus algorithm",
-                                      key: "i18n-twykcar3l6l",
-                                      use: "en-US",
-                                      "zh-CN": "共识算法",
-                                    }),
+                                    key: 'ufknvxft0u',
+                                    label:
+                                      this.i18n(
+                                        'i18n-twykcar3l6l'
+                                      ) /* 共识算法 */,
                                     span: 1,
                                   },
                                   {
                                     _unsafe_MixedSetter_children_select:
-                                      "VariableSetter",
+                                      'VariableSetter',
                                     children: __$$eval(
                                       () =>
                                         this.props.useGetNetwork?.data?.network
                                           ?.clusterSize
                                     ),
-                                    key: "81dsq3cni9b",
-                                    label: this._i18nText({
-                                      "en-US": "Cluster size",
-                                      key: "i18n-ax4swl3ryv7",
-                                      use: "en-US",
-                                      "zh-CN": "集群大小",
-                                    }),
+                                    key: '81dsq3cni9b',
+                                    label:
+                                      this.i18n(
+                                        'i18n-ax4swl3ryv7'
+                                      ) /* 集群大小 */,
                                     span: 1,
                                   },
                                   {
                                     children: null,
-                                    key: "634p9mdxipk",
-                                    label: this._i18nText({
-                                      "en-US": "Node database",
-                                      key: "i18n-kqc5q3s99wo",
-                                      use: "en-US",
-                                      "zh-CN": "节点数据库",
-                                    }),
+                                    key: '634p9mdxipk',
+                                    label:
+                                      this.i18n(
+                                        'i18n-kqc5q3s99wo'
+                                      ) /* 节点数据库 */,
                                     span: 1,
                                   },
                                 ]}
@@ -733,12 +645,9 @@ class NetworkDetail$$Page extends React.Component {
                                 <Descriptions.Item
                                   __component_name="Descriptions.Item"
                                   key="ufknvxft0u"
-                                  label={this._i18nText({
-                                    "en-US": "Consensus algorithm",
-                                    key: "i18n-twykcar3l6l",
-                                    use: "en-US",
-                                    "zh-CN": "共识算法",
-                                  })}
+                                  label={
+                                    this.i18n('i18n-twykcar3l6l') /* 共识算法 */
+                                  }
                                   span={1}
                                 >
                                   {__$$eval(
@@ -750,12 +659,9 @@ class NetworkDetail$$Page extends React.Component {
                                 <Descriptions.Item
                                   __component_name="Descriptions.Item"
                                   key="81dsq3cni9b"
-                                  label={this._i18nText({
-                                    "en-US": "Cluster size",
-                                    key: "i18n-ax4swl3ryv7",
-                                    use: "en-US",
-                                    "zh-CN": "集群大小",
-                                  })}
+                                  label={
+                                    this.i18n('i18n-ax4swl3ryv7') /* 集群大小 */
+                                  }
                                   span={1}
                                 >
                                   {__$$eval(
@@ -767,12 +673,11 @@ class NetworkDetail$$Page extends React.Component {
                                 <Descriptions.Item
                                   __component_name="Descriptions.Item"
                                   key="634p9mdxipk"
-                                  label={this._i18nText({
-                                    "en-US": "Node database",
-                                    key: "i18n-kqc5q3s99wo",
-                                    use: "en-US",
-                                    "zh-CN": "节点数据库",
-                                  })}
+                                  label={
+                                    this.i18n(
+                                      'i18n-kqc5q3s99wo'
+                                    ) /* 节点数据库 */
+                                  }
                                   span={1}
                                 >
                                   {null}
@@ -783,12 +688,7 @@ class NetworkDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="s3t5k3dk449"
-                            label={this._i18nText({
-                              "en-US": "status",
-                              key: "i18n-bik6xl952y6",
-                              use: "en-US",
-                              "zh-CN": "状态",
-                            })}
+                            label={this.i18n('i18n-bik6xl952y6') /* 状态 */}
                             span={1}
                           >
                             {
@@ -801,48 +701,32 @@ class NetworkDetail$$Page extends React.Component {
                                 )}
                                 types={[
                                   {
-                                    children: this._i18nText({
-                                      "en-US": "NetworkCreated",
-                                      key: "i18n-zrowlr7zwx",
-                                      use: "en-US",
-                                      "zh-CN": "运行中",
-                                    }),
-                                    icon: "CheckCircleFilled",
-                                    id: "NetworkCreated",
-                                    type: "success",
+                                    children:
+                                      this.i18n('i18n-zrowlr7zwx') /* 运行中 */,
+                                    icon: 'CheckCircleFilled',
+                                    id: 'NetworkCreated',
+                                    type: 'success',
                                   },
                                   {
-                                    children: this._i18nText({
-                                      "en-US": "NetworkDissolved",
-                                      key: "i18n-j3czm9su41",
-                                      use: "en-US",
-                                      "zh-CN": "已解散",
-                                    }),
-                                    icon: "CloseCircleFilled",
-                                    id: "NetworkDissolved",
-                                    type: "error",
+                                    children:
+                                      this.i18n('i18n-j3czm9su41') /* 已解散 */,
+                                    icon: 'CloseCircleFilled',
+                                    id: 'NetworkDissolved',
+                                    type: 'error',
                                   },
                                   {
-                                    children: this._i18nText({
-                                      "en-US": "Error",
-                                      key: "i18n-xtno2l9qqog",
-                                      use: "en-US",
-                                      "zh-CN": "异常",
-                                    }),
-                                    icon: "CloseCircleFilled",
-                                    id: "Error",
-                                    type: "error",
+                                    children:
+                                      this.i18n('i18n-xtno2l9qqog') /* 异常 */,
+                                    icon: 'CloseCircleFilled',
+                                    id: 'Error',
+                                    type: 'error',
                                   },
                                   {
-                                    children: this._i18nText({
-                                      "en-US": "Created",
-                                      key: "i18n-1vangoko4yf",
-                                      use: "en-US",
-                                      "zh-CN": "正常",
-                                    }),
-                                    icon: "CheckCircleFilled",
-                                    id: "Created",
-                                    type: "success",
+                                    children:
+                                      this.i18n('i18n-1vangoko4yf') /* 正常 */,
+                                    icon: 'CheckCircleFilled',
+                                    id: 'Created',
+                                    type: 'success',
                                   },
                                 ]}
                               />
@@ -851,13 +735,8 @@ class NetworkDetail$$Page extends React.Component {
                         </Descriptions>
                       </Spin>
                     ),
-                    key: "tab-item-1",
-                    label: this._i18nText({
-                      "en-US": "Network information",
-                      key: "i18n-y0o0zplhhom",
-                      use: "en-US",
-                      "zh-CN": "网络信息",
-                    }),
+                    key: 'tab-item-1',
+                    label: this.i18n('i18n-y0o0zplhhom') /* 网络信息 */,
                   },
                   {
                     children: (
@@ -872,49 +751,49 @@ class NetworkDetail$$Page extends React.Component {
                           __events={{
                             eventDataList: [
                               {
-                                name: "onChange",
-                                relatedEventName: "handleUserTableChange",
-                                type: "componentEvent",
+                                name: 'onChange',
+                                relatedEventName: 'handleUserTableChange',
+                                type: 'componentEvent',
                               },
                               {
-                                name: "pagination.onChange",
-                                relatedEventName: "handleUserPaginationChange",
-                                type: "componentEvent",
+                                name: 'pagination.onChange',
+                                relatedEventName: 'handleUserPaginationChange',
+                                type: 'componentEvent',
                               },
                               {
-                                name: "pagination.onShowSizeChange",
-                                relatedEventName: "handleUserPaginationChange",
-                                type: "componentEvent",
+                                name: 'pagination.onShowSizeChange',
+                                relatedEventName: 'handleUserPaginationChange',
+                                type: 'componentEvent',
                               },
                             ],
                             eventList: [
                               {
                                 disabled: true,
-                                name: "onChange",
+                                name: 'onChange',
                                 template:
                                   "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
                               },
                               {
                                 disabled: false,
-                                name: "rowSelection.onChange",
+                                name: 'rowSelection.onChange',
                                 template:
                                   "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
                               },
                               {
                                 disabled: false,
-                                name: "expandable.onExpand",
+                                name: 'expandable.onExpand',
                                 template:
                                   "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
                               },
                               {
                                 disabled: true,
-                                name: "pagination.onChange",
+                                name: 'pagination.onChange',
                                 template:
                                   "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
                               },
                               {
                                 disabled: true,
-                                name: "pagination.onShowSizeChange",
+                                name: 'pagination.onShowSizeChange',
                                 template:
                                   "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
                               },
@@ -922,18 +801,14 @@ class NetworkDetail$$Page extends React.Component {
                           }}
                           columns={[
                             {
-                              dataIndex: "name",
-                              key: "name",
-                              title: this._i18nText({
-                                "en-US": "organization",
-                                key: "i18n-gmx7l7tolvj",
-                                use: "en-US",
-                                "zh-CN": "成员组织",
-                              }),
+                              dataIndex: 'name',
+                              key: 'name',
+                              title:
+                                this.i18n('i18n-gmx7l7tolvj') /* 成员组织 */,
                             },
                             {
-                              dataIndex: "age",
-                              key: "age",
+                              dataIndex: 'age',
+                              key: 'age',
                               render: (text, record, index) =>
                                 ((__$$context) => (
                                   <Typography.Text
@@ -941,14 +816,13 @@ class NetworkDetail$$Page extends React.Component {
                                     disabled={false}
                                     ellipsis={true}
                                     strong={false}
-                                    style={{ fontSize: "" }}
+                                    style={{ fontSize: '' }}
                                   >
-                                    {this._i18nText({
-                                      "en-US": "Real-name authentication",
-                                      key: "i18n-1g6cw1w1uv4",
-                                      use: "en-US",
-                                      "zh-CN": "实名认证",
-                                    })}
+                                    {
+                                      this.i18n(
+                                        'i18n-1g6cw1w1uv4'
+                                      ) /* 实名认证 */
+                                    }
                                   </Typography.Text>
                                 ))(
                                   __$$createChildContext(__$$context, {
@@ -957,26 +831,18 @@ class NetworkDetail$$Page extends React.Component {
                                     index,
                                   })
                                 ),
-                              title: this._i18nText({
-                                "en-US": "infomation",
-                                key: "i18n-th9ag1qgsu",
-                                use: "en-US",
-                                "zh-CN": "认证信息",
-                              }),
+                              title:
+                                this.i18n('i18n-th9ag1qgsu') /* 认证信息 */,
                             },
                             {
-                              dataIndex: "num",
-                              key: "num",
-                              title: this._i18nText({
-                                "en-US": "Number of added nodes",
-                                key: "i18n-rs16rywzo",
-                                use: "en-US",
-                                "zh-CN": "加入节点个数",
-                              }),
+                              dataIndex: 'num',
+                              key: 'num',
+                              title:
+                                this.i18n('i18n-rs16rywzo') /* 加入节点个数 */,
                             },
                             {
-                              dataIndex: "joinedAt",
-                              key: "joinedAt",
+                              dataIndex: 'joinedAt',
+                              key: 'joinedAt',
                               render: (text, record, index) =>
                                 ((__$$context) => (
                                   <Typography.Time
@@ -991,12 +857,10 @@ class NetworkDetail$$Page extends React.Component {
                                     index,
                                   })
                                 ),
-                              title: this._i18nText({
-                                "en-US": "The last time a node was added",
-                                key: "i18n-iku70tej4ja",
-                                use: "en-US",
-                                "zh-CN": "节点最近加入时间",
-                              }),
+                              title:
+                                this.i18n(
+                                  'i18n-iku70tej4ja'
+                                ) /* 节点最近加入时间 */,
                             },
                           ]}
                           dataSource={__$$eval(() =>
@@ -1004,7 +868,7 @@ class NetworkDetail$$Page extends React.Component {
                               this.props.useGetNetwork?.data?.network
                                 ?.organizations || []
                             )?.sort((a, b) => {
-                              if (this.state.sorter?.order !== "ascend") {
+                              if (this.state.sorter?.order !== 'ascend') {
                                 return (
                                   new Date(b.joinedAt).getTime() -
                                   new Date(a.joinedAt).getTime()
@@ -1049,7 +913,7 @@ class NetworkDetail$$Page extends React.Component {
                               );
                             }.bind(this),
                             simple: false,
-                            size: "default",
+                            size: 'default',
                             total: __$$eval(
                               () =>
                                 (
@@ -1065,17 +929,12 @@ class NetworkDetail$$Page extends React.Component {
                         />
                       </Spin>
                     ),
-                    key: "tab-item-2",
-                    label: this._i18nText({
-                      "en-US": "Network member",
-                      key: "i18n-xinrdc2qk1f",
-                      use: "en-US",
-                      "zh-CN": "网络成员",
-                    }),
+                    key: 'tab-item-2',
+                    label: this.i18n('i18n-xinrdc2qk1f') /* 网络成员 */,
                   },
                 ]}
                 size="large"
-                style={{ marginTop: "-20px" }}
+                style={{ marginTop: '-20px' }}
                 tabPosition="top"
                 type="line"
               />
@@ -1089,15 +948,15 @@ class NetworkDetail$$Page extends React.Component {
                   __events={{
                     eventDataList: [
                       {
-                        name: "onClick",
-                        relatedEventName: "openAddChannelModal",
-                        type: "componentEvent",
+                        name: 'onClick',
+                        relatedEventName: 'openAddChannelModal',
+                        type: 'componentEvent',
                       },
                     ],
                     eventList: [
                       {
                         disabled: true,
-                        name: "onClick",
+                        name: 'onClick',
                         template:
                           "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                       },
@@ -1126,12 +985,7 @@ class NetworkDetail$$Page extends React.Component {
                   target="_self"
                   type="primary"
                 >
-                  {this._i18nText({
-                    "en-US": "New channel",
-                    key: "i18n-snaon3b2fni",
-                    use: "en-US",
-                    "zh-CN": "新建通道",
-                  })}
+                  {this.i18n('i18n-snaon3b2fni') /* 新建通道 */}
                 </Button>
               </Col>
               <Col __component_name="Col">
@@ -1146,57 +1000,57 @@ class NetworkDetail$$Page extends React.Component {
                     __events={{
                       eventDataList: [
                         {
-                          name: "onChange",
-                          relatedEventName: "handleSearchValueChange",
-                          type: "componentEvent",
+                          name: 'onChange',
+                          relatedEventName: 'handleSearchValueChange',
+                          type: 'componentEvent',
                         },
                       ],
                       eventList: [
                         {
                           disabled: true,
-                          name: "onChange",
+                          name: 'onChange',
                           template:
                             "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onPressEnter",
+                          name: 'onPressEnter',
                           template:
                             "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onSearch",
+                          name: 'onSearch',
                           template:
                             "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
                         },
                         {
                           disabled: false,
-                          name: "onFocus",
+                          name: 'onFocus',
                           template:
                             "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyDown",
+                          name: 'onKeyDown',
                           template:
                             "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyPress",
+                          name: 'onKeyPress',
                           template:
                             "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyUp",
+                          name: 'onKeyUp',
                           template:
                             "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onBlur",
+                          name: 'onBlur',
                           template:
                             "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
                         },
@@ -1208,12 +1062,9 @@ class NetworkDetail$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    placeholder={this._i18nText({
-                      "en-US": "Enter a channel name",
-                      key: "i18n-ajsvl5v284r",
-                      use: "en-US",
-                      "zh-CN": "输入通道名称查询",
-                    })}
+                    placeholder={
+                      this.i18n('i18n-ajsvl5v284r') /* 输入通道名称查询 */
+                    }
                   />
                 </Space>
               </Col>
@@ -1234,49 +1085,49 @@ class NetworkDetail$$Page extends React.Component {
                 __events={{
                   eventDataList: [
                     {
-                      name: "onChange",
-                      relatedEventName: "handleTableChange",
-                      type: "componentEvent",
+                      name: 'onChange',
+                      relatedEventName: 'handleTableChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "pagination.onChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "pagination.onShowSizeChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onShowSizeChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                   ],
                   eventList: [
                     {
                       disabled: true,
-                      name: "onChange",
+                      name: 'onChange',
                       template:
                         "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
                     },
                     {
                       disabled: false,
-                      name: "rowSelection.onChange",
+                      name: 'rowSelection.onChange',
                       template:
                         "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
                     },
                     {
                       disabled: false,
-                      name: "expandable.onExpand",
+                      name: 'expandable.onExpand',
                       template:
                         "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onChange",
+                      name: 'pagination.onChange',
                       template:
                         "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onShowSizeChange",
+                      name: 'pagination.onShowSizeChange',
                       template:
                         "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
                     },
@@ -1284,28 +1135,18 @@ class NetworkDetail$$Page extends React.Component {
                 }}
                 columns={[
                   {
-                    dataIndex: "name",
-                    key: "name",
-                    title: this._i18nText({
-                      "en-US": "Channel name",
-                      key: "i18n-6oadzcxin7k",
-                      use: "en-US",
-                      "zh-CN": "通道名称",
-                    }),
+                    dataIndex: 'name',
+                    key: 'name',
+                    title: this.i18n('i18n-6oadzcxin7k') /* 通道名称 */,
                   },
                   {
-                    dataIndex: "creator",
-                    key: "creator",
-                    title: this._i18nText({
-                      "en-US": "initiator",
-                      key: "i18n-wctt13ld2x",
-                      use: "en-US",
-                      "zh-CN": "发起者",
-                    }),
+                    dataIndex: 'creator',
+                    key: 'creator',
+                    title: this.i18n('i18n-wctt13ld2x') /* 发起者 */,
                   },
                   {
-                    dataIndex: "proposal",
-                    key: "proposal",
+                    dataIndex: 'proposal',
+                    key: 'proposal',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Text
@@ -1313,7 +1154,7 @@ class NetworkDetail$$Page extends React.Component {
                           disabled={false}
                           ellipsis={true}
                           strong={false}
-                          style={{ fontSize: "" }}
+                          style={{ fontSize: '' }}
                         >
                           {__$$eval(() => text?.length || 0)}
                         </Typography.Text>
@@ -1324,26 +1165,16 @@ class NetworkDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "Relevant proposal",
-                      key: "i18n-4idd49uxsod",
-                      use: "en-US",
-                      "zh-CN": "相关提议",
-                    }),
+                    title: this.i18n('i18n-4idd49uxsod') /* 相关提议 */,
                   },
                   {
-                    dataIndex: "clusterSize",
-                    key: "clusterSize",
-                    title: this._i18nText({
-                      "en-US": "Number of members",
-                      key: "i18n-4btnh7pqt1m",
-                      use: "en-US",
-                      "zh-CN": "成员个数",
-                    }),
+                    dataIndex: 'clusterSize',
+                    key: 'clusterSize',
+                    title: this.i18n('i18n-4btnh7pqt1m') /* 成员个数 */,
                   },
                   {
-                    dataIndex: "creationTimestamp",
-                    key: "creationTimestamp",
+                    dataIndex: 'creationTimestamp',
+                    key: 'creationTimestamp',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Time
@@ -1359,16 +1190,11 @@ class NetworkDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "create time",
-                      key: "i18n-9ox4rx1wtwv",
-                      use: "en-US",
-                      "zh-CN": "创建时间",
-                    }),
+                    title: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                   },
                   {
-                    dataIndex: "number",
-                    key: "number",
+                    dataIndex: 'number',
+                    key: 'number',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Time
@@ -1383,32 +1209,17 @@ class NetworkDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "Number of nodes",
-                      key: "i18n-kh6e0jr0i7b",
-                      use: "en-US",
-                      "zh-CN": "节点数量",
-                    }),
+                    title: this.i18n('i18n-kh6e0jr0i7b') /* 节点数量 */,
                   },
                   {
-                    dataIndex: "status",
-                    key: "status",
-                    title: this._i18nText({
-                      "en-US": "status",
-                      key: "i18n-bik6xl952y6",
-                      use: "en-US",
-                      "zh-CN": "状态",
-                    }),
+                    dataIndex: 'status',
+                    key: 'status',
+                    title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
                   },
                   {
-                    dataIndex: "op",
-                    key: "op",
-                    title: this._i18nText({
-                      "en-US": "operation",
-                      key: "i18n-k5inn5jmnt9",
-                      use: "en-US",
-                      "zh-CN": "操作",
-                    }),
+                    dataIndex: 'op',
+                    key: 'op',
+                    title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
                   },
                 ]}
                 dataSource={__$$eval(() =>
@@ -1422,7 +1233,7 @@ class NetworkDetail$$Page extends React.Component {
                         : true;
                     })
                     ?.sort((a, b) => {
-                      if (this.state.sorter?.order !== "ascend") {
+                      if (this.state.sorter?.order !== 'ascend') {
                         return (
                           new Date(b.creationTimestamp).getTime() -
                           new Date(a.creationTimestamp).getTime()
@@ -1465,7 +1276,7 @@ class NetworkDetail$$Page extends React.Component {
                     );
                   }.bind(this),
                   simple: false,
-                  size: "default",
+                  size: 'default',
                   total: __$$eval(
                     () =>
                       ((
@@ -1478,7 +1289,7 @@ class NetworkDetail$$Page extends React.Component {
                             : true;
                         })
                         ?.sort((a, b) => {
-                          if (this.state.sorter?.order !== "ascend") {
+                          if (this.state.sorter?.order !== 'ascend') {
                             return (
                               new Date(b.creationTimestamp).getTime() -
                               new Date(a.creationTimestamp).getTime()
@@ -1495,7 +1306,7 @@ class NetworkDetail$$Page extends React.Component {
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
                 size="default"
-                style={{ marginTop: "-20px" }}
+                style={{ marginTop: '-20px' }}
               />
             </Card>
           </Col>
@@ -1505,32 +1316,32 @@ class NetworkDetail$$Page extends React.Component {
           __events={{
             eventDataList: [
               {
-                name: "onCancel",
-                relatedEventName: "closeModal",
-                type: "componentEvent",
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
               },
               {
-                name: "onOk",
-                relatedEventName: "confirmAddChannelModal",
-                type: "componentEvent",
+                name: 'onOk',
+                relatedEventName: 'confirmAddChannelModal',
+                type: 'componentEvent',
               },
             ],
             eventList: [
               {
                 disabled: false,
-                name: "afterClose",
+                name: 'afterClose',
                 templete:
                   "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
               },
               {
                 disabled: true,
-                name: "onCancel",
+                name: 'onCancel',
                 template:
                   "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
               },
               {
                 disabled: true,
-                name: "onOk",
+                name: 'onOk',
                 template:
                   "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
               },
@@ -1557,59 +1368,41 @@ class NetworkDetail$$Page extends React.Component {
           }.bind(this)}
           open={__$$eval(
             () =>
-              this.state.isOpenModal && this.state.modalType === "addchannel"
+              this.state.isOpenModal && this.state.modalType === 'addchannel'
           )}
-          title={this._i18nText({
-            "en-US": "New channel",
-            key: "i18n-snaon3b2fni",
-            use: "en-US",
-            "zh-CN": "新建通道",
-          })}
+          title={this.i18n('i18n-snaon3b2fni') /* 新建通道 */}
         >
           <FormilyForm
             __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              labelAlign: "left",
+              labelAlign: 'left',
               labelCol: 5,
-              layout: "horizontal",
+              layout: 'horizontal',
               wrapperCol: 20,
             }}
-            ref={this._refsManager.linkRef("formily_create")}
+            ref={this._refsManager.linkRef('formily_create')}
           >
             <FormilyInput
               __component_name="FormilyInput"
               componentProps={{
-                "x-component-props": {
+                'x-component-props': {
                   bordered: true,
-                  placeholder: this._i18nText({
-                    "en-US": "Please enter a channel name",
-                    key: "i18n-ienrgm2j5p9",
-                    use: "en-US",
-                    "zh-CN": "请输入通道名称",
-                  }),
+                  placeholder:
+                    this.i18n('i18n-ienrgm2j5p9') /* 请输入通道名称 */,
                 },
               }}
               fieldProps={{
-                name: "name",
+                name: 'name',
                 required: true,
-                title: this._i18nText({
-                  "en-US": "Channel name",
-                  key: "i18n-6oadzcxin7k",
-                  use: "en-US",
-                  "zh-CN": "通道名称",
-                }),
-                "x-validator": [
+                title: this.i18n('i18n-6oadzcxin7k') /* 通道名称 */,
+                'x-validator': [
                   {
-                    message: this._i18nText({
-                      "en-US":
-                        "The channel name contains 3 to 50 letters, digits, and underscores (_)",
-                      key: "i18n-0u5pwt0jtl4",
-                      use: "en-US",
-                      "zh-CN":
-                        "通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成",
-                    }),
-                    pattern: "^[a-zA-Z0-9_]{3,10}$",
+                    message:
+                      this.i18n(
+                        'i18n-0u5pwt0jtl4'
+                      ) /* 通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成 */,
+                    pattern: '^[a-zA-Z0-9_]{3,10}$',
                     required: true,
                     whitespace: true,
                   },
@@ -1619,88 +1412,55 @@ class NetworkDetail$$Page extends React.Component {
             <FormilySelect
               __component_name="FormilySelect"
               componentProps={{
-                "x-component-props": {
+                'x-component-props': {
                   allowClear: false,
                   disabled: false,
-                  placeholder: this._i18nText({
-                    "en-US": "Select the initiator",
-                    key: "i18n-nezb9wehqyh",
-                    use: "en-US",
-                    "zh-CN": "请选择发起者",
-                  }),
+                  placeholder: this.i18n('i18n-nezb9wehqyh') /* 请选择发起者 */,
                 },
               }}
               fieldProps={{
-                name: "Select",
+                name: 'Select',
                 required: true,
-                title: this._i18nText({
-                  "en-US": "Set initiator",
-                  key: "i18n-v6gmjbqnol",
-                  use: "en-US",
-                  "zh-CN": "设置发起者",
-                }),
-                "x-validator": [],
+                title: this.i18n('i18n-v6gmjbqnol') /* 设置发起者 */,
+                'x-validator': [],
               }}
             />
             <FormilySelect
               __component_name="FormilySelect"
               componentProps={{
-                "x-component-props": {
+                'x-component-props': {
                   allowClear: false,
                   disabled: false,
-                  placeholder: this._i18nText({
-                    "en-US": "Please select a member",
-                    key: "i18n-bko8c4ii1ad",
-                    use: "en-US",
-                    "zh-CN": "请选择成员",
-                  }),
+                  placeholder: this.i18n('i18n-bko8c4ii1ad') /* 请选择成员 */,
                 },
               }}
               fieldProps={{
-                name: "Select1",
+                name: 'Select1',
                 required: true,
-                title: this._i18nText({
-                  "en-US": "Select member",
-                  key: "i18n-0bo5igd908x",
-                  use: "en-US",
-                  "zh-CN": "选择成员",
-                }),
-                "x-validator": [],
+                title: this.i18n('i18n-0bo5igd908x') /* 选择成员 */,
+                'x-validator': [],
               }}
             />
             <FormilyTextArea
               __component_name="FormilyTextArea"
               componentProps={{
-                "x-component-props": {
-                  placeholder: this._i18nText({
-                    "en-US": "Please enter a discription",
-                    key: "i18n-rw0h41prk6",
-                    use: "en-US",
-                    "zh-CN": "请输入描述",
-                  }),
+                'x-component-props': {
+                  placeholder: this.i18n('i18n-rw0h41prk6') /* 请输入描述 */,
                 },
               }}
               fieldProps={{
-                _unsafe_MixedSetter_default_select: "StringSetter",
-                default: "",
-                name: "description",
-                title: this._i18nText({
-                  "en-US": "Channel description",
-                  key: "i18n-k3l0vmchhq",
-                  use: "en-US",
-                  "zh-CN": "通道描述",
-                }),
-                "x-component": "Input.TextArea",
-                "x-validator": [
+                _unsafe_MixedSetter_default_select: 'StringSetter',
+                default: '',
+                name: 'description',
+                title: this.i18n('i18n-k3l0vmchhq') /* 通道描述 */,
+                'x-component': 'Input.TextArea',
+                'x-validator': [
                   {
-                    message: this._i18nText({
-                      "en-US":
-                        "The channel description consists of 0 to 200 characters",
-                      key: "i18n-5eitggraalr",
-                      use: "en-US",
-                      "zh-CN": "通道描述由 0 ~ 200 字符组成",
-                    }),
-                    pattern: "^.{0,200}$",
+                    message:
+                      this.i18n(
+                        'i18n-5eitggraalr'
+                      ) /* 通道描述由 0 ~ 200 字符组成 */,
+                    pattern: '^.{0,200}$',
                   },
                 ],
               }}
@@ -1714,7 +1474,7 @@ class NetworkDetail$$Page extends React.Component {
 
 export default () => {
   const location = useLocation();
-  const match = matchPath({ path: "/network/detail/:id" }, location.pathname);
+  const match = matchPath({ path: '/network/detail/:id' }, location.pathname);
   location.match = match;
   const self = {
     location,
@@ -1729,7 +1489,7 @@ export default () => {
     <DataProvider
       sdkSwrFuncs={[
         {
-          func: "useGetNetwork",
+          func: 'useGetNetwork',
           params: {
             name: self.match?.params?.id,
           },

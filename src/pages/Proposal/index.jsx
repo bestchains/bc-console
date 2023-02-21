@@ -1,6 +1,6 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
-import React from "react";
+import React from 'react';
 
 import {
   Page,
@@ -14,18 +14,18 @@ import {
   Table,
   UnifiedLink,
   Status,
-} from "@tenx-ui/materials";
+} from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from "umi";
-import DataProvider from "../../components/DataProvider";
+import { useLocation, history, matchPath } from '@umijs/max';
+import DataProvider from '../../components/DataProvider';
 
-import utils, { RefsManager } from "../../utils";
+import utils, { RefsManager } from '../../utils';
 
-import * as __$$i18n from "../../i18n";
+import * as __$$i18n from '../../i18n';
 
-import __$$constants from "../../constants";
+import __$$constants from '../../constants';
 
-import "./index.css";
+import './index.css';
 
 class Proposal$$Page extends React.Component {
   _context = this;
@@ -48,32 +48,32 @@ class Proposal$$Page extends React.Component {
 
     this.state = {
       current: 1,
-      filter: "ALL",
+      filter: 'ALL',
       isOpenModal: false,
-      modalType: "create",
-      searchKey: "name",
+      modalType: 'create',
+      searchKey: 'name',
       searchValue: undefined,
       size: 10,
       types: [
         {
-          text: this.i18n("i18n-gspz6pec67u"),
-          value: "AddMemberProposal",
+          text: this.i18n('i18n-gspz6pec67u'),
+          value: 'AddMemberProposal',
         },
         {
-          text: this.i18n("i18n-l0it3k61ec"),
-          value: "CreateFederationProposal",
+          text: this.i18n('i18n-l0it3k61ec'),
+          value: 'CreateFederationProposal',
         },
         {
-          text: this.i18n("i18n-rufvxaz1mnc"),
-          value: "DeleteMemberProposal",
+          text: this.i18n('i18n-rufvxaz1mnc'),
+          value: 'DeleteMemberProposal',
         },
         {
-          text: this.i18n("i18n-i7slyi98o4e"),
-          value: "DissolveFederationProposal",
+          text: this.i18n('i18n-i7slyi98o4e'),
+          value: 'DissolveFederationProposal',
         },
         {
-          text: this.i18n("i18n-9utg1r58kz"),
-          value: "DissolveNetworkProposal",
+          text: this.i18n('i18n-9utg1r58kz'),
+          value: 'DissolveNetworkProposal',
         },
       ],
     };
@@ -98,7 +98,7 @@ class Proposal$$Page extends React.Component {
   confirmCreateModal(e, payload) {
     var _this$$, _this$$$formRef, _this$$$formRef$curre;
     const form =
-      (_this$$ = this.$("formily_create")) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -149,13 +149,13 @@ class Proposal$$Page extends React.Component {
   openCreateModal() {
     this.setState({
       isOpenModal: true,
-      modalType: "create",
+      modalType: 'create',
     });
   }
 
   paginationShowTotal(total, range) {
-    return `${this.i18n("i18n-5xl7aihzcuy")} ${total} ${this.i18n(
-      "i18n-v7xu122b9o"
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
     )}`;
   }
 
@@ -166,14 +166,14 @@ class Proposal$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page
-        ref={this._refsManager.linkRef("outerView")}
-        style={{ height: "100%" }}
+        ref={this._refsManager.linkRef('outerView')}
+        style={{ height: '100%' }}
       >
         <Row __component_name="Row" wrap={true}>
           <Col
             __component_name="Col"
             span={24}
-            style={{ paddingBottom: "12px" }}
+            style={{ paddingBottom: '12px' }}
           >
             <Typography.Title
               __component_name="Typography.Title"
@@ -182,11 +182,7 @@ class Proposal$$Page extends React.Component {
               ellipsis={true}
               level={1}
             >
-              {this._i18nText({
-                "en-US": "Proposal list",
-                key: "i18n-lu7m1mohwn",
-                "zh-CN": "提议列表",
-              })}
+              {this.i18n('i18n-lu7m1mohwn') /* 提议列表 */}
             </Typography.Title>
           </Col>
           <Col __component_name="Col" span={24}>
@@ -197,15 +193,15 @@ class Proposal$$Page extends React.Component {
                   __events={{
                     eventDataList: [
                       {
-                        name: "onChange",
-                        relatedEventName: "handleFilterChange",
-                        type: "componentEvent",
+                        name: 'onChange',
+                        relatedEventName: 'handleFilterChange',
+                        type: 'componentEvent',
                       },
                     ],
                     eventList: [
                       {
                         disabled: true,
-                        name: "onChange",
+                        name: 'onChange',
                         template:
                           "onChange(event,${extParams}){\n// 选项变化时的回调函数\nconsole.log('onChange',event);}",
                       },
@@ -223,29 +219,17 @@ class Proposal$$Page extends React.Component {
                   optionType="button"
                   options={[
                     {
-                      label: this._i18nText({
-                        "en-US": "Total proposal",
-                        key: "i18n-22h13n1kd8vi",
-                        "zh-CN": "全部提议",
-                      }),
-                      value: "ALL",
+                      label: this.i18n('i18n-22h13n1kd8vi') /* 全部提议 */,
+                      value: 'ALL',
                     },
                     {
-                      label: this._i18nText({
-                        "en-US": "I created",
-                        key: "i18n-5jwxi1nlnsm",
-                        "zh-CN": "我创建的",
-                      }),
-                      value: "my",
+                      label: this.i18n('i18n-5jwxi1nlnsm') /* 我创建的 */,
+                      value: 'my',
                     },
                     {
                       disabled: false,
-                      label: this._i18nText({
-                        "en-US": "pending",
-                        key: "i18n-krjfpdz3pfp",
-                        "zh-CN": "待处理的",
-                      }),
-                      value: "voted",
+                      label: this.i18n('i18n-krjfpdz3pfp') /* 待处理的 */,
+                      value: 'voted',
                     },
                   ]}
                   size="middle"
@@ -264,57 +248,57 @@ class Proposal$$Page extends React.Component {
                     __events={{
                       eventDataList: [
                         {
-                          name: "onChange",
-                          relatedEventName: "handleSearchValueChange",
-                          type: "componentEvent",
+                          name: 'onChange',
+                          relatedEventName: 'handleSearchValueChange',
+                          type: 'componentEvent',
                         },
                       ],
                       eventList: [
                         {
                           disabled: true,
-                          name: "onChange",
+                          name: 'onChange',
                           template:
                             "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onPressEnter",
+                          name: 'onPressEnter',
                           template:
                             "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onSearch",
+                          name: 'onSearch',
                           template:
                             "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
                         },
                         {
                           disabled: false,
-                          name: "onFocus",
+                          name: 'onFocus',
                           template:
                             "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyDown",
+                          name: 'onKeyDown',
                           template:
                             "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyPress",
+                          name: 'onKeyPress',
                           template:
                             "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyUp",
+                          name: 'onKeyUp',
                           template:
                             "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onBlur",
+                          name: 'onBlur',
                           template:
                             "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
                         },
@@ -326,11 +310,9 @@ class Proposal$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    placeholder={this._i18nText({
-                      "en-US": "Enter the proposal name search",
-                      key: "i18n-95b8c48v1du",
-                      "zh-CN": "输入提议名称搜索",
-                    })}
+                    placeholder={
+                      this.i18n('i18n-95b8c48v1du') /* 输入提议名称搜索 */
+                    }
                   />
                 </Space>
               </Col>
@@ -351,49 +333,49 @@ class Proposal$$Page extends React.Component {
                 __events={{
                   eventDataList: [
                     {
-                      name: "pagination.onChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "pagination.onShowSizeChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onShowSizeChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "onChange",
-                      relatedEventName: "handleTableChange",
-                      type: "componentEvent",
+                      name: 'onChange',
+                      relatedEventName: 'handleTableChange',
+                      type: 'componentEvent',
                     },
                   ],
                   eventList: [
                     {
                       disabled: true,
-                      name: "onChange",
+                      name: 'onChange',
                       template:
                         "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
                     },
                     {
                       disabled: false,
-                      name: "rowSelection.onChange",
+                      name: 'rowSelection.onChange',
                       template:
                         "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
                     },
                     {
                       disabled: false,
-                      name: "expandable.onExpand",
+                      name: 'expandable.onExpand',
                       template:
                         "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onChange",
+                      name: 'pagination.onChange',
                       template:
                         "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onShowSizeChange",
+                      name: 'pagination.onShowSizeChange',
                       template:
                         "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
                     },
@@ -401,14 +383,14 @@ class Proposal$$Page extends React.Component {
                 }}
                 columns={[
                   {
-                    dataIndex: "name",
-                    key: "name",
+                    dataIndex: 'name',
+                    key: 'name',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <UnifiedLink
                           __component_name="UnifiedLink"
                           target="_self"
-                          to={__$$eval(() => "/proposal/" + record.name)}
+                          to={__$$eval(() => '/proposal/' + record.name)}
                         >
                           {__$$eval(() => record.name)}
                         </UnifiedLink>
@@ -419,17 +401,13 @@ class Proposal$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "Proposed name",
-                      key: "i18n-d3zo18q4hrn",
-                      "zh-CN": "提议名称",
-                    }),
+                    title: this.i18n('i18n-d3zo18q4hrn') /* 提议名称 */,
                   },
                   {
-                    _unsafe_MixedSetter_filters_select: "ExpressionSetter",
-                    dataIndex: "type",
+                    _unsafe_MixedSetter_filters_select: 'ExpressionSetter',
+                    dataIndex: 'type',
                     filters: __$$eval(() => this.state.types),
-                    key: "type",
+                    key: 'type',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Text
@@ -437,7 +415,7 @@ class Proposal$$Page extends React.Component {
                           disabled={false}
                           ellipsis={true}
                           strong={false}
-                          style={{ fontSize: "" }}
+                          style={{ fontSize: '' }}
                         >
                           {__$$eval(
                             () =>
@@ -454,24 +432,16 @@ class Proposal$$Page extends React.Component {
                         })
                       ),
                     sorter: false,
-                    title: this._i18nText({
-                      "en-US": "Proposal type",
-                      key: "i18n-6bj0f7fay8",
-                      "zh-CN": "提议类型",
-                    }),
+                    title: this.i18n('i18n-6bj0f7fay8') /* 提议类型 */,
                   },
                   {
-                    dataIndex: "policy",
-                    key: "policy",
-                    title: this._i18nText({
-                      "en-US": "Proposal strategy",
-                      key: "i18n-g8rbmvh04cd",
-                      "zh-CN": "提议策略",
-                    }),
+                    dataIndex: 'policy',
+                    key: 'policy',
+                    title: this.i18n('i18n-g8rbmvh04cd') /* 提议策略 */,
                   },
                   {
-                    dataIndex: "creationTimestamp",
-                    key: "creationTimestamp",
+                    dataIndex: 'creationTimestamp',
+                    key: 'creationTimestamp',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Time
@@ -488,15 +458,11 @@ class Proposal$$Page extends React.Component {
                         })
                       ),
                     sorter: true,
-                    title: this._i18nText({
-                      "en-US": "Creation time",
-                      key: "i18n-9ox4rx1wtwv",
-                      "zh-CN": "创建时间",
-                    }),
+                    title: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                   },
                   {
-                    dataIndex: "endAt",
-                    key: "endAt",
+                    dataIndex: 'endAt',
+                    key: 'endAt',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Time
@@ -512,15 +478,11 @@ class Proposal$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "Cut-off time",
-                      key: "i18n-v1ic8b3llyo",
-                      "zh-CN": "截止时间",
-                    }),
+                    title: this.i18n('i18n-v1ic8b3llyo') /* 截止时间 */,
                   },
                   {
-                    dataIndex: "status",
-                    key: "status",
+                    dataIndex: 'status',
+                    key: 'status',
                     render: /* 插槽容器*/ (text, record, index) =>
                       ((__$$context) => (
                         <Status
@@ -528,64 +490,46 @@ class Proposal$$Page extends React.Component {
                           id={__$$eval(() => text)}
                           types={[
                             {
-                              children: this._i18nText({
-                                "en-US": "Pending",
-                                key: "i18n-pmpcxrn4hxn",
-                                "zh-CN": "等待中",
-                              }),
-                              icon: "ClockCircleFilled",
-                              id: "Pending",
-                              type: "warning",
+                              children:
+                                this.i18n('i18n-pmpcxrn4hxn') /* 等待中 */,
+                              icon: 'ClockCircleFilled',
+                              id: 'Pending',
+                              type: 'warning',
                             },
                             {
-                              children: this._i18nText({
-                                "en-US": "Voting",
-                                key: "i18n-cj4k368h6p9",
-                                "zh-CN": "投票中",
-                              }),
-                              icon: "CheckCircleFilled",
-                              id: "Voting",
-                              type: "success",
+                              children:
+                                this.i18n('i18n-cj4k368h6p9') /* 投票中 */,
+                              icon: 'CheckCircleFilled',
+                              id: 'Voting',
+                              type: 'success',
                             },
                             {
-                              children: this._i18nText({
-                                "en-US": "Succeeded",
-                                key: "i18n-6sh24mree",
-                                "zh-CN": "提议成功",
-                              }),
-                              icon: "CheckCircleFilled",
-                              id: "Succeeded",
-                              type: "success",
+                              children:
+                                this.i18n('i18n-6sh24mree') /* 提议成功 */,
+                              icon: 'CheckCircleFilled',
+                              id: 'Succeeded',
+                              type: 'success',
                             },
                             {
-                              children: this._i18nText({
-                                "en-US": "Failed",
-                                key: "i18n-i94pxfwl0cb",
-                                "zh-CN": "提议失败",
-                              }),
-                              icon: "CloseCircleFilled",
-                              id: "Failed",
-                              type: "error",
+                              children:
+                                this.i18n('i18n-i94pxfwl0cb') /* 提议失败 */,
+                              icon: 'CloseCircleFilled',
+                              id: 'Failed',
+                              type: 'error',
                             },
                             {
-                              children: this._i18nText({
-                                "en-US": "Expired",
-                                key: "i18n-6ojbq0y628y",
-                                "zh-CN": "提议超时",
-                              }),
-                              icon: "CloseCircleFilled",
-                              id: "Expired",
-                              type: "error",
+                              children:
+                                this.i18n('i18n-6ojbq0y628y') /* 提议超时 */,
+                              icon: 'CloseCircleFilled',
+                              id: 'Expired',
+                              type: 'error',
                             },
                             {
-                              children: this._i18nText({
-                                "en-US": "Error",
-                                key: "i18n-ibaeqidf0n",
-                                "zh-CN": "提议异常",
-                              }),
-                              icon: "CloseCircleFilled",
-                              id: "Error",
-                              type: "error",
+                              children:
+                                this.i18n('i18n-ibaeqidf0n') /* 提议异常 */,
+                              icon: 'CloseCircleFilled',
+                              id: 'Error',
+                              type: 'error',
                             },
                           ]}
                         />
@@ -596,24 +540,16 @@ class Proposal$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "Current state",
-                      key: "i18n-nfnc1vxid1",
-                      "zh-CN": "当前状态",
-                    }),
+                    title: this.i18n('i18n-nfnc1vxid1') /* 当前状态 */,
                   },
                   {
-                    dataIndex: "voted",
-                    key: "voted",
-                    title: this._i18nText({
-                      "en-US": "Have voted",
-                      key: "i18n-ldhfyodm92n",
-                      "zh-CN": "已投票",
-                    }),
+                    dataIndex: 'voted',
+                    key: 'voted',
+                    title: this.i18n('i18n-ldhfyodm92n') /* 已投票 */,
                   },
                   {
-                    dataIndex: "op",
-                    key: "op",
+                    dataIndex: 'op',
+                    key: 'op',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Space
@@ -625,13 +561,9 @@ class Proposal$$Page extends React.Component {
                           <UnifiedLink
                             __component_name="UnifiedLink"
                             target="_self"
-                            to={__$$eval(() => "/proposal/" + record.name)}
+                            to={__$$eval(() => '/proposal/' + record.name)}
                           >
-                            {this._i18nText({
-                              "en-US": "View details",
-                              key: "i18n-4t70z9gdf8u",
-                              "zh-CN": "查看详情",
-                            })}
+                            {this.i18n('i18n-4t70z9gdf8u') /* 查看详情 */}
                           </UnifiedLink>
                         </Space>
                       ))(
@@ -641,11 +573,7 @@ class Proposal$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "operation",
-                      key: "i18n-k5inn5jmnt9",
-                      "zh-CN": "操作",
-                    }),
+                    title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
                     width: 100,
                   },
                 ]}
@@ -653,11 +581,11 @@ class Proposal$$Page extends React.Component {
                   () =>
                     this.props.useGetProposals?.data?.proposals
                       ?.filter((item) => {
-                        if (this.state.filter === "ALL") {
+                        if (this.state.filter === 'ALL') {
                           return true;
                         }
-                        if (this.state.filter === "voted") {
-                          return item.voted === "NotVoted";
+                        if (this.state.filter === 'voted') {
+                          return item.voted === 'NotVoted';
                         }
                         return (
                           this.props.authData?.user?.name ===
@@ -676,7 +604,7 @@ class Proposal$$Page extends React.Component {
                           : true;
                       })
                       ?.sort((a, b) => {
-                        if (this.state.sorter?.order !== "ascend") {
+                        if (this.state.sorter?.order !== 'ascend') {
                           return (
                             new Date(b.creationTimestamp).getTime() -
                             new Date(a.creationTimestamp).getTime()
@@ -719,21 +647,21 @@ class Proposal$$Page extends React.Component {
                     );
                   }.bind(this),
                   simple: false,
-                  size: "default",
+                  size: 'default',
                   total: __$$eval(
                     () =>
                       (
                         this.props.useGetProposals?.data?.proposals
                           ?.filter((item) => {
-                            if (this.state.filter === "ALL") {
+                            if (this.state.filter === 'ALL') {
                               return true;
                             }
-                            if (this.state.filter === "voted") {
+                            if (this.state.filter === 'voted') {
                               return votes.some(
                                 (vote) =>
                                   vote.organizationAdmin ===
                                     this.props.authData?.user?.name &&
-                                  vote.status === "Created"
+                                  vote.status === 'Created'
                               );
                             }
                             return (
@@ -753,7 +681,7 @@ class Proposal$$Page extends React.Component {
                               : true;
                           })
                           ?.sort((a, b) => {
-                            if (this.state.sorter?.order !== "ascend") {
+                            if (this.state.sorter?.order !== 'ascend') {
                               return (
                                 new Date(b.creationTimestamp).getTime() -
                                 new Date(a.creationTimestamp).getTime()
@@ -771,7 +699,7 @@ class Proposal$$Page extends React.Component {
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
                 size="default"
-                style={{ marginTop: "-20px" }}
+                style={{ marginTop: '-20px' }}
               />
             </Card>
           </Col>
@@ -783,7 +711,7 @@ class Proposal$$Page extends React.Component {
 
 export default () => {
   const location = useLocation();
-  const match = matchPath({ path: "/proposal" }, location.pathname);
+  const match = matchPath({ path: '/proposal' }, location.pathname);
   location.match = match;
   const self = {
     location,
@@ -798,7 +726,7 @@ export default () => {
     <DataProvider
       sdkSwrFuncs={[
         {
-          func: "useGetProposals",
+          func: 'useGetProposals',
           params: undefined,
         },
       ]}

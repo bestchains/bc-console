@@ -1,6 +1,6 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
-import React from "react";
+import React from 'react';
 
 import {
   Page,
@@ -20,18 +20,19 @@ import {
   FormilyInput,
   FormilySelect,
   Alert,
-} from "@tenx-ui/materials";
+  UnifiedLink,
+} from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from "umi";
-import DataProvider from "../../components/DataProvider";
+import { useLocation, history, matchPath } from '@umijs/max';
+import DataProvider from '../../components/DataProvider';
 
-import utils, { RefsManager } from "../../utils";
+import utils, { RefsManager } from '../../utils';
 
-import * as __$$i18n from "../../i18n";
+import * as __$$i18n from '../../i18n';
 
-import __$$constants from "../../constants";
+import __$$constants from '../../constants';
 
-import "./index.css";
+import './index.css';
 
 class OrganizationDetail$$Page extends React.Component {
   _context = this;
@@ -54,11 +55,11 @@ class OrganizationDetail$$Page extends React.Component {
 
     this.state = {
       current: 1,
-      filter: "ALL",
+      filter: 'ALL',
       isOpenModal: false,
-      modalType: "create",
+      modalType: 'create',
       record: {},
-      searchKey: "name",
+      searchKey: 'name',
       searchValue: undefined,
       size: 10,
     };
@@ -95,7 +96,7 @@ class OrganizationDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetOrg2.organization) || {};
     const form =
-      (_this$$ = this.$("formily_create")) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -117,21 +118,22 @@ class OrganizationDetail$$Page extends React.Component {
                   : organization.users) || []
               ).concat({
                 name: v.name,
-                isOrganizationAdmin: !!v.isOrganizationAdmin === "true",
+                isOrganizationAdmin: !!v.isOrganizationAdmin === 'true',
               })) === null || _concat === void 0
                 ? void 0
                 : _concat.map((item) => item.name),
           },
         });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n("i18n-x26twb9oy0l"),
-        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-x26twb9oy0l'),
+        // })
+        this.openCreateSuccessModal();
         this.props.useGetOrganization.mutate();
       } catch (error) {
         var _error$response;
         this.utils.notification.warnings({
-          message: this.i18n("i18n-43getajmxf3"),
+          message: this.i18n('i18n-43getajmxf3'),
           errors:
             error === null || error === void 0
               ? void 0
@@ -180,13 +182,13 @@ class OrganizationDetail$$Page extends React.Component {
       });
       this.closeModal();
       this.utils.notification.success({
-        message: this.i18n("i18n-yy3f9rxigm"),
+        message: this.i18n('i18n-yy3f9rxigm'),
       });
       this.props.useGetOrganization.mutate();
     } catch (error) {
       var _error$response;
       this.utils.notification.warnings({
-        message: this.i18n("i18n-p5gea1q7fem"),
+        message: this.i18n('i18n-p5gea1q7fem'),
         errors:
           error === null || error === void 0
             ? void 0
@@ -213,7 +215,7 @@ class OrganizationDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetOrg2.organization) || {};
     const form =
-      (_this$$ = this.$("formily_transfer")) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_transfer')) === null || _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -230,13 +232,13 @@ class OrganizationDetail$$Page extends React.Component {
         });
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n("i18n-hjonznxjara"),
+          message: this.i18n('i18n-hjonznxjara'),
         });
         this.props.useGetOrganization.mutate();
       } catch (error) {
         var _error$response;
         this.utils.notification.warnings({
-          message: this.i18n("i18n-zzu9mo73zo"),
+          message: this.i18n('i18n-zzu9mo73zo'),
           errors:
             error === null || error === void 0
               ? void 0
@@ -281,14 +283,21 @@ class OrganizationDetail$$Page extends React.Component {
   openCreateModal() {
     this.setState({
       isOpenModal: true,
-      modalType: "create",
+      modalType: 'create',
+    });
+  }
+
+  openCreateSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'createsuccess',
     });
   }
 
   openDeleteModal(e, payload) {
     this.setState({
       isOpenModal: true,
-      modalType: "delete",
+      modalType: 'delete',
       record: payload === null || payload === void 0 ? void 0 : payload.record,
     });
   }
@@ -296,14 +305,14 @@ class OrganizationDetail$$Page extends React.Component {
   openTransferModal(e, payload) {
     this.setState({
       isOpenModal: true,
-      modalType: "transfer",
+      modalType: 'transfer',
       record: payload === null || payload === void 0 ? void 0 : payload.record,
     });
   }
 
   paginationShowTotal(total, range) {
-    return `${this.i18n("i18n-5xl7aihzcuy")} ${total} ${this.i18n(
-      "i18n-v7xu122b9o"
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
     )}`;
   }
 
@@ -314,22 +323,18 @@ class OrganizationDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page
-        ref={this._refsManager.linkRef("outerView")}
-        style={{ height: "100%" }}
+        ref={this._refsManager.linkRef('outerView')}
+        style={{ height: '100%' }}
       >
         <Row __component_name="Row" wrap={true}>
           <Col
             __component_name="Col"
             span={24}
-            style={{ paddingBottom: "12px" }}
+            style={{ paddingBottom: '12px' }}
           >
             <Button.Back
               __component_name="Button.Back"
-              title={this._i18nText({
-                "en-US": "Management organization",
-                key: "i18n-m6n5fnxybu",
-                "zh-CN": "管理组织",
-              })}
+              title={this.i18n('i18n-m6n5fnxybu') /* 管理组织 */}
               type="simple"
             />
           </Col>
@@ -357,7 +362,7 @@ class OrganizationDetail$$Page extends React.Component {
                         disabled={false}
                         ellipsis={true}
                         strong={false}
-                        style={{ fontSize: "" }}
+                        style={{ fontSize: '' }}
                       >
                         {__$$eval(
                           () =>
@@ -366,12 +371,8 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       </Typography.Text>
                     ),
-                    key: "r4gchd14zz",
-                    label: this._i18nText({
-                      "en-US": "Total organizational users",
-                      key: "i18n-v4wf8ejznd",
-                      "zh-CN": "组织用户总数",
-                    }),
+                    key: 'r4gchd14zz',
+                    label: this.i18n('i18n-v4wf8ejznd') /* 组织用户总数 */,
                     span: 1,
                   },
                   {
@@ -385,50 +386,34 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                         types={[
                           {
-                            children: "未知",
-                            icon: "tenx-ui-icon:Circle",
-                            id: "disabled",
-                            type: "disabled",
+                            children: '未知',
+                            icon: 'tenx-ui-icon:Circle',
+                            id: 'disabled',
+                            type: 'disabled',
                           },
                           {
-                            children: this._i18nText({
-                              "en-US": "Normal",
-                              key: "i18n-fifkprltibf",
-                              "zh-CN": "正常",
-                            }),
-                            icon: "CheckCircleFilled",
-                            id: "Deploying",
-                            type: "success",
+                            children: this.i18n('i18n-fifkprltibf') /* 正常 */,
+                            icon: 'CheckCircleFilled',
+                            id: 'Deploying',
+                            type: 'success',
                           },
                           {
-                            children: this._i18nText({
-                              "en-US": "Error",
-                              key: "i18n-xtno2l9qqog",
-                              "zh-CN": "异常",
-                            }),
-                            icon: "CloseCircleFilled",
-                            id: "Error",
-                            type: "error",
+                            children: this.i18n('i18n-xtno2l9qqog') /* 异常 */,
+                            icon: 'CloseCircleFilled',
+                            id: 'Error',
+                            type: 'error',
                           },
                           {
-                            children: this._i18nText({
-                              "en-US": "Normal",
-                              key: "i18n-fifkprltibf",
-                              "zh-CN": "正常",
-                            }),
-                            icon: "CheckCircleFilled",
-                            id: "Deployed",
-                            type: "success",
+                            children: this.i18n('i18n-fifkprltibf') /* 正常 */,
+                            icon: 'CheckCircleFilled',
+                            id: 'Deployed',
+                            type: 'success',
                           },
                         ]}
                       />
                     ),
-                    key: "bdr5go2aun",
-                    label: this._i18nText({
-                      "en-US": "status",
-                      key: "i18n-bik6xl952y6",
-                      "zh-CN": "状态",
-                    }),
+                    key: 'bdr5go2aun',
+                    label: this.i18n('i18n-bik6xl952y6') /* 状态 */,
                     span: 1,
                   },
                   {
@@ -443,12 +428,8 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       />
                     ),
-                    key: "lu5nygtudhq",
-                    label: this._i18nText({
-                      "en-US": "Creation time",
-                      key: "i18n-9ox4rx1wtwv",
-                      "zh-CN": "创建时间",
-                    }),
+                    key: 'lu5nygtudhq',
+                    label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                     span: 1,
                   },
                   {
@@ -463,12 +444,8 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       />
                     ),
-                    key: "o0cvbxwkrj",
-                    label: this._i18nText({
-                      "en-US": "Last update time",
-                      key: "i18n-5er0ayqzcp",
-                      "zh-CN": "最近更新时间",
-                    }),
+                    key: 'o0cvbxwkrj',
+                    label: this.i18n('i18n-5er0ayqzcp') /* 最近更新时间 */,
                     span: 1,
                   },
                   {
@@ -478,7 +455,7 @@ class OrganizationDetail$$Page extends React.Component {
                         disabled={false}
                         ellipsis={true}
                         strong={false}
-                        style={{ fontSize: "" }}
+                        style={{ fontSize: '' }}
                       >
                         {__$$eval(
                           () =>
@@ -487,12 +464,8 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       </Typography.Text>
                     ),
-                    key: "eleg9opa0dc",
-                    label: this._i18nText({
-                      "en-US": "introduce",
-                      key: "i18n-wlgvrke3jz9",
-                      "zh-CN": "介绍",
-                    }),
+                    key: 'eleg9opa0dc',
+                    label: this.i18n('i18n-wlgvrke3jz9') /* 介绍 */,
                     span: 1,
                   },
                 ]}
@@ -506,11 +479,7 @@ class OrganizationDetail$$Page extends React.Component {
                 <Descriptions.Item
                   __component_name="Descriptions.Item"
                   key="r4gchd14zz"
-                  label={this._i18nText({
-                    "en-US": "Total organizational users",
-                    key: "i18n-v4wf8ejznd",
-                    "zh-CN": "组织用户总数",
-                  })}
+                  label={this.i18n('i18n-v4wf8ejznd') /* 组织用户总数 */}
                   span={1}
                   tab=""
                 >
@@ -520,7 +489,7 @@ class OrganizationDetail$$Page extends React.Component {
                       disabled={false}
                       ellipsis={true}
                       strong={false}
-                      style={{ fontSize: "" }}
+                      style={{ fontSize: '' }}
                     >
                       {__$$eval(
                         () =>
@@ -533,11 +502,7 @@ class OrganizationDetail$$Page extends React.Component {
                 <Descriptions.Item
                   __component_name="Descriptions.Item"
                   key="bdr5go2aun"
-                  label={this._i18nText({
-                    "en-US": "status",
-                    key: "i18n-bik6xl952y6",
-                    "zh-CN": "状态",
-                  })}
+                  label={this.i18n('i18n-bik6xl952y6') /* 状态 */}
                   span={1}
                   tab=""
                 >
@@ -551,50 +516,34 @@ class OrganizationDetail$$Page extends React.Component {
                       )}
                       types={[
                         {
-                          children: "未知",
-                          icon: "tenx-ui-icon:Circle",
-                          id: "disabled",
-                          type: "disabled",
+                          children: '未知',
+                          icon: 'tenx-ui-icon:Circle',
+                          id: 'disabled',
+                          type: 'disabled',
                         },
                         {
-                          children: this._i18nText({
-                            "en-US": "Normal",
-                            key: "i18n-fifkprltibf",
-                            "zh-CN": "正常",
-                          }),
-                          icon: "CheckCircleFilled",
-                          id: "Deploying",
-                          type: "success",
+                          children: this.i18n('i18n-fifkprltibf') /* 正常 */,
+                          icon: 'CheckCircleFilled',
+                          id: 'Deploying',
+                          type: 'success',
                         },
                         {
-                          children: this._i18nText({
-                            "en-US": "Error",
-                            key: "i18n-xtno2l9qqog",
-                            "zh-CN": "异常",
-                          }),
-                          icon: "CloseCircleFilled",
-                          id: "Error",
-                          type: "error",
+                          children: this.i18n('i18n-xtno2l9qqog') /* 异常 */,
+                          icon: 'CloseCircleFilled',
+                          id: 'Error',
+                          type: 'error',
                         },
                         {
-                          children: this._i18nText({
-                            "en-US": "Normal",
-                            key: "i18n-fifkprltibf",
-                            "zh-CN": "正常",
-                          }),
-                          icon: "CheckCircleFilled",
-                          id: "Deployed",
-                          type: "success",
+                          children: this.i18n('i18n-fifkprltibf') /* 正常 */,
+                          icon: 'CheckCircleFilled',
+                          id: 'Deployed',
+                          type: 'success',
                         },
                         {
-                          children: this._i18nText({
-                            "en-US": "Normal",
-                            key: "i18n-fifkprltibf",
-                            "zh-CN": "正常",
-                          }),
-                          icon: "CheckCircleFilled",
-                          id: "Created",
-                          type: "success",
+                          children: this.i18n('i18n-fifkprltibf') /* 正常 */,
+                          icon: 'CheckCircleFilled',
+                          id: 'Created',
+                          type: 'success',
                         },
                       ]}
                     />
@@ -603,11 +552,7 @@ class OrganizationDetail$$Page extends React.Component {
                 <Descriptions.Item
                   __component_name="Descriptions.Item"
                   key="lu5nygtudhq"
-                  label={this._i18nText({
-                    "en-US": "Creation time",
-                    key: "i18n-9ox4rx1wtwv",
-                    "zh-CN": "创建时间",
-                  })}
+                  label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
                   span={1}
                 >
                   {
@@ -625,11 +570,7 @@ class OrganizationDetail$$Page extends React.Component {
                 <Descriptions.Item
                   __component_name="Descriptions.Item"
                   key="o0cvbxwkrj"
-                  label={this._i18nText({
-                    "en-US": "Last update time",
-                    key: "i18n-5er0ayqzcp",
-                    "zh-CN": "最近更新时间",
-                  })}
+                  label={this.i18n('i18n-5er0ayqzcp') /* 最近更新时间 */}
                   span={1}
                 >
                   {
@@ -647,11 +588,7 @@ class OrganizationDetail$$Page extends React.Component {
                 <Descriptions.Item
                   __component_name="Descriptions.Item"
                   key="eleg9opa0dc"
-                  label={this._i18nText({
-                    "en-US": "introduce",
-                    key: "i18n-wlgvrke3jz9",
-                    "zh-CN": "介绍",
-                  })}
+                  label={this.i18n('i18n-wlgvrke3jz9') /* 介绍 */}
                   span={1}
                 >
                   {
@@ -660,7 +597,7 @@ class OrganizationDetail$$Page extends React.Component {
                       disabled={false}
                       ellipsis={true}
                       strong={false}
-                      style={{ fontSize: "" }}
+                      style={{ fontSize: '' }}
                     >
                       {__$$eval(
                         () =>
@@ -681,15 +618,15 @@ class OrganizationDetail$$Page extends React.Component {
                   __events={{
                     eventDataList: [
                       {
-                        name: "onClick",
-                        relatedEventName: "openCreateModal",
-                        type: "componentEvent",
+                        name: 'onClick',
+                        relatedEventName: 'openCreateModal',
+                        type: 'componentEvent',
                       },
                     ],
                     eventList: [
                       {
                         disabled: true,
-                        name: "onClick",
+                        name: 'onClick',
                         template:
                           "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                       },
@@ -716,11 +653,7 @@ class OrganizationDetail$$Page extends React.Component {
                   shape="default"
                   type="primary"
                 >
-                  {this._i18nText({
-                    "en-US": "New user",
-                    key: "i18n-n5ny2k3khy",
-                    "zh-CN": "新增用户",
-                  })}
+                  {this.i18n('i18n-n5ny2k3khy') /* 新增用户 */}
                 </Button>
               </Col>
               <Col __component_name="Col">
@@ -735,57 +668,57 @@ class OrganizationDetail$$Page extends React.Component {
                     __events={{
                       eventDataList: [
                         {
-                          name: "onChange",
-                          relatedEventName: "handleSearchValueChange",
-                          type: "componentEvent",
+                          name: 'onChange',
+                          relatedEventName: 'handleSearchValueChange',
+                          type: 'componentEvent',
                         },
                       ],
                       eventList: [
                         {
                           disabled: true,
-                          name: "onChange",
+                          name: 'onChange',
                           template:
                             "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onPressEnter",
+                          name: 'onPressEnter',
                           template:
                             "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onSearch",
+                          name: 'onSearch',
                           template:
                             "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
                         },
                         {
                           disabled: false,
-                          name: "onFocus",
+                          name: 'onFocus',
                           template:
                             "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyDown",
+                          name: 'onKeyDown',
                           template:
                             "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyPress",
+                          name: 'onKeyPress',
                           template:
                             "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyUp",
+                          name: 'onKeyUp',
                           template:
                             "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onBlur",
+                          name: 'onBlur',
                           template:
                             "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
                         },
@@ -797,11 +730,9 @@ class OrganizationDetail$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    placeholder={this._i18nText({
-                      "en-US": "Enter the user name to search",
-                      key: "i18n-gnwdi4ep1vt",
-                      "zh-CN": "输入用户名搜索",
-                    })}
+                    placeholder={
+                      this.i18n('i18n-gnwdi4ep1vt') /* 输入用户名搜索 */
+                    }
                   />
                 </Space>
               </Col>
@@ -822,49 +753,49 @@ class OrganizationDetail$$Page extends React.Component {
                 __events={{
                   eventDataList: [
                     {
-                      name: "onChange",
-                      relatedEventName: "handleTableChange",
-                      type: "componentEvent",
+                      name: 'onChange',
+                      relatedEventName: 'handleTableChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "pagination.onChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "pagination.onShowSizeChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onShowSizeChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                   ],
                   eventList: [
                     {
                       disabled: true,
-                      name: "onChange",
+                      name: 'onChange',
                       template:
                         "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
                     },
                     {
                       disabled: false,
-                      name: "rowSelection.onChange",
+                      name: 'rowSelection.onChange',
                       template:
                         "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
                     },
                     {
                       disabled: false,
-                      name: "expandable.onExpand",
+                      name: 'expandable.onExpand',
                       template:
                         "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onChange",
+                      name: 'pagination.onChange',
                       template:
                         "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onShowSizeChange",
+                      name: 'pagination.onShowSizeChange',
                       template:
                         "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
                     },
@@ -872,21 +803,17 @@ class OrganizationDetail$$Page extends React.Component {
                 }}
                 columns={[
                   {
-                    dataIndex: "name",
-                    key: "id",
-                    title: this._i18nText({
-                      "en-US": "User",
-                      key: "i18n-289qyoqa3vs",
-                      "zh-CN": "用户",
-                    }),
+                    dataIndex: 'name',
+                    key: 'id',
+                    title: this.i18n('i18n-289qyoqa3vs') /* 用户 */,
                   },
                   {
-                    dataIndex: "isOrganizationAdmin",
+                    dataIndex: 'isOrganizationAdmin',
                     filters: [
-                      { text: "admin", value: true },
-                      { text: "client", value: false },
+                      { text: 'admin', value: true },
+                      { text: 'client', value: false },
                     ],
-                    key: "isOrganizationAdmin",
+                    key: 'isOrganizationAdmin',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Text
@@ -894,10 +821,10 @@ class OrganizationDetail$$Page extends React.Component {
                           disabled={false}
                           ellipsis={true}
                           strong={false}
-                          style={{ fontSize: "" }}
+                          style={{ fontSize: '' }}
                         >
                           {__$$eval(() =>
-                            record.isOrganizationAdmin ? "admin" : "client"
+                            record.isOrganizationAdmin ? 'admin' : 'client'
                           )}
                         </Typography.Text>
                       ))(
@@ -907,14 +834,10 @@ class OrganizationDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "Type",
-                      key: "i18n-9yrquy3v2y7",
-                      "zh-CN": "类型",
-                    }),
+                    title: this.i18n('i18n-9yrquy3v2y7') /* 类型 */,
                   },
                   {
-                    dataIndex: "op",
+                    dataIndex: 'op',
                     render: (text, record, index) =>
                       ((__$$context) => [
                         !!__$$eval(() => record.isOrganizationAdmin) && (
@@ -923,16 +846,16 @@ class OrganizationDetail$$Page extends React.Component {
                             __events={{
                               eventDataList: [
                                 {
-                                  name: "onClick",
-                                  paramStr: "{\n \trecord: this.record\n}",
-                                  relatedEventName: "openTransferModal",
-                                  type: "componentEvent",
+                                  name: 'onClick',
+                                  paramStr: '{\n \trecord: this.record\n}',
+                                  relatedEventName: 'openTransferModal',
+                                  type: 'componentEvent',
                                 },
                               ],
                               eventList: [
                                 {
                                   disabled: true,
-                                  name: "onClick",
+                                  name: 'onClick',
                                   template:
                                     "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                                 },
@@ -956,11 +879,7 @@ class OrganizationDetail$$Page extends React.Component {
                             shape="default"
                             type="link"
                           >
-                            {this._i18nText({
-                              "en-US": "transfer",
-                              key: "i18n-v10ihnkwhn",
-                              "zh-CN": "转移",
-                            })}
+                            {this.i18n('i18n-v10ihnkwhn') /* 转移 */}
                           </Button>
                         ),
                         !!__$$eval(() => !record.isOrganizationAdmin) && (
@@ -969,16 +888,16 @@ class OrganizationDetail$$Page extends React.Component {
                             __events={{
                               eventDataList: [
                                 {
-                                  name: "onClick",
-                                  paramStr: "{\n \trecord: this.record \n}",
-                                  relatedEventName: "openDeleteModal",
-                                  type: "componentEvent",
+                                  name: 'onClick',
+                                  paramStr: '{\n \trecord: this.record \n}',
+                                  relatedEventName: 'openDeleteModal',
+                                  type: 'componentEvent',
                                 },
                               ],
                               eventList: [
                                 {
                                   disabled: true,
-                                  name: "onClick",
+                                  name: 'onClick',
                                   template:
                                     "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                                 },
@@ -1002,11 +921,7 @@ class OrganizationDetail$$Page extends React.Component {
                             shape="default"
                             type="link"
                           >
-                            {this._i18nText({
-                              "en-US": "delete",
-                              key: "i18n-ias68eipm18",
-                              "zh-CN": "删除",
-                            })}
+                            {this.i18n('i18n-ias68eipm18') /* 删除 */}
                           </Button>
                         ),
                       ])(
@@ -1016,11 +931,7 @@ class OrganizationDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "operation",
-                      key: "i18n-k5inn5jmnt9",
-                      "zh-CN": "操作",
-                    }),
+                    title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
                     width: 100,
                   },
                 ]}
@@ -1069,7 +980,7 @@ class OrganizationDetail$$Page extends React.Component {
                     );
                   }.bind(this),
                   simple: false,
-                  size: "default",
+                  size: 'default',
                   total: __$$eval(
                     () =>
                       this.props.useGetOrganization?.data?.organization?.users
@@ -1092,7 +1003,7 @@ class OrganizationDetail$$Page extends React.Component {
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
                 size="default"
-                style={{ marginTop: "-20px" }}
+                style={{ marginTop: '-20px' }}
               />
             </Card>
           </Col>
@@ -1102,32 +1013,32 @@ class OrganizationDetail$$Page extends React.Component {
           __events={{
             eventDataList: [
               {
-                name: "onCancel",
-                relatedEventName: "closeModal",
-                type: "componentEvent",
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
               },
               {
-                name: "onOk",
-                relatedEventName: "confirmCreateModal",
-                type: "componentEvent",
+                name: 'onOk',
+                relatedEventName: 'confirmCreateModal',
+                type: 'componentEvent',
               },
             ],
             eventList: [
               {
                 disabled: false,
-                name: "afterClose",
+                name: 'afterClose',
                 templete:
                   "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
               },
               {
                 disabled: true,
-                name: "onCancel",
+                name: 'onCancel',
                 template:
                   "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
               },
               {
                 disabled: true,
-                name: "onOk",
+                name: 'onOk',
                 template:
                   "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
               },
@@ -1153,55 +1064,41 @@ class OrganizationDetail$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(
-            () => this.state.modalType === "create" && this.state.isOpenModal
+            () => this.state.modalType === 'create' && this.state.isOpenModal
           )}
-          title={this._i18nText({
-            "en-US": "New user",
-            key: "i18n-n5ny2k3khy",
-            "zh-CN": "新增用户",
-          })}
+          title={this.i18n('i18n-n5ny2k3khy') /* 新增用户 */}
         >
           <FormilyForm
             __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              labelAlign: "left",
+              labelAlign: 'left',
               labelCol: 5,
-              layout: "horizontal",
+              layout: 'horizontal',
               wrapperCol: 19,
             }}
-            ref={this._refsManager.linkRef("formily_create")}
+            ref={this._refsManager.linkRef('formily_create')}
           >
             <FormilyInput
               __component_name="FormilyInput"
               componentProps={{
-                "x-component-props": {
+                'x-component-props': {
                   bordered: true,
-                  placeholder: this._i18nText({
-                    "en-US": "Please enter the user name",
-                    key: "i18n-ttjyzz0s45l",
-                    "zh-CN": "请输入用户名称",
-                  }),
+                  placeholder:
+                    this.i18n('i18n-ttjyzz0s45l') /* 请输入用户名称 */,
                 },
               }}
               fieldProps={{
-                name: "name",
+                name: 'name',
                 required: true,
-                title: this._i18nText({
-                  "en-US": "User",
-                  key: "i18n-289qyoqa3vs",
-                  "zh-CN": "用户",
-                }),
-                "x-validator": [
+                title: this.i18n('i18n-289qyoqa3vs') /* 用户 */,
+                'x-validator': [
                   {
-                    message: this._i18nText({
-                      "en-US":
-                        "The user name contains 3 to 20 letters, digits, and underscores",
-                      key: "i18n-ch5wgxkhdhs",
-                      "zh-CN":
-                        "用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成",
-                    }),
-                    pattern: "^[a-zA-Z0-9_]{3,10}$",
+                    message:
+                      this.i18n(
+                        'i18n-ch5wgxkhdhs'
+                      ) /* 用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
+                    pattern: '^[a-zA-Z0-9_]{3,10}$',
                     required: true,
                     whitespace: true,
                   },
@@ -1211,29 +1108,22 @@ class OrganizationDetail$$Page extends React.Component {
             <FormilySelect
               __component_name="FormilySelect"
               componentProps={{
-                "x-component-props": {
+                'x-component-props': {
                   allowClear: false,
                   disabled: true,
-                  placeholder: this._i18nText({
-                    "en-US": "Please select a user type",
-                    key: "i18n-6a9y7k26xhq",
-                    "zh-CN": "请选择用户类型",
-                  }),
+                  placeholder:
+                    this.i18n('i18n-6a9y7k26xhq') /* 请选择用户类型 */,
                 },
               }}
               fieldProps={{
-                default: "client",
+                default: 'client',
                 enum: [
-                  { children: [], label: "admin", value: "true" },
-                  { children: [], label: "client", value: "false" },
+                  { children: [], label: 'admin', value: 'true' },
+                  { children: [], label: 'client', value: 'false' },
                 ],
-                name: "isOrganizationAdmin",
-                title: this._i18nText({
-                  "en-US": "Configuring the user Type",
-                  key: "i18n-irf019z3fd",
-                  "zh-CN": "配置用户类型",
-                }),
-                "x-validator": [],
+                name: 'isOrganizationAdmin',
+                title: this.i18n('i18n-irf019z3fd') /* 配置用户类型 */,
+                'x-validator': [],
               }}
             />
           </FormilyForm>
@@ -1243,32 +1133,32 @@ class OrganizationDetail$$Page extends React.Component {
           __events={{
             eventDataList: [
               {
-                name: "onCancel",
-                relatedEventName: "closeModal",
-                type: "componentEvent",
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
               },
               {
-                name: "onOk",
-                relatedEventName: "confirmTransferModal",
-                type: "componentEvent",
+                name: 'onOk',
+                relatedEventName: 'confirmTransferModal',
+                type: 'componentEvent',
               },
             ],
             eventList: [
               {
                 disabled: false,
-                name: "afterClose",
+                name: 'afterClose',
                 templete:
                   "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
               },
               {
                 disabled: true,
-                name: "onCancel",
+                name: 'onCancel',
                 template:
                   "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
               },
               {
                 disabled: true,
-                name: "onOk",
+                name: 'onOk',
                 template:
                   "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
               },
@@ -1294,55 +1184,41 @@ class OrganizationDetail$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(
-            () => this.state.modalType === "transfer" && this.state.isOpenModal
+            () => this.state.modalType === 'transfer' && this.state.isOpenModal
           )}
-          title={this._i18nText({
-            "en-US": "Transfer administrator rights",
-            key: "i18n-armm7kw0zpr",
-            "zh-CN": "转移管理员权限",
-          })}
+          title={this.i18n('i18n-armm7kw0zpr') /* 转移管理员权限 */}
         >
           <FormilyForm
             __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              labelAlign: "left",
+              labelAlign: 'left',
               labelCol: 6,
-              layout: "horizontal",
+              layout: 'horizontal',
               wrapperCol: 18,
             }}
-            ref={this._refsManager.linkRef("formily_transfer")}
+            ref={this._refsManager.linkRef('formily_transfer')}
           >
             <FormilyInput
               __component_name="FormilyInput"
               componentProps={{
-                "x-component-props": {
+                'x-component-props': {
                   bordered: true,
-                  placeholder: this._i18nText({
-                    "en-US": "Please enter the user name",
-                    key: "i18n-ttjyzz0s45l",
-                    "zh-CN": "请输入用户名称",
-                  }),
+                  placeholder:
+                    this.i18n('i18n-ttjyzz0s45l') /* 请输入用户名称 */,
                 },
               }}
               fieldProps={{
-                name: "admin",
+                name: 'admin',
                 required: true,
-                title: this._i18nText({
-                  "en-US": "New administrator",
-                  key: "i18n-0tsputxj615",
-                  "zh-CN": "新的管理员用户",
-                }),
-                "x-validator": [
+                title: this.i18n('i18n-0tsputxj615') /* 新的管理员用户 */,
+                'x-validator': [
                   {
-                    message: this._i18nText({
-                      "en-US":
-                        "The user name contains 3 to 20 letters, digits, and underscores",
-                      key: "i18n-ch5wgxkhdhs",
-                      "zh-CN":
-                        "用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成",
-                    }),
-                    pattern: "^[a-zA-Z0-9_]{3,10}$",
+                    message:
+                      this.i18n(
+                        'i18n-ch5wgxkhdhs'
+                      ) /* 用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
+                    pattern: '^[a-zA-Z0-9_]{3,10}$',
                     required: true,
                     whitespace: true,
                   },
@@ -1353,47 +1229,140 @@ class OrganizationDetail$$Page extends React.Component {
           <Alert
             __component_name="Alert"
             bordered="none"
-            message={this._i18nText({
-              "en-US":
-                "Tip: After confirmation, all administrator permissions are transferred to the new user",
-              key: "i18n-3ja6wz9xvoh",
-              "zh-CN": "提示：确认后，管理员权限将全部转移给新用户",
-            })}
+            message={
+              this.i18n(
+                'i18n-3ja6wz9xvoh'
+              ) /* 提示：确认后，管理员权限将全部转移给新用户 */
+            }
             showIcon={true}
             type="warning"
           />
+        </Modal>
+        <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onOk',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal && this.state.modalType === 'createsuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-od5gesjx') /* 用户邀请已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
         </Modal>
         <Modal
           __component_name="Modal"
           __events={{
             eventDataList: [
               {
-                name: "onCancel",
-                relatedEventName: "closeModal",
-                type: "componentEvent",
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
               },
               {
-                name: "onOk",
-                relatedEventName: "confirmDeleteModal",
-                type: "componentEvent",
+                name: 'onOk',
+                relatedEventName: 'confirmDeleteModal',
+                type: 'componentEvent',
               },
             ],
             eventList: [
               {
                 disabled: false,
-                name: "afterClose",
+                name: 'afterClose',
                 templete:
                   "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
               },
               {
                 disabled: true,
-                name: "onCancel",
+                name: 'onCancel',
                 template:
                   "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
               },
               {
                 disabled: true,
-                name: "onOk",
+                name: 'onOk',
                 template:
                   "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
               },
@@ -1419,13 +1388,9 @@ class OrganizationDetail$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(
-            () => this.state.modalType === "delete" && this.state.isOpenModal
+            () => this.state.modalType === 'delete' && this.state.isOpenModal
           )}
-          title={this._i18nText({
-            "en-US": "Delete a user",
-            key: "i18n-h52hay1ld2s",
-            "zh-CN": "删除用户",
-          })}
+          title={this.i18n('i18n-h52hay1ld2s') /* 删除用户 */}
         >
           <Alert
             __component_name="Alert"
@@ -1436,20 +1401,16 @@ class OrganizationDetail$$Page extends React.Component {
                 disabled={false}
                 ellipsis={true}
                 strong={false}
-                style={{ fontSize: "" }}
+                style={{ fontSize: '' }}
               >
-                {this._i18nText({
-                  "en-US": "You are moving from the organization",
-                  key: "i18n-3lwzud889in",
-                  "zh-CN": "您正在从组织",
-                })}
+                {this.i18n('i18n-3lwzud889in') /* 您正在从组织 */}
               </Typography.Text>,
               <Typography.Text
                 __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
                 strong={false}
-                style={{ fontSize: "" }}
+                style={{ fontSize: '' }}
               >
                 {__$$eval(
                   () => this.props.useGetOrganization?.data?.organization?.name
@@ -1460,20 +1421,16 @@ class OrganizationDetail$$Page extends React.Component {
                 disabled={false}
                 ellipsis={true}
                 strong={false}
-                style={{ fontSize: "" }}
+                style={{ fontSize: '' }}
               >
-                {this._i18nText({
-                  "en-US": "Delete a user from",
-                  key: "i18n-nm17suv2xhh",
-                  "zh-CN": "中删除用户",
-                })}
+                {this.i18n('i18n-nm17suv2xhh') /* 中删除用户 */}
               </Typography.Text>,
               <Typography.Text
                 __component_name="Typography.Text"
                 disabled={false}
                 ellipsis={true}
                 strong={false}
-                style={{ fontSize: "" }}
+                style={{ fontSize: '' }}
               >
                 {__$$eval(() => this.state.record && this.state.record.name)}
               </Typography.Text>,
@@ -1482,14 +1439,13 @@ class OrganizationDetail$$Page extends React.Component {
                 disabled={false}
                 ellipsis={true}
                 strong={false}
-                style={{ fontSize: "" }}
+                style={{ fontSize: '' }}
               >
-                {this._i18nText({
-                  "en-US":
-                    "，After the user is deleted, all permissions under the organization will be revoked",
-                  key: "i18n-h8159rss9ij",
-                  "zh-CN": "，删除后，用户在该组织下所有权限将被收回",
-                })}
+                {
+                  this.i18n(
+                    'i18n-h8159rss9ij'
+                  ) /* ，删除后，用户在该组织下所有权限将被收回 */
+                }
               </Typography.Text>,
             ]}
             showIcon={true}
@@ -1503,7 +1459,7 @@ class OrganizationDetail$$Page extends React.Component {
 
 export default () => {
   const location = useLocation();
-  const match = matchPath({ path: "/organization/:id" }, location.pathname);
+  const match = matchPath({ path: '/organization/:id' }, location.pathname);
   location.match = match;
   const self = {
     location,
@@ -1518,7 +1474,7 @@ export default () => {
     <DataProvider
       sdkSwrFuncs={[
         {
-          func: "useGetOrganization",
+          func: 'useGetOrganization',
           params: { name: self.match?.params?.id },
         },
       ]}
