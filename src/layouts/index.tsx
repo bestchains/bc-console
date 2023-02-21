@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Outlet, useLocation, history } from 'umi';
+import { Outlet, useLocation, history } from '@umijs/max';
 import utils from '../utils';
 import { IS_PROD, isQiankun } from '../constants';
 import { getLocale } from '../i18n';

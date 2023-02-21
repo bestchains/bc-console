@@ -1,6 +1,6 @@
 // 注意: 出码引擎注入的临时变量默认都以 "__$$" 开头，禁止在搭建的代码中直接访问。
 // 例外：react 框架的导出名和各种组件名除外。
-import React from "react";
+import React from 'react';
 
 import {
   Page,
@@ -20,18 +20,18 @@ import {
   FormilyForm,
   FormilySelect,
   Alert,
-} from "@tenx-ui/materials";
+} from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from "umi";
-import DataProvider from "../../components/DataProvider";
+import { useLocation, history, matchPath } from '@umijs/max';
+import DataProvider from '../../components/DataProvider';
 
-import utils, { RefsManager } from "../../utils";
+import utils, { RefsManager } from '../../utils';
 
-import * as __$$i18n from "../../i18n";
+import * as __$$i18n from '../../i18n';
 
-import __$$constants from "../../constants";
+import __$$constants from '../../constants';
 
-import "./index.css";
+import './index.css';
 
 class FederationDetail$$Page extends React.Component {
   _context = this;
@@ -54,11 +54,11 @@ class FederationDetail$$Page extends React.Component {
 
     this.state = {
       current: 1,
-      filter: "ALL",
+      filter: 'ALL',
       isOpenModal: false,
-      modalType: "adduser",
+      modalType: 'adduser',
       organizations: [],
-      searchKey: "name",
+      searchKey: 'name',
       searchValue: undefined,
       size: 10,
       userCurrent: 1,
@@ -98,7 +98,7 @@ class FederationDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetFed2.federation) || {};
     const form =
-      (_this$$ = this.$("formily_create")) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -108,6 +108,7 @@ class FederationDetail$$Page extends React.Component {
         ? void 0
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
+      console.log(v, 'vvvvvvvvvvv');
       try {
         const res =
           await this.props.appHelper.utils.bff.addOrganizationToFederation({
@@ -119,13 +120,13 @@ class FederationDetail$$Page extends React.Component {
           });
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n("i18n-x26twb9oy0l"),
+          message: this.i18n('i18n-x26twb9oy0l'),
         });
         this.props.useGetFederation.mutate();
       } catch (error) {
         var _error$response;
         this.utils.notification.warnings({
-          message: this.i18n("i18n-43getajmxf3"),
+          message: this.i18n('i18n-43getajmxf3'),
           errors:
             error === null || error === void 0
               ? void 0
@@ -163,13 +164,13 @@ class FederationDetail$$Page extends React.Component {
       });
       this.closeModal();
       this.utils.notification.success({
-        message: this.i18n("i18n-yy3f9rxigm"),
+        message: this.i18n('i18n-yy3f9rxigm'),
       });
       this.props.useGetFederation.mutate();
     } catch (error) {
       var _error$response;
       this.utils.notification.warnings({
-        message: this.i18n("i18n-p5gea1q7fem"),
+        message: this.i18n('i18n-p5gea1q7fem'),
         errors:
           error === null || error === void 0
             ? void 0
@@ -226,22 +227,22 @@ class FederationDetail$$Page extends React.Component {
   openAddUserModal() {
     this.setState({
       isOpenModal: true,
-      modalType: "adduser",
+      modalType: 'adduser',
     });
   }
 
   openDeleteUserModal(e, payload) {
     this.setState({
       isOpenModal: true,
-      modalType: "delete",
+      modalType: 'delete',
       userRecord:
         payload === null || payload === void 0 ? void 0 : payload.record,
     });
   }
 
   paginationShowTotal(total, range) {
-    return `${this.i18n("i18n-5xl7aihzcuy")} ${total} ${this.i18n(
-      "i18n-v7xu122b9o"
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
     )}`;
   }
 
@@ -270,22 +271,18 @@ class FederationDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page
-        ref={this._refsManager.linkRef("outerView")}
-        style={{ height: "100%" }}
+        ref={this._refsManager.linkRef('outerView')}
+        style={{ height: '100%' }}
       >
         <Row __component_name="Row" wrap={true}>
           <Col
             __component_name="Col"
             span={24}
-            style={{ paddingBottom: "12px" }}
+            style={{ paddingBottom: '12px' }}
           >
             <Button.Back
               __component_name="Button.Back"
-              title={this._i18nText({
-                "en-US": "federation detail",
-                key: "i18n-abe4gir44un",
-                "zh-CN": "联盟详情",
-              })}
+              title={this.i18n('i18n-abe4gir44un') /* 联盟详情 */}
               type="simple"
             />
           </Col>
@@ -321,14 +318,11 @@ class FederationDetail$$Page extends React.Component {
                               children: __$$eval(
                                 () =>
                                   this.props.useGetFederation?.data?.federation
-                                    ?.description || "-"
+                                    ?.description || '-'
                               ),
-                              key: "r4gchd14zz",
-                              label: this._i18nText({
-                                "en-US": "federation description",
-                                key: "i18n-8weq4mfy9lf",
-                                "zh-CN": "联盟描述",
-                              }),
+                              key: 'r4gchd14zz',
+                              label:
+                                this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */,
                               span: 1,
                             },
                             {
@@ -338,21 +332,17 @@ class FederationDetail$$Page extends React.Component {
                                   disabled={false}
                                   ellipsis={true}
                                   strong={false}
-                                  style={{ fontSize: "" }}
+                                  style={{ fontSize: '' }}
                                 >
                                   {__$$eval(
                                     () =>
                                       this.props.useGetFederation?.data
-                                        ?.federation?.initiator?.admin || "-"
+                                        ?.federation?.initiator?.admin || '-'
                                   )}
                                 </Typography.Text>
                               ),
-                              key: "bdr5go2aun",
-                              label: this._i18nText({
-                                "en-US": "creator",
-                                key: "i18n-yyexdt18ora",
-                                "zh-CN": "创建人",
-                              }),
+                              key: 'bdr5go2aun',
+                              label: this.i18n('i18n-yyexdt18ora') /* 创建人 */,
                               span: 1,
                             },
                             {
@@ -362,21 +352,14 @@ class FederationDetail$$Page extends React.Component {
                                   disabled={false}
                                   ellipsis={true}
                                   strong={false}
-                                  style={{ fontSize: "" }}
+                                  style={{ fontSize: '' }}
                                 >
-                                  {this._i18nText({
-                                    "en-US": "Real-name authentication",
-                                    key: "i18n-1g6cw1w1uv4",
-                                    "zh-CN": "实名认证",
-                                  })}
+                                  {this.i18n('i18n-1g6cw1w1uv4') /* 实名认证 */}
                                 </Typography.Text>
                               ),
-                              key: "lu5nygtudhq",
-                              label: this._i18nText({
-                                "en-US": "members",
-                                key: "i18n-21z9nbkoohk",
-                                "zh-CN": "成员限制",
-                              }),
+                              key: 'lu5nygtudhq',
+                              label:
+                                this.i18n('i18n-21z9nbkoohk') /* 成员限制 */,
                               span: 1,
                             },
                             {
@@ -392,12 +375,9 @@ class FederationDetail$$Page extends React.Component {
                                   )}
                                 />
                               ),
-                              key: "o0cvbxwkrj",
-                              label: this._i18nText({
-                                "en-US": "create time",
-                                key: "i18n-9ox4rx1wtwv",
-                                "zh-CN": "创建时间",
-                              }),
+                              key: 'o0cvbxwkrj',
+                              label:
+                                this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                               span: 1,
                             },
                             {
@@ -413,26 +393,20 @@ class FederationDetail$$Page extends React.Component {
                                   )}
                                 />
                               ),
-                              key: "8ei6l6dk6xn",
-                              label: this._i18nText({
-                                "en-US": "join time",
-                                key: "i18n-c0d66z03kpk",
-                                "zh-CN": "加入时间",
-                              }),
+                              key: '8ei6l6dk6xn',
+                              label:
+                                this.i18n('i18n-c0d66z03kpk') /* 加入时间 */,
                               span: 1,
                             },
                             {
                               children: __$$eval(
                                 () =>
                                   this.props.useGetFederation?.data?.federation
-                                    ?.policy || "-"
+                                    ?.policy || '-'
                               ),
-                              key: "mljbt4bcmo",
-                              label: this._i18nText({
-                                "en-US": "propsoal",
-                                key: "i18n-g8rbmvh04cd",
-                                "zh-CN": "提议策略",
-                              }),
+                              key: 'mljbt4bcmo',
+                              label:
+                                this.i18n('i18n-g8rbmvh04cd') /* 提议策略 */,
                               span: 1,
                             },
                           ]}
@@ -442,34 +416,26 @@ class FederationDetail$$Page extends React.Component {
                           title={__$$eval(
                             () =>
                               this.props.useGetFederation?.data?.federation
-                                ?.name || "-"
+                                ?.name || '-'
                           )}
                         >
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="r4gchd14zz"
-                            label={this._i18nText({
-                              "en-US": "federation description",
-                              key: "i18n-8weq4mfy9lf",
-                              "zh-CN": "联盟描述",
-                            })}
+                            label={this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */}
                             span={1}
                             tab=""
                           >
                             {__$$eval(
                               () =>
                                 this.props.useGetFederation?.data?.federation
-                                  ?.description || "-"
+                                  ?.description || '-'
                             )}
                           </Descriptions.Item>
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="bdr5go2aun"
-                            label={this._i18nText({
-                              "en-US": "creator",
-                              key: "i18n-yyexdt18ora",
-                              "zh-CN": "创建人",
-                            })}
+                            label={this.i18n('i18n-yyexdt18ora') /* 创建人 */}
                             span={1}
                             tab=""
                           >
@@ -479,12 +445,12 @@ class FederationDetail$$Page extends React.Component {
                                 disabled={false}
                                 ellipsis={true}
                                 strong={false}
-                                style={{ fontSize: "" }}
+                                style={{ fontSize: '' }}
                               >
                                 {__$$eval(
                                   () =>
                                     this.props.useGetFederation?.data
-                                      ?.federation?.initiator?.admin || "-"
+                                      ?.federation?.initiator?.admin || '-'
                                 )}
                               </Typography.Text>
                             }
@@ -492,11 +458,7 @@ class FederationDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="lu5nygtudhq"
-                            label={this._i18nText({
-                              "en-US": "members",
-                              key: "i18n-21z9nbkoohk",
-                              "zh-CN": "成员限制",
-                            })}
+                            label={this.i18n('i18n-21z9nbkoohk') /* 成员限制 */}
                             span={1}
                           >
                             {
@@ -505,24 +467,16 @@ class FederationDetail$$Page extends React.Component {
                                 disabled={false}
                                 ellipsis={true}
                                 strong={false}
-                                style={{ fontSize: "" }}
+                                style={{ fontSize: '' }}
                               >
-                                {this._i18nText({
-                                  "en-US": "Real-name authentication",
-                                  key: "i18n-1g6cw1w1uv4",
-                                  "zh-CN": "实名认证",
-                                })}
+                                {this.i18n('i18n-1g6cw1w1uv4') /* 实名认证 */}
                               </Typography.Text>
                             }
                           </Descriptions.Item>
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="o0cvbxwkrj"
-                            label={this._i18nText({
-                              "en-US": "create time",
-                              key: "i18n-9ox4rx1wtwv",
-                              "zh-CN": "创建时间",
-                            })}
+                            label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
                             span={1}
                           >
                             {
@@ -541,11 +495,7 @@ class FederationDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="8ei6l6dk6xn"
-                            label={this._i18nText({
-                              "en-US": "join time",
-                              key: "i18n-c0d66z03kpk",
-                              "zh-CN": "加入时间",
-                            })}
+                            label={this.i18n('i18n-c0d66z03kpk') /* 加入时间 */}
                             span={1}
                           >
                             {
@@ -564,28 +514,20 @@ class FederationDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="mljbt4bcmo"
-                            label={this._i18nText({
-                              "en-US": "propsoal",
-                              key: "i18n-g8rbmvh04cd",
-                              "zh-CN": "提议策略",
-                            })}
+                            label={this.i18n('i18n-g8rbmvh04cd') /* 提议策略 */}
                             span={1}
                           >
                             {__$$eval(
                               () =>
                                 this.props.useGetFederation?.data?.federation
-                                  ?.policy || "-"
+                                  ?.policy || '-'
                             )}
                           </Descriptions.Item>
                         </Descriptions>
                       </Spin>
                     ),
-                    key: "tab-item-1",
-                    label: this._i18nText({
-                      "en-US": "federation infomation",
-                      key: "i18n-a7fnfkzqkks",
-                      "zh-CN": "联盟信息",
-                    }),
+                    key: 'tab-item-1',
+                    label: this.i18n('i18n-a7fnfkzqkks') /* 联盟信息 */,
                   },
                   {
                     children: (
@@ -602,15 +544,15 @@ class FederationDetail$$Page extends React.Component {
                               __events={{
                                 eventDataList: [
                                   {
-                                    name: "onClick",
-                                    relatedEventName: "openAddUserModal",
-                                    type: "componentEvent",
+                                    name: 'onClick',
+                                    relatedEventName: 'openAddUserModal',
+                                    type: 'componentEvent',
                                   },
                                 ],
                                 eventList: [
                                   {
                                     disabled: true,
-                                    name: "onClick",
+                                    name: 'onClick',
                                     template:
                                       "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                                   },
@@ -639,11 +581,7 @@ class FederationDetail$$Page extends React.Component {
                               shape="default"
                               type="primary"
                             >
-                              {this._i18nText({
-                                "en-US": "add member",
-                                key: "i18n-gwumlhyv4ub",
-                                "zh-CN": "邀请成员",
-                              })}
+                              {this.i18n('i18n-gwumlhyv4ub') /* 邀请成员 */}
                             </Button>
                           </Col>
                           <Col __component_name="Col" span={24}>
@@ -652,51 +590,51 @@ class FederationDetail$$Page extends React.Component {
                               __events={{
                                 eventDataList: [
                                   {
-                                    name: "onChange",
-                                    relatedEventName: "handleUserTableChange",
-                                    type: "componentEvent",
+                                    name: 'onChange',
+                                    relatedEventName: 'handleUserTableChange',
+                                    type: 'componentEvent',
                                   },
                                   {
-                                    name: "pagination.onChange",
+                                    name: 'pagination.onChange',
                                     relatedEventName:
-                                      "handleUserPaginationChange",
-                                    type: "componentEvent",
+                                      'handleUserPaginationChange',
+                                    type: 'componentEvent',
                                   },
                                   {
-                                    name: "pagination.onShowSizeChange",
+                                    name: 'pagination.onShowSizeChange',
                                     relatedEventName:
-                                      "handleUserPaginationChange",
-                                    type: "componentEvent",
+                                      'handleUserPaginationChange',
+                                    type: 'componentEvent',
                                   },
                                 ],
                                 eventList: [
                                   {
                                     disabled: true,
-                                    name: "onChange",
+                                    name: 'onChange',
                                     template:
                                       "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
                                   },
                                   {
                                     disabled: false,
-                                    name: "rowSelection.onChange",
+                                    name: 'rowSelection.onChange',
                                     template:
                                       "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
                                   },
                                   {
                                     disabled: false,
-                                    name: "expandable.onExpand",
+                                    name: 'expandable.onExpand',
                                     template:
                                       "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
                                   },
                                   {
                                     disabled: true,
-                                    name: "pagination.onChange",
+                                    name: 'pagination.onChange',
                                     template:
                                       "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
                                   },
                                   {
                                     disabled: true,
-                                    name: "pagination.onShowSizeChange",
+                                    name: 'pagination.onShowSizeChange',
                                     template:
                                       "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
                                   },
@@ -704,17 +642,16 @@ class FederationDetail$$Page extends React.Component {
                               }}
                               columns={[
                                 {
-                                  dataIndex: "name",
-                                  key: "name",
-                                  title: this._i18nText({
-                                    "en-US": "organization",
-                                    key: "i18n-gmx7l7tolvj",
-                                    "zh-CN": "成员组织",
-                                  }),
+                                  dataIndex: 'name',
+                                  key: 'name',
+                                  title:
+                                    this.i18n(
+                                      'i18n-gmx7l7tolvj'
+                                    ) /* 成员组织 */,
                                 },
                                 {
-                                  dataIndex: "age",
-                                  key: "age",
+                                  dataIndex: 'age',
+                                  key: 'age',
                                   render: (text, record, index) =>
                                     ((__$$context) => (
                                       <Typography.Text
@@ -722,13 +659,13 @@ class FederationDetail$$Page extends React.Component {
                                         disabled={false}
                                         ellipsis={true}
                                         strong={false}
-                                        style={{ fontSize: "" }}
+                                        style={{ fontSize: '' }}
                                       >
-                                        {this._i18nText({
-                                          "en-US": "Real-name authentication",
-                                          key: "i18n-1g6cw1w1uv4",
-                                          "zh-CN": "实名认证",
-                                        })}
+                                        {
+                                          this.i18n(
+                                            'i18n-1g6cw1w1uv4'
+                                          ) /* 实名认证 */
+                                        }
                                       </Typography.Text>
                                     ))(
                                       __$$createChildContext(__$$context, {
@@ -737,15 +674,12 @@ class FederationDetail$$Page extends React.Component {
                                         index,
                                       })
                                     ),
-                                  title: this._i18nText({
-                                    "en-US": "infomation",
-                                    key: "i18n-th9ag1qgsu",
-                                    "zh-CN": "认证信息",
-                                  }),
+                                  title:
+                                    this.i18n('i18n-th9ag1qgsu') /* 认证信息 */,
                                 },
                                 {
-                                  dataIndex: "joinedAt",
-                                  key: "infomation",
+                                  dataIndex: 'joinedAt',
+                                  key: 'infomation',
                                   render: (text, record, index) =>
                                     ((__$$context) => (
                                       <Typography.Time
@@ -760,15 +694,14 @@ class FederationDetail$$Page extends React.Component {
                                         index,
                                       })
                                     ),
-                                  title: this._i18nText({
-                                    "en-US": "join time",
-                                    key: "i18n-c0d66z03kpk",
-                                    "zh-CN": "加入时间",
-                                  }),
+                                  title:
+                                    this.i18n(
+                                      'i18n-c0d66z03kpk'
+                                    ) /* 加入时间 */,
                                 },
                                 {
-                                  dataIndex: "op",
-                                  key: "op",
+                                  dataIndex: 'op',
+                                  key: 'op',
                                   render: (text, record, index) =>
                                     ((__$$context) => (
                                       <Button
@@ -776,18 +709,18 @@ class FederationDetail$$Page extends React.Component {
                                         __events={{
                                           eventDataList: [
                                             {
-                                              name: "onClick",
+                                              name: 'onClick',
                                               paramStr:
                                                 '{\n \t "record":this.record \n}',
                                               relatedEventName:
-                                                "openDeleteUserModal",
-                                              type: "componentEvent",
+                                                'openDeleteUserModal',
+                                              type: 'componentEvent',
                                             },
                                           ],
                                           eventList: [
                                             {
                                               disabled: true,
-                                              name: "onClick",
+                                              name: 'onClick',
                                               template:
                                                 "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                                             },
@@ -797,8 +730,8 @@ class FederationDetail$$Page extends React.Component {
                                         danger={false}
                                         disabled={__$$eval(() =>
                                           [
-                                            "FederationPending",
-                                            "FederationDissolved",
+                                            'FederationPending',
+                                            'FederationDissolved',
                                           ].includes(
                                             __$$context.props.useGetFederation
                                               ?.data?.federation?.status
@@ -807,8 +740,8 @@ class FederationDetail$$Page extends React.Component {
                                         ghost={false}
                                         icon={__$$eval(() =>
                                           [
-                                            "FederationPending",
-                                            "FederationDissolved",
+                                            'FederationPending',
+                                            'FederationDissolved',
                                           ].includes(
                                             __$$context.props.useGetFederation
                                               ?.data?.federation?.status
@@ -829,11 +762,11 @@ class FederationDetail$$Page extends React.Component {
                                         shape="default"
                                         type="link"
                                       >
-                                        {this._i18nText({
-                                          "en-US": "delete",
-                                          key: "i18n-ias68eipm18",
-                                          "zh-CN": "删除",
-                                        })}
+                                        {
+                                          this.i18n(
+                                            'i18n-ias68eipm18'
+                                          ) /* 删除 */
+                                        }
                                       </Button>
                                     ))(
                                       __$$createChildContext(__$$context, {
@@ -842,11 +775,8 @@ class FederationDetail$$Page extends React.Component {
                                         index,
                                       })
                                     ),
-                                  title: this._i18nText({
-                                    "en-US": "operation",
-                                    key: "i18n-k5inn5jmnt9",
-                                    "zh-CN": "操作",
-                                  }),
+                                  title:
+                                    this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
                                   width: 100,
                                 },
                               ]}
@@ -855,7 +785,7 @@ class FederationDetail$$Page extends React.Component {
                                   this.props.useGetFederation?.data?.federation
                                     ?.organizations || []
                                 )?.sort((a, b) => {
-                                  if (this.state.sorter?.order !== "ascend") {
+                                  if (this.state.sorter?.order !== 'ascend') {
                                     return (
                                       new Date(b.joinedAt).getTime() -
                                       new Date(a.joinedAt).getTime()
@@ -908,7 +838,7 @@ class FederationDetail$$Page extends React.Component {
                                   );
                                 }.bind(this),
                                 simple: false,
-                                size: "default",
+                                size: 'default',
                                 total: __$$eval(
                                   () =>
                                     (
@@ -921,22 +851,18 @@ class FederationDetail$$Page extends React.Component {
                               scroll={{ scrollToFirstRowOnChange: true }}
                               showHeader={true}
                               size="default"
-                              style={{ marginTop: "-10px" }}
+                              style={{ marginTop: '-10px' }}
                             />
                           </Col>
                         </Row>
                       </Spin>
                     ),
-                    key: "tab-item-2",
-                    label: this._i18nText({
-                      "en-US": "federation members",
-                      key: "i18n-8vybx9itd3n",
-                      "zh-CN": "联盟成员",
-                    }),
+                    key: 'tab-item-2',
+                    label: this.i18n('i18n-8vybx9itd3n') /* 联盟成员 */,
                   },
                 ]}
                 size="large"
-                style={{ marginTop: "-20px" }}
+                style={{ marginTop: '-20px' }}
                 tabPosition="top"
                 type="line"
               />
@@ -964,11 +890,7 @@ class FederationDetail$$Page extends React.Component {
                   target="_self"
                   type="primary"
                 >
-                  {this._i18nText({
-                    "en-US": "create network",
-                    key: "i18n-kwbu3vyst6",
-                    "zh-CN": "新建网络",
-                  })}
+                  {this.i18n('i18n-kwbu3vyst6') /* 新建网络 */}
                 </Button>
               </Col>
               <Col __component_name="Col">
@@ -983,57 +905,57 @@ class FederationDetail$$Page extends React.Component {
                     __events={{
                       eventDataList: [
                         {
-                          name: "onChange",
-                          relatedEventName: "handleSearchValueChange",
-                          type: "componentEvent",
+                          name: 'onChange',
+                          relatedEventName: 'handleSearchValueChange',
+                          type: 'componentEvent',
                         },
                       ],
                       eventList: [
                         {
                           disabled: true,
-                          name: "onChange",
+                          name: 'onChange',
                           template:
                             "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onPressEnter",
+                          name: 'onPressEnter',
                           template:
                             "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onSearch",
+                          name: 'onSearch',
                           template:
                             "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
                         },
                         {
                           disabled: false,
-                          name: "onFocus",
+                          name: 'onFocus',
                           template:
                             "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyDown",
+                          name: 'onKeyDown',
                           template:
                             "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyPress",
+                          name: 'onKeyPress',
                           template:
                             "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onKeyUp",
+                          name: 'onKeyUp',
                           template:
                             "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
                         },
                         {
                           disabled: false,
-                          name: "onBlur",
+                          name: 'onBlur',
                           template:
                             "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
                         },
@@ -1045,11 +967,9 @@ class FederationDetail$$Page extends React.Component {
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
-                    placeholder={this._i18nText({
-                      "en-US": "search",
-                      key: "i18n-mrdb0wulhmc",
-                      "zh-CN": "输入资源ID或网络名",
-                    })}
+                    placeholder={
+                      this.i18n('i18n-mrdb0wulhmc') /* 输入资源ID或网络名 */
+                    }
                   />
                 </Space>
               </Col>
@@ -1070,49 +990,49 @@ class FederationDetail$$Page extends React.Component {
                 __events={{
                   eventDataList: [
                     {
-                      name: "onChange",
-                      relatedEventName: "handleTableChange",
-                      type: "componentEvent",
+                      name: 'onChange',
+                      relatedEventName: 'handleTableChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "pagination.onChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                     {
-                      name: "pagination.onShowSizeChange",
-                      relatedEventName: "handlePaginationChange",
-                      type: "componentEvent",
+                      name: 'pagination.onShowSizeChange',
+                      relatedEventName: 'handlePaginationChange',
+                      type: 'componentEvent',
                     },
                   ],
                   eventList: [
                     {
                       disabled: true,
-                      name: "onChange",
+                      name: 'onChange',
                       template:
                         "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
                     },
                     {
                       disabled: false,
-                      name: "rowSelection.onChange",
+                      name: 'rowSelection.onChange',
                       template:
                         "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
                     },
                     {
                       disabled: false,
-                      name: "expandable.onExpand",
+                      name: 'expandable.onExpand',
                       template:
                         "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onChange",
+                      name: 'pagination.onChange',
                       template:
                         "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
                     },
                     {
                       disabled: true,
-                      name: "pagination.onShowSizeChange",
+                      name: 'pagination.onShowSizeChange',
                       template:
                         "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
                     },
@@ -1120,26 +1040,18 @@ class FederationDetail$$Page extends React.Component {
                 }}
                 columns={[
                   {
-                    dataIndex: "name",
-                    key: "name",
-                    title: this._i18nText({
-                      "en-US": "id/name",
-                      key: "i18n-03e0p0acqmaf",
-                      "zh-CN": "资源ID/网络名称",
-                    }),
+                    dataIndex: 'name',
+                    key: 'name',
+                    title: this.i18n('i18n-03e0p0acqmaf') /* 资源ID/网络名称 */,
                   },
                   {
-                    dataIndex: "ordererType",
-                    key: "ordererType",
-                    title: this._i18nText({
-                      "en-US": "type",
-                      key: "i18n-oi2oqdfkq6i",
-                      "zh-CN": "引擎类型",
-                    }),
+                    dataIndex: 'ordererType',
+                    key: 'ordererType',
+                    title: this.i18n('i18n-oi2oqdfkq6i') /* 引擎类型 */,
                   },
                   {
-                    dataIndex: "organizations",
-                    key: "organizations",
+                    dataIndex: 'organizations',
+                    key: 'organizations',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Text
@@ -1147,7 +1059,7 @@ class FederationDetail$$Page extends React.Component {
                           disabled={false}
                           ellipsis={true}
                           strong={false}
-                          style={{ fontSize: "" }}
+                          style={{ fontSize: '' }}
                         >
                           {__$$eval(() => text?.length || 0)}
                         </Typography.Text>
@@ -1158,24 +1070,16 @@ class FederationDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "organization",
-                      key: "i18n-18ncsld69pu",
-                      "zh-CN": "组织数",
-                    }),
+                    title: this.i18n('i18n-18ncsld69pu') /* 组织数 */,
                   },
                   {
-                    dataIndex: "clusterSize",
-                    key: "clusterSize",
-                    title: this._i18nText({
-                      "en-US": "node number",
-                      key: "i18n-fg85es7zp8",
-                      "zh-CN": "我的节点总数",
-                    }),
+                    dataIndex: 'clusterSize',
+                    key: 'clusterSize',
+                    title: this.i18n('i18n-fg85es7zp8') /* 我的节点总数 */,
                   },
                   {
-                    dataIndex: "creationTimestamp",
-                    key: "creationTimestamp",
+                    dataIndex: 'creationTimestamp',
+                    key: 'creationTimestamp',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Time
@@ -1191,15 +1095,11 @@ class FederationDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "create time",
-                      key: "i18n-9ox4rx1wtwv",
-                      "zh-CN": "创建时间",
-                    }),
+                    title: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                   },
                   {
-                    dataIndex: "expiredTime",
-                    key: "expiredTime",
+                    dataIndex: 'expiredTime',
+                    key: 'expiredTime',
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Typography.Time
@@ -1214,11 +1114,7 @@ class FederationDetail$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this._i18nText({
-                      "en-US": "time",
-                      key: "i18n-scjygs4e08n",
-                      "zh-CN": "过期时间",
-                    }),
+                    title: this.i18n('i18n-scjygs4e08n') /* 过期时间 */,
                   },
                 ]}
                 dataSource={__$$eval(() =>
@@ -1232,7 +1128,7 @@ class FederationDetail$$Page extends React.Component {
                         : true;
                     })
                     ?.sort((a, b) => {
-                      if (this.state.sorter?.order !== "ascend") {
+                      if (this.state.sorter?.order !== 'ascend') {
                         return (
                           new Date(b.creationTimestamp).getTime() -
                           new Date(a.creationTimestamp).getTime()
@@ -1275,7 +1171,7 @@ class FederationDetail$$Page extends React.Component {
                     );
                   }.bind(this),
                   simple: false,
-                  size: "default",
+                  size: 'default',
                   total: __$$eval(
                     () =>
                       ((
@@ -1288,7 +1184,7 @@ class FederationDetail$$Page extends React.Component {
                             : true;
                         })
                         ?.sort((a, b) => {
-                          if (this.state.sorter?.order !== "ascend") {
+                          if (this.state.sorter?.order !== 'ascend') {
                             return (
                               new Date(b.creationTimestamp).getTime() -
                               new Date(a.creationTimestamp).getTime()
@@ -1305,7 +1201,7 @@ class FederationDetail$$Page extends React.Component {
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
                 size="default"
-                style={{ marginTop: "-20px" }}
+                style={{ marginTop: '-20px' }}
               />
             </Card>
           </Col>
@@ -1315,32 +1211,32 @@ class FederationDetail$$Page extends React.Component {
           __events={{
             eventDataList: [
               {
-                name: "onCancel",
-                relatedEventName: "closeModal",
-                type: "componentEvent",
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
               },
               {
-                name: "onOk",
-                relatedEventName: "confirmAddUserModal",
-                type: "componentEvent",
+                name: 'onOk',
+                relatedEventName: 'confirmAddUserModal',
+                type: 'componentEvent',
               },
             ],
             eventList: [
               {
                 disabled: false,
-                name: "afterClose",
+                name: 'afterClose',
                 templete:
                   "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
               },
               {
                 disabled: true,
-                name: "onCancel",
+                name: 'onCancel',
                 template:
                   "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
               },
               {
                 disabled: true,
-                name: "onOk",
+                name: 'onOk',
                 template:
                   "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
               },
@@ -1366,54 +1262,43 @@ class FederationDetail$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(
-            () => this.state.isOpenModal && this.state.modalType === "adduser"
+            () => this.state.isOpenModal && this.state.modalType === 'adduser'
           )}
-          title={this._i18nText({
-            "en-US": "add member",
-            key: "i18n-gwumlhyv4ub",
-            "zh-CN": "邀请成员",
-          })}
+          title={this.i18n('i18n-gwumlhyv4ub') /* 邀请成员 */}
         >
           <FormilyForm
             __component_name="FormilyForm"
             componentProps={{
               colon: false,
-              labelAlign: "left",
+              labelAlign: 'left',
               labelCol: 4,
-              layout: "horizontal",
+              layout: 'horizontal',
               wrapperCol: 20,
             }}
-            ref={this._refsManager.linkRef("formily_create")}
+            ref={this._refsManager.linkRef('formily_create')}
           >
             <FormilySelect
               __component_name="FormilySelect"
               componentProps={{
-                "x-component-props": {
-                  _unsafe_MixedSetter_enum_select: "ExpressionSetter",
-                  _unsafe_MixedSetter_notFoundContent_select: "StringSetter",
+                'x-component-props': {
+                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                  _unsafe_MixedSetter_notFoundContent_select: 'StringSetter',
                   allowClear: false,
                   disabled: false,
                   enum: __$$eval(() => this.state.organizations),
-                  mode: "multiple",
-                  notFoundContent: "",
-                  placeholder: this._i18nText({
-                    "en-US": "name",
-                    key: "i18n-ihfepbwjnv",
-                    "zh-CN": "被邀请的成员/组织名称",
-                  }),
+                  mode: 'multiple',
+                  notFoundContent: '',
+                  placeholder:
+                    this.i18n('i18n-ihfepbwjnv') /* 被邀请的成员/组织名称 */,
                 },
               }}
-              decoratorProps={{ "x-decorator-props": { asterisk: true } }}
+              decoratorProps={{ 'x-decorator-props': { asterisk: true } }}
               fieldProps={{
-                _unsafe_MixedSetter_enum_select: "ExpressionSetter",
+                _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                 enum: __$$eval(() => this.state.organizations),
-                name: "organizations",
-                title: this._i18nText({
-                  "en-US": "Member organization",
-                  key: "i18n-gmx7l7tolvj",
-                  "zh-CN": "成员组织",
-                }),
-                "x-validator": [],
+                name: 'organizations',
+                title: this.i18n('i18n-gmx7l7tolvj') /* 成员组织 */,
+                'x-validator': [],
               }}
             />
           </FormilyForm>
@@ -1423,32 +1308,32 @@ class FederationDetail$$Page extends React.Component {
           __events={{
             eventDataList: [
               {
-                name: "onCancel",
-                relatedEventName: "closeModal",
-                type: "componentEvent",
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
               },
               {
-                name: "onOk",
-                relatedEventName: "confirmDeleteUserModal",
-                type: "componentEvent",
+                name: 'onOk',
+                relatedEventName: 'confirmDeleteUserModal',
+                type: 'componentEvent',
               },
             ],
             eventList: [
               {
                 disabled: false,
-                name: "afterClose",
+                name: 'afterClose',
                 templete:
                   "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
               },
               {
                 disabled: true,
-                name: "onCancel",
+                name: 'onCancel',
                 template:
                   "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
               },
               {
                 disabled: true,
-                name: "onOk",
+                name: 'onOk',
                 template:
                   "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
               },
@@ -1474,22 +1359,14 @@ class FederationDetail$$Page extends React.Component {
             );
           }.bind(this)}
           open={__$$eval(
-            () => this.state.isOpenModal && this.state.modalType === "delete"
+            () => this.state.isOpenModal && this.state.modalType === 'delete'
           )}
-          title={this._i18nText({
-            "en-US": "Delete a user",
-            key: "i18n-h52hay1ld2s",
-            "zh-CN": "删除用户",
-          })}
+          title={this.i18n('i18n-h52hay1ld2s') /* 删除用户 */}
         >
           <Alert
             __component_name="Alert"
             bordered="none"
-            message={this._i18nText({
-              "en-US": "Confirm user deletion",
-              key: "i18n-mmk8cikrrw",
-              "zh-CN": "确定删除用户",
-            })}
+            message={this.i18n('i18n-mmk8cikrrw') /* 确定删除用户 */}
             showIcon={true}
             type="warning"
           />
@@ -1501,7 +1378,7 @@ class FederationDetail$$Page extends React.Component {
 
 export default () => {
   const location = useLocation();
-  const match = matchPath({ path: "/federation/:id" }, location.pathname);
+  const match = matchPath({ path: '/federation/:id' }, location.pathname);
   location.match = match;
   const self = {
     location,
@@ -1516,7 +1393,7 @@ export default () => {
     <DataProvider
       sdkSwrFuncs={[
         {
-          func: "useGetFederation",
+          func: 'useGetFederation',
           params: {
             name: self.match?.params?.id,
           },
