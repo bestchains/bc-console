@@ -8,20 +8,20 @@ import {
   FormilyForm,
   FormilyInput,
   FormilySelect,
+  Space,
+  Typography,
+  UnifiedLink,
   FormilyTextArea,
   Alert,
-  Row,
-  Col,
-  Typography,
   Button,
   Icon,
-  Space,
+  Row,
+  Col,
   Radio,
   Input,
   Card,
   Table,
   Status,
-  Dropdown,
 } from '@tenx-ui/materials';
 
 import { useLocation, history, matchPath } from '@umijs/max';
@@ -105,10 +105,11 @@ class Federation$$Page extends React.Component {
         await this.props.appHelper.utils.bff.createFederation({
           federation: v,
         });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-d4bbvp00v5t'),
-        });
+        this.openCreateSuccessModal();
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-d4bbvp00v5t'),
+        // })
         this.props.useGetFederations.mutate();
         this.setState({
           createLoading: false,
@@ -172,10 +173,11 @@ class Federation$$Page extends React.Component {
             ? void 0
             : _this$state$record.name,
       });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-gagifmv2uun'),
-      });
+      // this.closeModal()
+      // this.utils.notification.success({
+      //   message: this.i18n('i18n-gagifmv2uun'),
+      // })
+      this.openDissolveSuccessModal();
       this.props.useGetFederations.mutate();
     } catch (error) {
       var _error$response;
@@ -221,7 +223,8 @@ class Federation$$Page extends React.Component {
     });
   }
 
-  onMenuClick({ key }, payload) {
+  onMenuClick(e, payload) {
+    const { key } = payload || {};
     this.setState({
       record: payload === null || payload === void 0 ? void 0 : payload.record,
     });
@@ -240,6 +243,13 @@ class Federation$$Page extends React.Component {
     });
   }
 
+  openCreateSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'createsuccess',
+    });
+  }
+
   openDeleteModal() {
     this.setState({
       isOpenModal: true,
@@ -251,6 +261,13 @@ class Federation$$Page extends React.Component {
     this.setState({
       isOpenModal: true,
       modalType: 'dissolve',
+    });
+  }
+
+  openDissolveSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'dissolvesuccess',
     });
   }
 
@@ -420,7 +437,27 @@ class Federation$$Page extends React.Component {
                 },
               }}
               fieldProps={{
+                _unsafe_MixedSetter_description_select: 'SlotSetter',
                 _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                description: (
+                  <Space align="center" direction="horizontal">
+                    <Typography.Text
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {
+                        this.i18n(
+                          'i18n-lkzmdgmv'
+                        ) /* 如果您还没有组织，您可以 */
+                      }
+                    </Typography.Text>
+                    <UnifiedLink target="_blank" to="/organization">
+                      {this.i18n('i18n-tlql06imj7') /* 创建组织 */}
+                    </UnifiedLink>
+                  </Space>
+                ),
                 enum: __$$eval(
                   () =>
                     this.state.organizations?.filter(
@@ -452,7 +489,7 @@ class Federation$$Page extends React.Component {
                     ) || []
                 ),
                 name: 'organizations',
-                required: true,
+                required: false,
                 title: this.i18n('i18n-0bo5igd908x') /* 选择成员 */,
                 'x-validator': [],
               }}
@@ -519,7 +556,7 @@ class Federation$$Page extends React.Component {
               }}
               fieldProps={{
                 name: 'description',
-                title: this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */,
+                title: this.i18n('i18n-8weq4mfy9lf') /* 描述 */,
                 'x-component': 'Input.TextArea',
                 'x-validator': [
                   {
@@ -533,6 +570,272 @@ class Federation$$Page extends React.Component {
               }}
             />
           </FormilyForm>
+          <Alert
+            message={this.i18n('i18n-ohwea8x7') /* 申请提议将发送给组建成员 */}
+            showIcon={true}
+            type="info"
+          />
+        </Modal>
+        <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal && this.state.modalType === 'createsuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-x6icsntt') /* 新建联盟提议已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
+        </Modal>
+        <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'dissolvesuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-lxd7pwc9') /* 解散联盟提议已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
         </Modal>
         <Modal
           __component_name="Modal"
@@ -592,7 +895,7 @@ class Federation$$Page extends React.Component {
           open={__$$eval(
             () => this.state.isOpenModal && this.state.modalType === 'dissolve'
           )}
-          title={this.i18n('i18n-axcofu86f15') /* 解散联盟 */}
+          title={this.i18n('i18n-fcr3rfde') /* 确认发起解散联盟提议 */}
         >
           <Alert
             __component_name="Alert"
@@ -600,8 +903,8 @@ class Federation$$Page extends React.Component {
             icon=""
             message={
               this.i18n(
-                'i18n-z04apojz8aj'
-              ) /* 解散联盟后，内部资源仍需要手动删除 */
+                'i18n-ny3xb6gq'
+              ) /* 请确保联盟下所有网络已经停用，解散之后不可恢复，请慎重！ */
             }
             showIcon={true}
             type="warning"
@@ -915,7 +1218,7 @@ class Federation$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this.i18n('i18n-wctt13ld2x') /* 发起者 */,
+                    title: this.i18n('i18n-7ww60oxk') /* 创建者 */,
                   },
                   {
                     dataIndex: 'organizations',
@@ -938,7 +1241,7 @@ class Federation$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this.i18n('i18n-4btnh7pqt1m') /* 成员个数 */,
+                    title: this.i18n('i18n-si4qi37l') /* 成员数 */,
                   },
                   {
                     dataIndex: 'networks',
@@ -961,7 +1264,7 @@ class Federation$$Page extends React.Component {
                           index,
                         })
                       ),
-                    title: this.i18n('i18n-w4mcacnr3z') /* 网络个数 */,
+                    title: this.i18n('i18n-csxel0bc') /* 网络数 */,
                   },
                   {
                     dataIndex: 'creationTimestamp',
@@ -1089,101 +1392,101 @@ class Federation$$Page extends React.Component {
                             shape="default"
                             type="link"
                           >
-                            {this.i18n('i18n-e6ttl8tm6f') /* 管理联盟 */}
+                            {this.i18n('i18n-m6n5fnxybu') /* 详情 */}
                           </Button>
-                          <Dropdown
-                            __component_name="Dropdown"
-                            __events={{
-                              eventDataList: [
-                                {
-                                  name: 'menu.onClick',
-                                  paramStr: '{\n \t"record": this.record \n}',
-                                  relatedEventName: 'onMenuClick',
-                                  type: 'componentEvent',
-                                },
-                              ],
-                              eventList: [
-                                {
-                                  disabled: true,
-                                  name: 'menu.onClick',
-                                  template:
-                                    "onDropDownClick({ item, key, keyPath, domEvent }, ${extParams}){\n// onClick\t点击 MenuItem 调用此函数 \nconsole.log('onDropDownClick', item, key, keyPath, domEvent);}",
-                                },
-                              ],
-                            }}
-                            destroyPopupOnHide={true}
-                            disabled={false}
-                            menu={{
-                              items: [
-                                {
-                                  disabled: __$$eval(
-                                    () =>
-                                      record?.status === 'FederationDissolved'
-                                  ),
-                                  key: 'dissolve',
-                                  label:
-                                    this.i18n(
-                                      'i18n-axcofu86f15'
-                                    ) /* 解散联盟 */,
-                                },
-                                {
-                                  _unsafe_MixedSetter_label_select:
-                                    'I18nSetter',
-                                  disabled: __$$eval(
-                                    () =>
-                                      record?.status !== 'FederationDissolved'
-                                  ),
-                                  key: 'delete',
-                                  label:
-                                    this.i18n(
-                                      'i18n-anergo0dunh'
-                                    ) /* 删除联盟 */,
-                                },
-                              ],
-                              onClick: function () {
-                                this.onMenuClick.apply(
+                          {!!__$$eval(
+                            () => record?.status === 'FederationDissolved'
+                          ) && (
+                            <Button
+                              __component_name="Button"
+                              __events={{
+                                eventDataList: [
+                                  {
+                                    name: 'onClick',
+                                    paramStr:
+                                      '{\n \t "record":this.record,\n\t\tkey: \'delete\'\n}',
+                                    relatedEventName: 'onMenuClick',
+                                    type: 'componentEvent',
+                                  },
+                                ],
+                                eventList: [
+                                  {
+                                    disabled: true,
+                                    name: 'onClick',
+                                    template:
+                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                  },
+                                ],
+                              }}
+                              block={false}
+                              danger={false}
+                              disabled={null}
+                              ghost={false}
+                              icon=""
+                              onClick={function () {
+                                return this.onMenuClick.apply(
                                   this,
                                   Array.prototype.slice.call(arguments).concat([
                                     {
                                       record: record,
+                                      key: 'delete',
                                     },
                                   ])
                                 );
-                              }.bind(__$$context),
-                            }}
-                            placement="bottomLeft"
-                            trigger={['hover']}
-                          >
-                            <Button
-                              __component_name="Button"
-                              block={false}
-                              danger={false}
-                              disabled={false}
-                              ghost={false}
+                              }.bind(__$$context)}
                               shape="default"
                               type="link"
                             >
-                              {[
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  strong={false}
-                                  style={{ color: 'inherit', fontSize: '' }}
-                                >
-                                  {this.i18n('i18n-2b4dhrz51wu') /* 更多 */}
-                                </Typography.Text>,
-                                <Icon
-                                  __component_name="Icon"
-                                  size={12}
-                                  style={{
-                                    marginLeft: 4,
-                                    verticalAlign: 'middle',
-                                  }}
-                                  type="DownOutlined"
-                                />,
-                              ]}
+                              {this.i18n('i18n-ias68eipm18') /* 删除 */}
                             </Button>
-                          </Dropdown>
+                          )}
+                          {!!__$$eval(
+                            () => record?.status !== 'FederationDissolved'
+                          ) && (
+                            <Button
+                              __component_name="Button"
+                              __events={{
+                                eventDataList: [
+                                  {
+                                    name: 'onClick',
+                                    paramStr:
+                                      '{\n \t "record":this.record, \n\t\t"key":"dissolve"\n}',
+                                    relatedEventName: 'onMenuClick',
+                                    type: 'componentEvent',
+                                  },
+                                ],
+                                eventList: [
+                                  {
+                                    disabled: true,
+                                    name: 'onClick',
+                                    template:
+                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                  },
+                                ],
+                              }}
+                              block={false}
+                              danger={false}
+                              disabled={null}
+                              ghost={false}
+                              href={null}
+                              icon=""
+                              onClick={function () {
+                                return this.onMenuClick.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      record: record,
+                                      key: 'dissolve',
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
+                              shape="default"
+                              type="link"
+                            >
+                              {this.i18n('i18n-lfchnp1t') /* 解散 */}
+                            </Button>
+                          )}
                         </Space>
                       ))(
                         __$$createChildContext(__$$context, {
@@ -1363,7 +1666,9 @@ class Federation$$Page extends React.Component {
           <Alert
             __component_name="Alert"
             bordered="none"
-            message={this.i18n('i18n-nnvhk2w7bh') /* 确定删除联盟？ */}
+            message={
+              this.i18n('i18n-qyzhg15a') /* 删除之后不可恢复，请慎重！ */
+            }
             showIcon={true}
             type="warning"
           />

@@ -11,6 +11,7 @@ import {
   Descriptions,
   Typography,
   Status,
+  Tabs,
   Icon,
   Space,
   Input,
@@ -21,6 +22,7 @@ import {
   FormilySelect,
   Alert,
   UnifiedLink,
+  FormilyNumberPicker,
 } from '@tenx-ui/materials';
 
 import { useLocation, history, matchPath } from '@umijs/max';
@@ -146,6 +148,34 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  confirmCreateNodelModal(e, payload) {
+    // const organization = this.props.useGetOrganization?.data?.organization || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   try {
+    //     const res = await this.props.appHelper.utils.bff.updateOrganization({
+    //       name: organization.name,
+    //       organization: {
+    //         users: (organization?.users || []).concat({
+    //           name: v.name,
+    //           isOrganizationAdmin: !!v.isOrganizationAdmin === 'true'
+    //         })?.map(item => item.name)
+    //       }
+    //     })
+    //     this.closeModal()
+    //     this.utils.notification.success({
+    //       message: this.i18n('i18n-x26twb9oy0l'),
+    //     })
+    //     this.props.useGetOrganization.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-43getajmxf3'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
   async confirmDeleteModal(e, payload) {
     var _this$props$useGetOrg, _this$props$useGetOrg2, _filter;
     const organization =
@@ -258,6 +288,35 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  handleNodeFilterChange(e) {
+    this.setState({
+      filter: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleNodePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleNodeSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleNodeTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
+  }
+
   handlePaginationChange(c, s) {
     this.setState({
       size: s,
@@ -280,10 +339,23 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  nodePaginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
+  }
+
   openCreateModal() {
     this.setState({
       isOpenModal: true,
       modalType: 'create',
+    });
+  }
+
+  openCreateNodeModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'createnode',
     });
   }
 
@@ -353,26 +425,32 @@ class OrganizationDetail$$Page extends React.Component {
                 __component_name="Descriptions"
                 bordered={false}
                 colon={false}
-                column={1}
+                column={2}
                 items={[
                   {
+                    children: __$$eval(
+                      () =>
+                        this.props.useGetOrganization?.data?.organization?.name
+                    ),
+                    key: 'x6fzmf20wkg',
+                    label: this.i18n('i18n-ycr2zketd3o') /* 组织名称 */,
+                    span: 1,
+                  },
+                  {
                     children: (
-                      <Typography.Text
-                        __component_name="Typography.Text"
-                        disabled={false}
-                        ellipsis={true}
-                        strong={false}
-                        style={{ fontSize: '' }}
-                      >
-                        {__$$eval(
+                      <Typography.Time
+                        __component_name="Typography.Time"
+                        format=""
+                        relativeTime={false}
+                        time={__$$eval(
                           () =>
                             this.props.useGetOrganization?.data?.organization
-                              ?.users?.length
+                              ?.creationTimestamp
                         )}
-                      </Typography.Text>
+                      />
                     ),
-                    key: 'r4gchd14zz',
-                    label: this.i18n('i18n-v4wf8ejznd') /* 组织用户总数 */,
+                    key: 'lu5nygtudhq',
+                    label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                     span: 1,
                   },
                   {
@@ -409,6 +487,12 @@ class OrganizationDetail$$Page extends React.Component {
                             id: 'Deployed',
                             type: 'success',
                           },
+                          {
+                            children: this.i18n('i18n-fifkprltibf') /* 正常 */,
+                            icon: 'CheckCircleFilled',
+                            id: 'Created',
+                            type: 'success',
+                          },
                         ]}
                       />
                     ),
@@ -421,15 +505,27 @@ class OrganizationDetail$$Page extends React.Component {
                       <Typography.Time
                         __component_name="Typography.Time"
                         format=""
+                        relativeTime={false}
                         time={__$$eval(
                           () =>
                             this.props.useGetOrganization?.data?.organization
-                              ?.creationTimestamp
+                              ?.joinAt
                         )}
                       />
                     ),
-                    key: 'lu5nygtudhq',
-                    label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
+                    key: 'ub0bc25o7d',
+                    label: this.i18n('i18n-c0d66z03kpk') /* 加入时间 */,
+                    span: 1,
+                  },
+                  {
+                    children: __$$eval(
+                      () =>
+                        this.props.useGetOrganization?.data?.organization?.federations?.join(
+                          ','
+                        ) || '-'
+                    ),
+                    key: '9yucmkfjfqg',
+                    label: this.i18n('i18n-dlxiuotq6z4') /* 所属联盟 */,
                     span: 1,
                   },
                   {
@@ -437,6 +533,7 @@ class OrganizationDetail$$Page extends React.Component {
                       <Typography.Time
                         __component_name="Typography.Time"
                         format=""
+                        relativeTime={false}
                         time={__$$eval(
                           () =>
                             this.props.useGetOrganization?.data?.organization
@@ -445,7 +542,27 @@ class OrganizationDetail$$Page extends React.Component {
                       />
                     ),
                     key: 'o0cvbxwkrj',
-                    label: this.i18n('i18n-5er0ayqzcp') /* 最近更新时间 */,
+                    label: this.i18n('i18n-5er0ayqzcp') /* 最近更新 */,
+                    span: 1,
+                  },
+                  {
+                    children: (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        {__$$eval(
+                          () =>
+                            this.props.useGetOrganization?.data?.organization
+                              ?.lml || '-'
+                        )}
+                      </Typography.Text>
+                    ),
+                    key: 'r4gchd14zz',
+                    label: this.i18n('i18n-miybp3ih') /* 所属联盟链 */,
                     span: 1,
                   },
                   {
@@ -468,35 +585,60 @@ class OrganizationDetail$$Page extends React.Component {
                     label: this.i18n('i18n-wlgvrke3jz9') /* 介绍 */,
                     span: 1,
                   },
+                  {
+                    children: __$$eval(
+                      () =>
+                        this.props.useGetOrganization?.data?.organization
+                          ?.chanel || '-'
+                    ),
+                    key: '5gva0owfbf9',
+                    label: this.i18n('i18n-ci3cdwcy') /* 加入通道 */,
+                    span: 1,
+                  },
+                  { children: null, key: 'k20atuz7jte', label: ' ', span: 1 },
+                  {
+                    children: __$$eval(
+                      () =>
+                        this.props.useGetOrganization?.data?.organization?.nodes
+                          ?.length || '-'
+                    ),
+                    key: 'ayb0txehyzf',
+                    label: this.i18n('i18n-kh6e0jr0i7b') /* 节点数量 */,
+                    span: 1,
+                  },
                 ]}
                 labelStyle={{ width: 100 }}
                 layout="horizontal"
                 size="default"
-                title={__$$eval(
-                  () => this.props.useGetOrganization?.data?.organization?.name
-                )}
+                title=""
               >
                 <Descriptions.Item
-                  __component_name="Descriptions.Item"
-                  key="r4gchd14zz"
-                  label={this.i18n('i18n-v4wf8ejznd') /* 组织用户总数 */}
+                  key="x6fzmf20wkg"
+                  label={this.i18n('i18n-ycr2zketd3o') /* 组织名称 */}
                   span={1}
-                  tab=""
+                >
+                  {__$$eval(
+                    () =>
+                      this.props.useGetOrganization?.data?.organization?.name
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  __component_name="Descriptions.Item"
+                  key="lu5nygtudhq"
+                  label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
+                  span={1}
                 >
                   {
-                    <Typography.Text
-                      __component_name="Typography.Text"
-                      disabled={false}
-                      ellipsis={true}
-                      strong={false}
-                      style={{ fontSize: '' }}
-                    >
-                      {__$$eval(
+                    <Typography.Time
+                      __component_name="Typography.Time"
+                      format=""
+                      relativeTime={false}
+                      time={__$$eval(
                         () =>
                           this.props.useGetOrganization?.data?.organization
-                            ?.users?.length
+                            ?.creationTimestamp
                       )}
-                    </Typography.Text>
+                    />
                   }
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -550,39 +692,75 @@ class OrganizationDetail$$Page extends React.Component {
                   }
                 </Descriptions.Item>
                 <Descriptions.Item
-                  __component_name="Descriptions.Item"
-                  key="lu5nygtudhq"
-                  label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
+                  key="ub0bc25o7d"
+                  label={this.i18n('i18n-c0d66z03kpk') /* 加入时间 */}
                   span={1}
                 >
                   {
                     <Typography.Time
                       __component_name="Typography.Time"
                       format=""
+                      relativeTime={false}
                       time={__$$eval(
                         () =>
                           this.props.useGetOrganization?.data?.organization
-                            ?.creationTimestamp
+                            ?.joinAt
                       )}
                     />
                   }
                 </Descriptions.Item>
                 <Descriptions.Item
+                  key="9yucmkfjfqg"
+                  label={this.i18n('i18n-dlxiuotq6z4') /* 所属联盟 */}
+                  span={1}
+                >
+                  {__$$eval(
+                    () =>
+                      this.props.useGetOrganization?.data?.organization?.federations?.join(
+                        ','
+                      ) || '-'
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item
                   __component_name="Descriptions.Item"
                   key="o0cvbxwkrj"
-                  label={this.i18n('i18n-5er0ayqzcp') /* 最近更新时间 */}
+                  label={this.i18n('i18n-5er0ayqzcp') /* 最近更新 */}
                   span={1}
                 >
                   {
                     <Typography.Time
                       __component_name="Typography.Time"
                       format=""
+                      relativeTime={false}
                       time={__$$eval(
                         () =>
                           this.props.useGetOrganization?.data?.organization
                             ?.lastHeartbeatTime
                       )}
                     />
+                  }
+                </Descriptions.Item>
+                <Descriptions.Item
+                  __component_name="Descriptions.Item"
+                  key="r4gchd14zz"
+                  label={this.i18n('i18n-miybp3ih') /* 所属联盟链 */}
+                  span={1}
+                  tab=""
+                >
+                  {
+                    <Typography.Text
+                      __component_name="Typography.Text"
+                      disabled={false}
+                      ellipsis={true}
+                      strong={false}
+                      style={{ fontSize: '' }}
+                    >
+                      {__$$eval(
+                        () =>
+                          this.props.useGetOrganization?.data?.organization
+                            ?.lml || '-'
+                      )}
+                    </Typography.Text>
                   }
                 </Descriptions.Item>
                 <Descriptions.Item
@@ -607,405 +785,954 @@ class OrganizationDetail$$Page extends React.Component {
                     </Typography.Text>
                   }
                 </Descriptions.Item>
+                <Descriptions.Item
+                  key="5gva0owfbf9"
+                  label={this.i18n('i18n-ci3cdwcy') /* 加入通道 */}
+                  span={1}
+                >
+                  {__$$eval(
+                    () =>
+                      this.props.useGetOrganization?.data?.organization
+                        ?.chanel || '-'
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item key="k20atuz7jte" label=" " span={1}>
+                  {null}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  key="ayb0txehyzf"
+                  label={this.i18n('i18n-kh6e0jr0i7b') /* 节点数量 */}
+                  span={1}
+                >
+                  {__$$eval(
+                    () =>
+                      this.props.useGetOrganization?.data?.organization?.nodes
+                        ?.length || '-'
+                  )}
+                </Descriptions.Item>
               </Descriptions>
             </Card>
           </Col>
           <Col __component_name="Col" span={24}>
-            <Row __component_name="Row" justify="space-between" wrap={false}>
-              <Col __component_name="Col">
-                <Button
-                  __component_name="Button"
-                  __events={{
-                    eventDataList: [
-                      {
-                        name: 'onClick',
-                        relatedEventName: 'openCreateModal',
-                        type: 'componentEvent',
-                      },
-                    ],
-                    eventList: [
-                      {
-                        disabled: true,
-                        name: 'onClick',
-                        template:
-                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
-                      },
-                    ],
-                  }}
-                  block={false}
-                  danger={false}
-                  disabled={false}
-                  ghost={false}
-                  icon={
-                    <Icon
-                      __component_name="Icon"
-                      size={12}
-                      style={{ marginRight: 3 }}
-                      type="PlusOutlined"
-                    />
-                  }
-                  onClick={function () {
-                    this.openCreateModal.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this)}
-                  shape="default"
-                  type="primary"
-                >
-                  {this.i18n('i18n-n5ny2k3khy') /* 新增用户 */}
-                </Button>
-              </Col>
-              <Col __component_name="Col">
-                <Space
-                  __component_name="Space"
-                  align="center"
-                  direction="horizontal"
-                  size="large"
-                >
-                  <Input.Search
-                    __component_name="Input.Search"
-                    __events={{
-                      eventDataList: [
-                        {
-                          name: 'onChange',
-                          relatedEventName: 'handleSearchValueChange',
-                          type: 'componentEvent',
-                        },
-                      ],
-                      eventList: [
-                        {
-                          disabled: true,
-                          name: 'onChange',
-                          template:
-                            "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onPressEnter',
-                          template:
-                            "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onSearch',
-                          template:
-                            "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onFocus',
-                          template:
-                            "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onKeyDown',
-                          template:
-                            "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onKeyPress',
-                          template:
-                            "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onKeyUp',
-                          template:
-                            "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onBlur',
-                          template:
-                            "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
-                        },
-                      ],
-                    }}
-                    onChange={function () {
-                      this.handleSearchValueChange.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    placeholder={
-                      this.i18n('i18n-gnwdi4ep1vt') /* 输入用户名搜索 */
-                    }
-                  />
-                </Space>
-              </Col>
-            </Row>
-          </Col>
-          <Col __component_name="Col" span={24}>
-            <Card
-              __component_name="Card"
-              actions={[]}
-              bordered={false}
-              hoverable={false}
-              loading={false}
-              size="default"
-              type="default"
-            >
-              <Table
-                __component_name="Table"
-                __events={{
-                  eventDataList: [
-                    {
-                      name: 'onChange',
-                      relatedEventName: 'handleTableChange',
-                      type: 'componentEvent',
-                    },
-                    {
-                      name: 'pagination.onChange',
-                      relatedEventName: 'handlePaginationChange',
-                      type: 'componentEvent',
-                    },
-                    {
-                      name: 'pagination.onShowSizeChange',
-                      relatedEventName: 'handlePaginationChange',
-                      type: 'componentEvent',
-                    },
-                  ],
-                  eventList: [
-                    {
-                      disabled: true,
-                      name: 'onChange',
-                      template:
-                        "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
-                    },
-                    {
-                      disabled: false,
-                      name: 'rowSelection.onChange',
-                      template:
-                        "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
-                    },
-                    {
-                      disabled: false,
-                      name: 'expandable.onExpand',
-                      template:
-                        "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
-                    },
-                    {
-                      disabled: true,
-                      name: 'pagination.onChange',
-                      template:
-                        "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
-                    },
-                    {
-                      disabled: true,
-                      name: 'pagination.onShowSizeChange',
-                      template:
-                        "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
-                    },
-                  ],
-                }}
-                columns={[
-                  {
-                    dataIndex: 'name',
-                    key: 'id',
-                    title: this.i18n('i18n-289qyoqa3vs') /* 用户 */,
-                  },
-                  {
-                    dataIndex: 'isOrganizationAdmin',
-                    filters: [
-                      { text: 'admin', value: true },
-                      { text: 'client', value: false },
-                    ],
-                    key: 'isOrganizationAdmin',
-                    render: (text, record, index) =>
-                      ((__$$context) => (
-                        <Typography.Text
-                          __component_name="Typography.Text"
-                          disabled={false}
-                          ellipsis={true}
-                          strong={false}
-                          style={{ fontSize: '' }}
+            <Tabs
+              destroyInactiveTabPane="true"
+              items={[
+                {
+                  children: (
+                    <Row wrap={true}>
+                      <Col span={24}>
+                        <Card
+                          __component_name="Card"
+                          actions={[]}
+                          bordered={false}
+                          hoverable={false}
+                          loading={false}
+                          size="default"
+                          style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                          type="default"
                         >
-                          {__$$eval(() =>
-                            record.isOrganizationAdmin ? 'admin' : 'client'
-                          )}
-                        </Typography.Text>
-                      ))(
-                        __$$createChildContext(__$$context, {
-                          text,
-                          record,
-                          index,
-                        })
-                      ),
-                    title: this.i18n('i18n-9yrquy3v2y7') /* 类型 */,
-                  },
-                  {
-                    dataIndex: 'op',
-                    render: (text, record, index) =>
-                      ((__$$context) => [
-                        !!__$$eval(() => record.isOrganizationAdmin) && (
-                          <Button
-                            __component_name="Button"
+                          <Row
+                            __component_name="Row"
+                            justify="space-between"
+                            wrap={false}
+                          >
+                            <Col __component_name="Col">
+                              <Button
+                                __component_name="Button"
+                                __events={{
+                                  eventDataList: [
+                                    {
+                                      name: 'onClick',
+                                      relatedEventName: 'openCreateModal',
+                                      type: 'componentEvent',
+                                    },
+                                  ],
+                                  eventList: [
+                                    {
+                                      disabled: true,
+                                      name: 'onClick',
+                                      template:
+                                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    },
+                                  ],
+                                }}
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                icon={
+                                  <Icon
+                                    __component_name="Icon"
+                                    size={12}
+                                    style={{ marginRight: 3 }}
+                                    type="PlusOutlined"
+                                  />
+                                }
+                                onClick={function () {
+                                  this.openCreateModal.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([])
+                                  );
+                                }.bind(this)}
+                                shape="default"
+                                type="primary"
+                              >
+                                {this.i18n('i18n-n5ny2k3khy') /* 新增用户 */}
+                              </Button>
+                            </Col>
+                            <Col __component_name="Col">
+                              <Space
+                                __component_name="Space"
+                                align="center"
+                                direction="horizontal"
+                                size="large"
+                              >
+                                <Input.Search
+                                  __component_name="Input.Search"
+                                  __events={{
+                                    eventDataList: [
+                                      {
+                                        name: 'onChange',
+                                        relatedEventName:
+                                          'handleSearchValueChange',
+                                        type: 'componentEvent',
+                                      },
+                                    ],
+                                    eventList: [
+                                      {
+                                        disabled: true,
+                                        name: 'onChange',
+                                        template:
+                                          "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onPressEnter',
+                                        template:
+                                          "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onSearch',
+                                        template:
+                                          "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onFocus',
+                                        template:
+                                          "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyDown',
+                                        template:
+                                          "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyPress',
+                                        template:
+                                          "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyUp',
+                                        template:
+                                          "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onBlur',
+                                        template:
+                                          "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
+                                      },
+                                    ],
+                                  }}
+                                  onChange={function () {
+                                    this.handleSearchValueChange.apply(
+                                      this,
+                                      Array.prototype.slice
+                                        .call(arguments)
+                                        .concat([])
+                                    );
+                                  }.bind(this)}
+                                  placeholder={
+                                    this.i18n(
+                                      'i18n-gnwdi4ep1vt'
+                                    ) /* 输入用户名搜索 */
+                                  }
+                                />
+                              </Space>
+                            </Col>
+                          </Row>
+                          <Table
+                            __component_name="Table"
                             __events={{
                               eventDataList: [
                                 {
-                                  name: 'onClick',
-                                  paramStr: '{\n \trecord: this.record\n}',
-                                  relatedEventName: 'openTransferModal',
+                                  name: 'onChange',
+                                  relatedEventName: 'handleTableChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onChange',
+                                  relatedEventName: 'handlePaginationChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onShowSizeChange',
+                                  relatedEventName: 'handlePaginationChange',
                                   type: 'componentEvent',
                                 },
                               ],
                               eventList: [
                                 {
                                   disabled: true,
-                                  name: 'onClick',
+                                  name: 'onChange',
                                   template:
-                                    "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
                                 },
-                              ],
-                            }}
-                            block={false}
-                            danger={false}
-                            disabled={false}
-                            ghost={false}
-                            icon=""
-                            onClick={function () {
-                              this.openTransferModal.apply(
-                                this,
-                                Array.prototype.slice.call(arguments).concat([
-                                  {
-                                    record: record,
-                                  },
-                                ])
-                              );
-                            }.bind(__$$context)}
-                            shape="default"
-                            type="link"
-                          >
-                            {this.i18n('i18n-v10ihnkwhn') /* 转移 */}
-                          </Button>
-                        ),
-                        !!__$$eval(() => !record.isOrganizationAdmin) && (
-                          <Button
-                            __component_name="Button"
-                            __events={{
-                              eventDataList: [
                                 {
-                                  name: 'onClick',
-                                  paramStr: '{\n \trecord: this.record \n}',
-                                  relatedEventName: 'openDeleteModal',
-                                  type: 'componentEvent',
+                                  disabled: false,
+                                  name: 'rowSelection.onChange',
+                                  template:
+                                    "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
                                 },
-                              ],
-                              eventList: [
+                                {
+                                  disabled: false,
+                                  name: 'expandable.onExpand',
+                                  template:
+                                    "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
+                                },
                                 {
                                   disabled: true,
-                                  name: 'onClick',
+                                  name: 'pagination.onChange',
                                   template:
-                                    "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
+                                },
+                                {
+                                  disabled: true,
+                                  name: 'pagination.onShowSizeChange',
+                                  template:
+                                    "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
                                 },
                               ],
                             }}
-                            block={false}
-                            danger={false}
-                            disabled={false}
-                            ghost={false}
-                            icon=""
-                            onClick={function () {
-                              this.openDeleteModal.apply(
+                            columns={[
+                              {
+                                dataIndex: 'name',
+                                key: 'id',
+                                title: this.i18n('i18n-289qyoqa3vs') /* 用户 */,
+                              },
+                              {
+                                dataIndex: 'isOrganizationAdmin',
+                                filters: [
+                                  { text: 'admin', value: true },
+                                  { text: 'client', value: false },
+                                ],
+                                key: 'isOrganizationAdmin',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {__$$eval(() =>
+                                        record.isOrganizationAdmin
+                                          ? 'admin'
+                                          : 'client'
+                                      )}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title: this.i18n('i18n-9yrquy3v2y7') /* 类型 */,
+                              },
+                              {
+                                dataIndex: 'joinAt',
+                                key: 'joinAt',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Time
+                                      format=""
+                                      relativeTime={false}
+                                      time=""
+                                    />
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title:
+                                  this.i18n('i18n-c0d66z03kpk') /* 加入时间 */,
+                              },
+                              {
+                                dataIndex: 'status',
+                                key: 'status',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Status
+                                      id="disabled"
+                                      types={[
+                                        {
+                                          children: '未知',
+                                          icon: 'tenx-ui-icon:Circle',
+                                          id: 'disabled',
+                                          type: 'disabled',
+                                        },
+                                      ]}
+                                    />
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
+                              },
+                              {
+                                dataIndex: 'op',
+                                render: (text, record, index) =>
+                                  ((__$$context) => [
+                                    !!__$$eval(
+                                      () => record.isOrganizationAdmin
+                                    ) && (
+                                      <Button
+                                        __component_name="Button"
+                                        __events={{
+                                          eventDataList: [
+                                            {
+                                              name: 'onClick',
+                                              paramStr:
+                                                '{\n \trecord: this.record\n}',
+                                              relatedEventName:
+                                                'openTransferModal',
+                                              type: 'componentEvent',
+                                            },
+                                          ],
+                                          eventList: [
+                                            {
+                                              disabled: true,
+                                              name: 'onClick',
+                                              template:
+                                                "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                            },
+                                          ],
+                                        }}
+                                        block={false}
+                                        danger={false}
+                                        disabled={false}
+                                        ghost={false}
+                                        icon=""
+                                        onClick={function () {
+                                          this.openTransferModal.apply(
+                                            this,
+                                            Array.prototype.slice
+                                              .call(arguments)
+                                              .concat([
+                                                {
+                                                  record: record,
+                                                },
+                                              ])
+                                          );
+                                        }.bind(__$$context)}
+                                        shape="default"
+                                        type="link"
+                                      >
+                                        {
+                                          this.i18n(
+                                            'i18n-v10ihnkwhn'
+                                          ) /* 转移 */
+                                        }
+                                      </Button>
+                                    ),
+                                    !!__$$eval(
+                                      () => !record.isOrganizationAdmin
+                                    ) && (
+                                      <Button
+                                        __component_name="Button"
+                                        __events={{
+                                          eventDataList: [
+                                            {
+                                              name: 'onClick',
+                                              paramStr:
+                                                '{\n \trecord: this.record \n}',
+                                              relatedEventName:
+                                                'openDeleteModal',
+                                              type: 'componentEvent',
+                                            },
+                                          ],
+                                          eventList: [
+                                            {
+                                              disabled: true,
+                                              name: 'onClick',
+                                              template:
+                                                "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                            },
+                                          ],
+                                        }}
+                                        block={false}
+                                        danger={false}
+                                        disabled={false}
+                                        ghost={false}
+                                        icon=""
+                                        onClick={function () {
+                                          this.openDeleteModal.apply(
+                                            this,
+                                            Array.prototype.slice
+                                              .call(arguments)
+                                              .concat([
+                                                {
+                                                  record: record,
+                                                },
+                                              ])
+                                          );
+                                        }.bind(__$$context)}
+                                        shape="default"
+                                        type="link"
+                                      >
+                                        {
+                                          this.i18n(
+                                            'i18n-ias68eipm18'
+                                          ) /* 删除 */
+                                        }
+                                      </Button>
+                                    ),
+                                  ])(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
+                                width: 100,
+                              },
+                            ]}
+                            dataSource={__$$eval(() =>
+                              this.props.useGetOrganization?.data?.organization?.users
+                                ?.filter((item) => {
+                                  const arr =
+                                    this.state.filters?.isOrganizationAdmin;
+                                  return arr?.length > 0
+                                    ? arr.some(
+                                        (key) =>
+                                          item.isOrganizationAdmin === key
+                                      )
+                                    : true;
+                                })
+                                ?.filter((item) => {
+                                  return this.state.searchValue
+                                    ? item.name?.includes(
+                                        this.state.searchValue
+                                      )
+                                    : true;
+                                })
+                            )}
+                            loading={__$$eval(
+                              () => this.props.useGetOrganization?.loading
+                            )}
+                            onChange={function () {
+                              this.handleTableChange.apply(
                                 this,
-                                Array.prototype.slice.call(arguments).concat([
-                                  {
-                                    record: record,
-                                  },
-                                ])
+                                Array.prototype.slice.call(arguments).concat([])
                               );
-                            }.bind(__$$context)}
-                            shape="default"
-                            type="link"
-                          >
-                            {this.i18n('i18n-ias68eipm18') /* 删除 */}
-                          </Button>
-                        ),
-                      ])(
-                        __$$createChildContext(__$$context, {
-                          text,
-                          record,
-                          index,
-                        })
-                      ),
-                    title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
-                    width: 100,
-                  },
-                ]}
-                dataSource={__$$eval(() =>
-                  this.props.useGetOrganization?.data?.organization?.users
-                    ?.filter((item) => {
-                      const arr = this.state.filters?.isOrganizationAdmin;
-                      return arr?.length > 0
-                        ? arr.some((key) => item.isOrganizationAdmin === key)
-                        : true;
-                    })
-                    ?.filter((item) => {
-                      return this.state.searchValue
-                        ? item.name?.includes(this.state.searchValue)
-                        : true;
-                    })
-                )}
-                loading={__$$eval(() => this.props.useGetOrganization?.loading)}
-                onChange={function () {
-                  this.handleTableChange.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                pagination={{
-                  current: __$$eval(() => this.state.current),
-                  onChange: function () {
-                    this.handlePaginationChange.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  onShowSizeChange: function () {
-                    this.handlePaginationChange.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  pageSize: __$$eval(() => this.state.size),
-                  showQuickJumper: false,
-                  showSizeChanger: false,
-                  showTotal: function () {
-                    return this.paginationShowTotal.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  simple: false,
-                  size: 'default',
-                  total: __$$eval(
-                    () =>
-                      this.props.useGetOrganization?.data?.organization?.users
-                        ?.filter((item) => {
-                          const arr = this.state.filters?.isOrganizationAdmin;
-                          return arr?.length > 0
-                            ? arr.some(
-                                (key) => item.isOrganizationAdmin === key
-                              )
-                            : true;
-                        })
-                        ?.filter((item) => {
-                          return this.state.searchValue
-                            ? item.name?.includes(this.state.searchValue)
-                            : true;
-                        })?.length || 0
+                            }.bind(this)}
+                            pagination={{
+                              current: __$$eval(() => this.state.current),
+                              onChange: function () {
+                                this.handlePaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              onShowSizeChange: function () {
+                                this.handlePaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              pageSize: __$$eval(() => this.state.size),
+                              showQuickJumper: false,
+                              showSizeChanger: false,
+                              showTotal: function () {
+                                return this.paginationShowTotal.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              simple: false,
+                              size: 'default',
+                              total: __$$eval(
+                                () =>
+                                  this.props.useGetOrganization?.data?.organization?.users
+                                    ?.filter((item) => {
+                                      const arr =
+                                        this.state.filters?.isOrganizationAdmin;
+                                      return arr?.length > 0
+                                        ? arr.some(
+                                            (key) =>
+                                              item.isOrganizationAdmin === key
+                                          )
+                                        : true;
+                                    })
+                                    ?.filter((item) => {
+                                      return this.state.searchValue
+                                        ? item.name?.includes(
+                                            this.state.searchValue
+                                          )
+                                        : true;
+                                    })?.length || 0
+                              ),
+                            }}
+                            rowKey="name"
+                            scroll={{ scrollToFirstRowOnChange: true }}
+                            showHeader={true}
+                            size="default"
+                            style={{ marginTop: '-0px' }}
+                          />
+                        </Card>
+                      </Col>
+                    </Row>
                   ),
-                }}
-                rowKey="name"
-                scroll={{ scrollToFirstRowOnChange: true }}
-                showHeader={true}
-                size="default"
-                style={{ marginTop: '-20px' }}
-              />
-            </Card>
+                  key: 'tab-item-1',
+                  label: this.i18n('i18n-bs2k201x') /* 用户管理 */,
+                },
+                {
+                  children: (
+                    <Card
+                      __component_name="Card"
+                      actions={[]}
+                      bordered={false}
+                      hoverable={false}
+                      loading={false}
+                      size="default"
+                      style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                      type="default"
+                    >
+                      <Row
+                        __component_name="Row"
+                        justify="space-between"
+                        wrap={false}
+                      >
+                        <Col __component_name="Col">
+                          <Button
+                            __component_name="Button"
+                            __events={{
+                              eventDataList: [
+                                {
+                                  name: 'onClick',
+                                  relatedEventName: 'openCreateNodeModal',
+                                  type: 'componentEvent',
+                                },
+                              ],
+                              eventList: [
+                                {
+                                  disabled: true,
+                                  name: 'onClick',
+                                  template:
+                                    "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                },
+                              ],
+                            }}
+                            block={false}
+                            danger={false}
+                            disabled={false}
+                            ghost={false}
+                            icon={
+                              <Icon
+                                __component_name="Icon"
+                                size={12}
+                                style={{ marginRight: 3 }}
+                                type="PlusOutlined"
+                              />
+                            }
+                            onClick={function () {
+                              return this.openCreateNodeModal.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            shape="default"
+                            type="primary"
+                          >
+                            {this.i18n('i18n-30zxwkgi') /* 添加节点 */}
+                          </Button>
+                        </Col>
+                        <Col __component_name="Col">
+                          <Space
+                            __component_name="Space"
+                            align="center"
+                            direction="horizontal"
+                            size="large"
+                          >
+                            <Input.Search
+                              __component_name="Input.Search"
+                              __events={{
+                                eventDataList: [
+                                  {
+                                    name: 'onChange',
+                                    relatedEventName:
+                                      'handleNodeSearchValueChange',
+                                    type: 'componentEvent',
+                                  },
+                                ],
+                                eventList: [
+                                  {
+                                    disabled: true,
+                                    name: 'onChange',
+                                    template:
+                                      "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
+                                  },
+                                  {
+                                    disabled: false,
+                                    name: 'onPressEnter',
+                                    template:
+                                      "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
+                                  },
+                                  {
+                                    disabled: false,
+                                    name: 'onSearch',
+                                    template:
+                                      "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
+                                  },
+                                  {
+                                    disabled: false,
+                                    name: 'onFocus',
+                                    template:
+                                      "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
+                                  },
+                                  {
+                                    disabled: false,
+                                    name: 'onKeyDown',
+                                    template:
+                                      "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
+                                  },
+                                  {
+                                    disabled: false,
+                                    name: 'onKeyPress',
+                                    template:
+                                      "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
+                                  },
+                                  {
+                                    disabled: false,
+                                    name: 'onKeyUp',
+                                    template:
+                                      "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
+                                  },
+                                  {
+                                    disabled: false,
+                                    name: 'onBlur',
+                                    template:
+                                      "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
+                                  },
+                                ],
+                              }}
+                              onChange={function () {
+                                return this.handleNodeSearchValueChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this)}
+                              placeholder={
+                                this.i18n('i18n-x40a97na') /* 输入节点名搜索 */
+                              }
+                            />
+                          </Space>
+                        </Col>
+                      </Row>
+                      <Table
+                        __component_name="Table"
+                        __events={{
+                          eventDataList: [
+                            {
+                              name: 'onChange',
+                              relatedEventName: 'handleNodeTableChange',
+                              type: 'componentEvent',
+                            },
+                            {
+                              name: 'pagination.onChange',
+                              relatedEventName: 'handleNodePaginationChange',
+                              type: 'componentEvent',
+                            },
+                            {
+                              name: 'pagination.onShowSizeChange',
+                              relatedEventName: 'handleNodePaginationChange',
+                              type: 'componentEvent',
+                            },
+                          ],
+                          eventList: [
+                            {
+                              disabled: true,
+                              name: 'onChange',
+                              template:
+                                "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
+                            },
+                            {
+                              disabled: false,
+                              name: 'rowSelection.onChange',
+                              template:
+                                "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
+                            },
+                            {
+                              disabled: false,
+                              name: 'expandable.onExpand',
+                              template:
+                                "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
+                            },
+                            {
+                              disabled: true,
+                              name: 'pagination.onChange',
+                              template:
+                                "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
+                            },
+                            {
+                              disabled: true,
+                              name: 'pagination.onShowSizeChange',
+                              template:
+                                "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
+                            },
+                          ],
+                        }}
+                        columns={[
+                          {
+                            dataIndex: 'name',
+                            key: 'id',
+                            title: this.i18n('i18n-60cjqhh2') /* 节点名 */,
+                          },
+                          {
+                            dataIndex: 'lml',
+                            key: 'lml',
+                            render: '',
+                            title: this.i18n('i18n-rkrm1qsa') /* 加入联盟链 */,
+                          },
+                          {
+                            dataIndex: 'channel',
+                            key: 'channel',
+                            render: '',
+                            title: this.i18n('i18n-ci3cdwcy') /* 加入通道 */,
+                          },
+                          {
+                            dataIndex: 'node',
+                            key: 'node',
+                            title: this.i18n('i18n-zjmh7vtphh') /* 节点配置 */,
+                          },
+                          {
+                            dataIndex: 'creationTimestamp',
+                            key: 'creationTimestamp',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Time
+                                  format=""
+                                  relativeTime={false}
+                                  time=""
+                                />
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
+                            title: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
+                          },
+                          {
+                            dataIndex: 'status',
+                            key: 'status',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Status
+                                  id="disabled"
+                                  types={[
+                                    {
+                                      children: '未知',
+                                      icon: 'tenx-ui-icon:Circle',
+                                      id: 'disabled',
+                                      type: 'disabled',
+                                    },
+                                  ]}
+                                />
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
+                            title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
+                          },
+                          {
+                            dataIndex: 'op',
+                            render: (text, record, index) =>
+                              ((__$$context) => [
+                                <Button
+                                  __component_name="Button"
+                                  __events={{
+                                    eventDataList: [],
+                                    eventList: [
+                                      {
+                                        disabled: true,
+                                        name: 'onClick',
+                                        template:
+                                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                      },
+                                    ],
+                                  }}
+                                  block={false}
+                                  danger={false}
+                                  disabled={true}
+                                  ghost={false}
+                                  icon=""
+                                  shape="default"
+                                  type="link"
+                                >
+                                  {this.i18n('i18n-7zfzajob') /* 日志 */}
+                                </Button>,
+                                <Button
+                                  __component_name="Button"
+                                  __events={{
+                                    eventDataList: [],
+                                    eventList: [
+                                      {
+                                        disabled: true,
+                                        name: 'onClick',
+                                        template:
+                                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                      },
+                                    ],
+                                  }}
+                                  block={false}
+                                  danger={false}
+                                  disabled={true}
+                                  ghost={false}
+                                  icon=""
+                                  shape="default"
+                                  type="link"
+                                >
+                                  {this.i18n('i18n-15rtqwxm') /* 监控 */}
+                                </Button>,
+                              ])(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
+                            title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
+                            width: 150,
+                          },
+                        ]}
+                        dataSource={__$$eval(() =>
+                          this.props.useGetOrganization?.data?.organization?.users
+                            ?.filter((item) => {
+                              const arr =
+                                this.state.filters?.isOrganizationAdmin;
+                              return arr?.length > 0
+                                ? arr.some(
+                                    (key) => item.isOrganizationAdmin === key
+                                  )
+                                : true;
+                            })
+                            ?.filter((item) => {
+                              return this.state.searchValue
+                                ? item.name?.includes(this.state.searchValue)
+                                : true;
+                            })
+                        )}
+                        loading={__$$eval(
+                          () => this.props.useGetOrganization?.loading
+                        )}
+                        onChange={function () {
+                          return this.handleNodeTableChange.apply(
+                            this,
+                            Array.prototype.slice.call(arguments).concat([])
+                          );
+                        }.bind(this)}
+                        pagination={{
+                          current: __$$eval(() => this.state.current),
+                          onChange: function () {
+                            return this.handleNodePaginationChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this),
+                          onShowSizeChange: function () {
+                            return this.handleNodePaginationChange.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this),
+                          pageSize: __$$eval(() => this.state.size),
+                          showQuickJumper: false,
+                          showSizeChanger: false,
+                          showTotal: function () {
+                            return this.nodePaginationShowTotal.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this),
+                          simple: false,
+                          size: 'default',
+                          total: __$$eval(
+                            () =>
+                              this.props.useGetOrganization?.data?.organization?.users
+                                ?.filter((item) => {
+                                  const arr =
+                                    this.state.filters?.isOrganizationAdmin;
+                                  return arr?.length > 0
+                                    ? arr.some(
+                                        (key) =>
+                                          item.isOrganizationAdmin === key
+                                      )
+                                    : true;
+                                })
+                                ?.filter((item) => {
+                                  return this.state.searchValue
+                                    ? item.name?.includes(
+                                        this.state.searchValue
+                                      )
+                                    : true;
+                                })?.length || 0
+                          ),
+                        }}
+                        rowKey="name"
+                        scroll={{ scrollToFirstRowOnChange: true }}
+                        showHeader={true}
+                        size="default"
+                        style={{ marginTop: '-0px' }}
+                      />
+                    </Card>
+                  ),
+                  key: 'tab-item-2',
+                  label: this.i18n('i18n-3hlx98g9') /* 节点管理 */,
+                },
+              ]}
+              size="large"
+              style={{ paddingLeft: '20px' }}
+              tabPosition="top"
+              type="line"
+            />
           </Col>
         </Row>
         <Modal
@@ -1451,6 +2178,214 @@ class OrganizationDetail$$Page extends React.Component {
             showIcon={true}
             type="warning"
           />
+        </Modal>
+        <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmCreateNodelModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmCreateNodelModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal && this.state.modalType === 'createnode'
+          )}
+          title={this.i18n('i18n-30zxwkgi') /* 添加节点 */}
+        >
+          <Row gutter={[0, 20]} h-gutter={0} v-gutter={20} wrap={true}>
+            <Col
+              span={24}
+              style={{
+                backgroundColor: 'rgba(13,8,13,0.08)',
+                borderRadius: '4px',
+                paddingBottom: '8px',
+                paddingLeft: '12px',
+                paddingRight: '12px',
+                paddingTop: '12px',
+              }}
+            >
+              <Descriptions
+                bordered={false}
+                colon={true}
+                column={3}
+                items={[
+                  {
+                    children: null,
+                    key: '7zzd99339hq',
+                    label: this.i18n('i18n-9e87qfos') /* 名称 */,
+                    span: 1,
+                  },
+                  {
+                    children: null,
+                    key: '1itgdo73rvo',
+                    label: this.i18n('i18n-flja3ls6') /* 云主机及配置 */,
+                    span: 1,
+                  },
+                  {
+                    children: null,
+                    key: '60po9w401l8',
+                    label: this.i18n('i18n-pra1gymtjol') /* 到期时间 */,
+                    span: 1,
+                  },
+                ]}
+                layout="horizontal"
+                size="default"
+                title={this.i18n('i18n-6w3cfx8m') /* 原配置 */}
+              >
+                <Descriptions.Item
+                  key="7zzd99339hq"
+                  label={this.i18n('i18n-9e87qfos') /* 名称 */}
+                  span={1}
+                >
+                  {null}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  key="1itgdo73rvo"
+                  label={this.i18n('i18n-flja3ls6') /* 云主机及配置 */}
+                  span={1}
+                >
+                  {null}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  key="60po9w401l8"
+                  label={this.i18n('i18n-pra1gymtjol') /* 到期时间 */}
+                  span={1}
+                >
+                  {null}
+                </Descriptions.Item>
+              </Descriptions>
+            </Col>
+            <Col span={24}>
+              <FormilyForm
+                __component_name="FormilyForm"
+                componentProps={{
+                  colon: false,
+                  labelAlign: 'left',
+                  labelCol: 5,
+                  layout: 'horizontal',
+                  wrapperCol: 20,
+                }}
+                ref={this._refsManager.linkRef('formily_node')}
+              >
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{
+                    'x-component-props': {
+                      placeholder:
+                        this.i18n('i18n-d6xpwgoamdo') /* 请输入组织名称 */,
+                    },
+                  }}
+                  fieldProps={{
+                    description: {},
+                    name: 'organization',
+                    title: this.i18n('i18n-2uy76ea1') /* 组织 */,
+                    'x-pattern': 'disabled',
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{
+                    'x-component-props': { placeholder: '请输入' },
+                  }}
+                  fieldProps={{
+                    name: 'nodes',
+                    title: this.i18n('i18n-8xwszqos') /* 原节点数 */,
+                    'x-pattern': 'disabled',
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyNumberPicker
+                  __component_name="FormilyNumberPicker"
+                  componentProps={{
+                    'x-component-props': {
+                      min: 1,
+                      placeholder: '请输入',
+                      precision: 0,
+                      step: 1,
+                    },
+                  }}
+                  decoratorProps={{ 'x-decorator-props': { size: 'default' } }}
+                  fieldProps={{
+                    name: 'numberPicker',
+                    title: this.i18n('i18n-rjt0ywiz') /* 新增节点数量 */,
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{
+                    'x-component-props': { placeholder: '请输入' },
+                  }}
+                  fieldProps={{
+                    name: 'storage',
+                    title: this.i18n('i18n-cbhoi5g6') /* 节点存储 */,
+                    'x-pattern': 'disabled',
+                    'x-validator': [],
+                  }}
+                />
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{
+                    'x-component-props': { placeholder: '请输入' },
+                  }}
+                  fieldProps={{
+                    name: 'time',
+                    title: this.i18n('i18n-ugehpppw') /* 购买时长 */,
+                    'x-pattern': 'disabled',
+                    'x-validator': [],
+                  }}
+                />
+              </FormilyForm>
+            </Col>
+          </Row>
         </Modal>
       </Page>
     );
