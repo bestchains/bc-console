@@ -26,6 +26,37 @@ export type Scalars = {
   JSONObject: any;
 };
 
+export type Channel = {
+  __typename?: 'Channel';
+  /** 合约数量 */
+  creationTimestamp?: Maybe<Scalars['String']>;
+  /** 组织数量 */
+  members?: Maybe<Array<SpecMember>>;
+  /** name */
+  name: Scalars['ID'];
+  /** 我的节点 */
+  peers?: Maybe<Array<SpecPeer>>;
+  /** 状态 */
+  status?: Maybe<ChannelStatus>;
+};
+
+export type ChannelPeer = {
+  /** 名称 */
+  name: Scalars['String'];
+  /** 命名空间（所属组织） */
+  namespace: Scalars['String'];
+};
+
+/** 「通道」状态 */
+export enum ChannelStatus {
+  /** Deployed */
+  Deployed = 'Deployed',
+  /** Deploying */
+  Deploying = 'Deploying',
+  /** 失败 */
+  Error = 'Error',
+}
+
 /** 联盟 */
 export type Federation = {
   __typename?: 'Federation';
@@ -63,6 +94,28 @@ export enum FederationStatus {
   FederationPending = 'FederationPending',
 }
 
+export type Ibppeer = {
+  __typename?: 'Ibppeer';
+  /** 创建时间 */
+  creationTimestamp: Scalars['String'];
+  /** 节点配置 */
+  limits?: Maybe<SpecResource>;
+  /** name */
+  name: Scalars['ID'];
+  /** 运行状态 */
+  status?: Maybe<IbppeerStatus>;
+};
+
+/** 「Peer节点」状态 */
+export enum IbppeerStatus {
+  /** Deployed */
+  Deployed = 'Deployed',
+  /** Deploying */
+  Deploying = 'Deploying',
+  /** 失败 */
+  Error = 'Error',
+}
+
 /** 操作状态 */
 export type K8sV1Status = {
   __typename?: 'K8sV1Status';
@@ -86,6 +139,10 @@ export type K8sV1StatusDetails = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** 创建通道 */
+  channelCreate: Channel;
+  /** 加入/去除Peer节点 */
+  channelUpdate: Channel;
   /** 向联盟中添加组织（返回true：只表示这个操作触发成功，而不是添加组织成功） */
   federationAddOrganization: Scalars['Boolean'];
   /** 创建联盟 */
@@ -96,6 +153,8 @@ export type Mutation = {
   federationDissolve: Scalars['Boolean'];
   /** 从联盟中驱逐一个组织（返回true：只表示这个操作触发成功，而不是驱逐组织成功） */
   federationRemoveOrganization: Scalars['Boolean'];
+  /** 创建IBPPeer节点 */
+  ibppeerCreate: Ibppeer;
   /** 创建网络 */
   networkCreate: Network;
   /** 释放网络（返回true：只表示这个操作触发成功，而不是释放网络成功） */
@@ -108,6 +167,16 @@ export type Mutation = {
   organizationUpdate: Organization;
   /** 更新投票 */
   voteUpdate: Vote;
+};
+
+export type MutationChannelCreateArgs = {
+  channel: NewChannel;
+  network: Scalars['String'];
+};
+
+export type MutationChannelUpdateArgs = {
+  channel: UpdateChannel;
+  name: Scalars['String'];
 };
 
 export type MutationFederationAddOrganizationArgs = {
@@ -129,6 +198,10 @@ export type MutationFederationDissolveArgs = {
 
 export type MutationFederationRemoveOrganizationArgs = {
   name: Scalars['String'];
+  organization: Scalars['String'];
+};
+
+export type MutationIbppeerCreateArgs = {
   organization: Scalars['String'];
 };
 
@@ -164,6 +237,8 @@ export type MutationVoteUpdateArgs = {
 /** 网络 */
 export type Network = {
   __typename?: 'Network';
+  /** 通道列表 */
+  channels?: Maybe<Array<Channel>>;
   /** 我的节点数 */
   clusterSize?: Maybe<Scalars['Float']>;
   /** 创建时间 */
@@ -186,6 +261,21 @@ export type Network = {
   status?: Maybe<StatusType>;
 };
 
+export type NewChannel = {
+  /** 描述 */
+  description?: InputMaybe<Scalars['String']>;
+  /** 发起者（组织） */
+  initiator: Scalars['String'];
+  /** 通道名称（channel name） */
+  name: Scalars['String'];
+  /** 配置成员（组织） */
+  organizations?: InputMaybe<Array<Scalars['String']>>;
+  /** Peer节点，仅能选Deployed的 */
+  peers: Array<ChannelPeer>;
+  /** 准入门槛 */
+  policy?: InputMaybe<Scalars['String']>;
+};
+
 export type NewFederationInput = {
   /** 联盟描述 */
   description?: InputMaybe<Scalars['String']>;
@@ -194,7 +284,7 @@ export type NewFederationInput = {
   /** 联盟名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*） */
   name: Scalars['String'];
   /** 选择组织 */
-  organizations: Array<Scalars['String']>;
+  organizations?: InputMaybe<Array<Scalars['String']>>;
   /** 提议投票策略 */
   policy: ProposalPolicy;
 };
@@ -223,6 +313,14 @@ export type NewOrganizationInput = {
   name: Scalars['String'];
 };
 
+/** 操作 */
+export enum Operator {
+  /** 加入节点 */
+  Add = 'add',
+  /** 移除节点 */
+  Remove = 'remove',
+}
+
 /** 新建网络的版本 */
 export enum OrderVersion {
   /** 企业版 */
@@ -246,6 +344,8 @@ export type Organization = {
   displayName?: Maybe<Scalars['String']>;
   /** 所在联盟 */
   federations?: Maybe<Array<Scalars['String']>>;
+  /** 所有节点 */
+  ibppeers?: Maybe<Array<Ibppeer>>;
   /** 加入时间（只在联盟中使用） */
   joinedAt?: Maybe<Scalars['String']>;
   /** 更新时间 */
@@ -365,6 +465,35 @@ export type QueryProposalArgs = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+/** 成员个数 */
+export type SpecMember = {
+  __typename?: 'SpecMember';
+  /** 是否为发起者 */
+  initiator?: Maybe<Scalars['Boolean']>;
+  joinedAt?: Maybe<Scalars['String']>;
+  joinedBy?: Maybe<Scalars['String']>;
+  /** name */
+  name?: Maybe<Scalars['String']>;
+  /** namespace */
+  namespace?: Maybe<Scalars['String']>;
+};
+
+export type SpecPeer = {
+  __typename?: 'SpecPeer';
+  /** 名称 */
+  name?: Maybe<Scalars['String']>;
+  /** 命名空间（所属组织） */
+  namespace?: Maybe<Scalars['String']>;
+};
+
+export type SpecResource = {
+  __typename?: 'SpecResource';
+  /** CPU */
+  cpu: Scalars['String'];
+  /** Memory */
+  memory: Scalars['String'];
+};
+
 /** IBPCR 状态 */
 export enum StatusType {
   /** 正常 */
@@ -394,6 +523,13 @@ export enum StatusType {
   /** Warning is the status when a component is running, but will fail in future */
   Warning = 'Warning',
 }
+
+export type UpdateChannel = {
+  /** 操作类型 */
+  operate: Operator;
+  /** 被操作的节点，若是添加节点则Peer节点仅能选Deployed的 */
+  peers: Array<ChannelPeer>;
+};
 
 export type UpdateOrganization = {
   /** 管理员 */
@@ -459,6 +595,48 @@ export enum VotePhase {
   /** The organization administrator has vote for the proposal. */
   Voted = 'Voted',
 }
+
+export type CreateChannelMutationVariables = Exact<{
+  network: Scalars['String'];
+  channel: NewChannel;
+}>;
+
+export type CreateChannelMutation = {
+  __typename?: 'Mutation';
+  channelCreate: {
+    __typename?: 'Channel';
+    name: string;
+    creationTimestamp?: string | null;
+    status?: ChannelStatus | null;
+    members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
+    peers?: Array<{
+      __typename?: 'SpecPeer';
+      name?: string | null;
+      namespace?: string | null;
+    }> | null;
+  };
+};
+
+export type UpdateChannelMutationVariables = Exact<{
+  channel: UpdateChannel;
+  name: Scalars['String'];
+}>;
+
+export type UpdateChannelMutation = {
+  __typename?: 'Mutation';
+  channelUpdate: {
+    __typename?: 'Channel';
+    name: string;
+    creationTimestamp?: string | null;
+    status?: ChannelStatus | null;
+    members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
+    peers?: Array<{
+      __typename?: 'SpecPeer';
+      name?: string | null;
+      namespace?: string | null;
+    }> | null;
+  };
+};
 
 export type GetFederationsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -602,6 +780,25 @@ export type DeleteFederationMutation = {
   };
 };
 
+export type CreateIbppeerMutationVariables = Exact<{
+  organization: Scalars['String'];
+}>;
+
+export type CreateIbppeerMutation = {
+  __typename?: 'Mutation';
+  ibppeerCreate: {
+    __typename?: 'Ibppeer';
+    name: string;
+    creationTimestamp: string;
+    status?: IbppeerStatus | null;
+    limits?: {
+      __typename?: 'SpecResource';
+      cpu: string;
+      memory: string;
+    } | null;
+  };
+};
+
 export type GetNetworksQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetNetworksQuery = {
@@ -626,6 +823,7 @@ export type GetNetworksQuery = {
       name: string;
       admin?: string | null;
     } | null;
+    channels?: Array<{ __typename?: 'Channel'; name: string }> | null;
   }>;
 };
 
@@ -655,6 +853,21 @@ export type GetNetworkQuery = {
       name: string;
       admin?: string | null;
     } | null;
+    channels?: Array<{
+      __typename?: 'Channel';
+      name: string;
+      creationTimestamp?: string | null;
+      status?: ChannelStatus | null;
+      members?: Array<{
+        __typename?: 'SpecMember';
+        name?: string | null;
+      }> | null;
+      peers?: Array<{
+        __typename?: 'SpecPeer';
+        name?: string | null;
+        namespace?: string | null;
+      }> | null;
+    }> | null;
   };
 };
 
@@ -742,6 +955,17 @@ export type GetOrganizationQuery = {
       __typename?: 'User';
       name: string;
       isOrganizationAdmin?: boolean | null;
+    }> | null;
+    ibppeers?: Array<{
+      __typename?: 'Ibppeer';
+      name: string;
+      creationTimestamp: string;
+      status?: IbppeerStatus | null;
+      limits?: {
+        __typename?: 'SpecResource';
+        cpu: string;
+        memory: string;
+      } | null;
     }> | null;
   };
 };
@@ -895,6 +1119,38 @@ export type UpdateVoteMutation = {
   };
 };
 
+export const CreateChannelDocument = gql`
+  mutation createChannel($network: String!, $channel: NewChannel!) {
+    channelCreate(network: $network, channel: $channel) {
+      name
+      members {
+        name
+      }
+      peers {
+        name
+        namespace
+      }
+      creationTimestamp
+      status
+    }
+  }
+`;
+export const UpdateChannelDocument = gql`
+  mutation updateChannel($channel: UpdateChannel!, $name: String!) {
+    channelUpdate(channel: $channel, name: $name) {
+      name
+      members {
+        name
+      }
+      peers {
+        name
+        namespace
+      }
+      creationTimestamp
+      status
+    }
+  }
+`;
 export const GetFederationsDocument = gql`
   query getFederations {
     federations {
@@ -999,6 +1255,19 @@ export const DeleteFederationDocument = gql`
     }
   }
 `;
+export const CreateIbppeerDocument = gql`
+  mutation createIbppeer($organization: String!) {
+    ibppeerCreate(organization: $organization) {
+      name
+      creationTimestamp
+      status
+      limits {
+        cpu
+        memory
+      }
+    }
+  }
+`;
 export const GetNetworksDocument = gql`
   query getNetworks {
     networks {
@@ -1018,6 +1287,9 @@ export const GetNetworksDocument = gql`
         admin
       }
       status
+      channels {
+        name
+      }
     }
   }
 `;
@@ -1040,6 +1312,18 @@ export const GetNetworkDocument = gql`
         admin
       }
       status
+      channels {
+        name
+        members {
+          name
+        }
+        peers {
+          name
+          namespace
+        }
+        creationTimestamp
+        status
+      }
     }
   }
 `;
@@ -1105,6 +1389,15 @@ export const GetOrganizationDocument = gql`
       users {
         name
         isOrganizationAdmin
+      }
+      ibppeers {
+        name
+        creationTimestamp
+        status
+        limits {
+          cpu
+          memory
+        }
       }
     }
   }
@@ -1233,6 +1526,34 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    createChannel(
+      variables: CreateChannelMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<CreateChannelMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<CreateChannelMutation>(CreateChannelDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'createChannel',
+        'mutation'
+      );
+    },
+    updateChannel(
+      variables: UpdateChannelMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<UpdateChannelMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<UpdateChannelMutation>(UpdateChannelDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'updateChannel',
+        'mutation'
+      );
+    },
     getFederations(
       variables?: GetFederationsQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -1330,6 +1651,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
             ...wrappedRequestHeaders,
           }),
         'deleteFederation',
+        'mutation'
+      );
+    },
+    createIbppeer(
+      variables: CreateIbppeerMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<CreateIbppeerMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<CreateIbppeerMutation>(CreateIbppeerDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'createIbppeer',
         'mutation'
       );
     },
