@@ -15,9 +15,9 @@ import {
   Card,
   Descriptions,
   Status,
-  Dropdown,
   Modal,
   Alert,
+  UnifiedLink,
 } from '@tenx-ui/materials';
 
 import { useLocation, history, matchPath } from '@umijs/max';
@@ -73,60 +73,56 @@ class Network$$Page extends React.Component {
     });
   }
 
+  async confirmDeleteModal(e, payload) {
+    // try {
+    //   await this.props.appHelper.utils.bff.deleteNetwork({
+    //     name: this.state.record?.name,
+    //     initiator: this.state.record?.initiator?.name,
+    //     federation: this.state.record?.federation
+    //   })
+    //   this.closeModal()
+    //   this.utils.message.success({
+    //     content: this.i18n('i18n-wm7zxvqr'),
+    //   })
+    //   this.props.useGetFederations.mutate()
+    // } catch (error) {
+    //   this.utils.message.warning({
+    //     content: this.i18n('i18n-8kpvya3f'),
+    //   })
+    // }
+  }
+
   async confirmDissolveModal(e, payload) {
-    var _this$state$record,
-      _this$state$record2,
-      _this$state$record2$i,
-      _this$state$record3;
-    console.log({
-      name:
-        (_this$state$record = this.state.record) === null ||
-        _this$state$record === void 0
-          ? void 0
-          : _this$state$record.name,
-      initiator:
-        (_this$state$record2 = this.state.record) === null ||
-        _this$state$record2 === void 0
-          ? void 0
-          : (_this$state$record2$i = _this$state$record2.initiator) === null ||
-            _this$state$record2$i === void 0
-          ? void 0
-          : _this$state$record2$i.name,
-      federation:
-        (_this$state$record3 = this.state.record) === null ||
-        _this$state$record3 === void 0
-          ? void 0
-          : _this$state$record3.federation,
-    });
     try {
-      var _this$state$record4,
-        _this$state$record5,
-        _this$state$record5$i,
-        _this$state$record6;
+      var _this$state$record,
+        _this$state$record2,
+        _this$state$record2$i,
+        _this$state$record3;
       await this.props.appHelper.utils.bff.dissolveNetwork({
         name:
-          (_this$state$record4 = this.state.record) === null ||
-          _this$state$record4 === void 0
+          (_this$state$record = this.state.record) === null ||
+          _this$state$record === void 0
             ? void 0
-            : _this$state$record4.name,
+            : _this$state$record.name,
         initiator:
-          (_this$state$record5 = this.state.record) === null ||
-          _this$state$record5 === void 0
+          (_this$state$record2 = this.state.record) === null ||
+          _this$state$record2 === void 0
             ? void 0
-            : (_this$state$record5$i = _this$state$record5.initiator) ===
-                null || _this$state$record5$i === void 0
+            : (_this$state$record2$i = _this$state$record2.initiator) ===
+                null || _this$state$record2$i === void 0
             ? void 0
-            : _this$state$record5$i.name,
+            : _this$state$record2$i.name,
         federation:
-          (_this$state$record6 = this.state.record) === null ||
-          _this$state$record6 === void 0
+          (_this$state$record3 = this.state.record) === null ||
+          _this$state$record3 === void 0
             ? void 0
-            : _this$state$record6.federation,
+            : _this$state$record3.federation,
       });
-      this.closeModal();
-      this.utils.message.success({
-        content: this.i18n('i18n-65qwbj9telu'),
-      });
+      // this.closeModal()
+      // this.utils.message.success({
+      //   content: this.i18n('i18n-65qwbj9telu'),
+      // })
+      this.openDissolveSuccessModal();
       this.props.useGetFederations.mutate();
     } catch (error) {
       this.utils.message.warning({
@@ -172,7 +168,8 @@ class Network$$Page extends React.Component {
     });
   }
 
-  onMenuClick({ key }, payload) {
+  onMenuClick(e, payload) {
+    const { key } = payload;
     this.setState({
       record: payload === null || payload === void 0 ? void 0 : payload.record,
     });
@@ -199,10 +196,24 @@ class Network$$Page extends React.Component {
     }
   }
 
+  openDeleteModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+    });
+  }
+
   openDissolveModal() {
     this.setState({
       isOpenModal: true,
       modalType: 'dissolve',
+    });
+  }
+
+  openDissolveSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'dissolvesuccess',
     });
   }
 
@@ -432,18 +443,20 @@ class Network$$Page extends React.Component {
                       __component_name="Card"
                       actions={[
                         <Row
-                          __component_name="Row"
-                          justify="space-between"
+                          gutter={[0, 0]}
+                          h-gutter={0}
+                          justify="start"
+                          v-gutter={0}
                           wrap={false}
                         >
-                          <Col __component_name="Col">
-                            <Dropdown
-                              __component_name="Dropdown"
+                          <Col>
+                            <Button
                               __events={{
                                 eventDataList: [
                                   {
-                                    name: 'menu.onClick',
-                                    paramStr: '{\n \t "record":this.item \n}',
+                                    name: 'onClick',
+                                    paramStr:
+                                      '{\n \t "record":this.item,\n\t\t"key": "detail"\n}',
                                     relatedEventName: 'onMenuClick',
                                     type: 'componentEvent',
                                   },
@@ -451,80 +464,116 @@ class Network$$Page extends React.Component {
                                 eventList: [
                                   {
                                     disabled: true,
-                                    name: 'menu.onClick',
+                                    name: 'onClick',
                                     template:
-                                      "onDropDownClick({ item, key, keyPath, domEvent }, ${extParams}){\n// onClick\t点击 MenuItem 调用此函数 \nconsole.log('onDropDownClick', item, key, keyPath, domEvent);}",
+                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                                   },
                                 ],
                               }}
-                              destroyPopupOnHide={true}
+                              block={false}
+                              danger={false}
                               disabled={false}
-                              menu={{
-                                items: [
+                              ghost={false}
+                              icon=""
+                              onClick={function () {
+                                return this.onMenuClick.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      record: item,
+                                      key: 'detail',
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
+                              shape="default"
+                              target="_self"
+                              type="link"
+                            >
+                              {this.i18n('i18n-4t70z9gdf8u') /* 查看详情 */}
+                            </Button>
+                            <Button
+                              __events={{
+                                eventDataList: [
                                   {
-                                    disabled: false,
-                                    key: 'detail',
-                                    label:
-                                      this.i18n(
-                                        'i18n-4t70z9gdf8u'
-                                      ) /* 查看详情 */,
-                                  },
-                                  {
-                                    key: 'dissolve',
-                                    label:
-                                      this.i18n(
-                                        'i18n-hlh9eenb9wn'
-                                      ) /* 解散网络 */,
+                                    name: 'onClick',
+                                    paramStr:
+                                      '{\n \t"record":this.item,\n\t"key": "dissolve" \n}',
+                                    relatedEventName: 'onMenuClick',
+                                    type: 'componentEvent',
                                   },
                                 ],
-                                onClick: function () {
-                                  this.onMenuClick.apply(
-                                    this,
-                                    Array.prototype.slice
-                                      .call(arguments)
-                                      .concat([
-                                        {
-                                          record: item,
-                                        },
-                                      ])
-                                  );
-                                }.bind(__$$context),
+                                eventList: [
+                                  {
+                                    disabled: true,
+                                    name: 'onClick',
+                                    template:
+                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                  },
+                                ],
                               }}
-                              placement="bottomLeft"
-                              trigger={['hover']}
+                              block={false}
+                              danger={false}
+                              disabled={false}
+                              ghost={false}
+                              onClick={function () {
+                                return this.onMenuClick.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      record: item,
+                                      key: 'dissolve',
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
+                              shape="default"
+                              type="link"
                             >
-                              <Button
-                                __component_name="Button"
-                                block={false}
-                                danger={false}
-                                disabled={false}
-                                ghost={false}
-                                shape="default"
-                                type="link"
-                              >
-                                {[
-                                  <Typography.Text
-                                    __component_name="Typography.Text"
-                                    disabled={false}
-                                    strong={false}
-                                    style={{ color: 'inherit', fontSize: '' }}
-                                  >
-                                    {this.i18n('i18n-2b4dhrz51wu') /* 更多 */}
-                                  </Typography.Text>,
-                                  <Icon
-                                    __component_name="Icon"
-                                    size={12}
-                                    style={{
-                                      marginLeft: 4,
-                                      verticalAlign: 'middle',
-                                    }}
-                                    type="DownOutlined"
-                                  />,
-                                ]}
-                              </Button>
-                            </Dropdown>
+                              {this.i18n('i18n-0ionguia') /* 停止 */}
+                            </Button>
+                            <Button
+                              __events={{
+                                eventDataList: [
+                                  {
+                                    name: 'onClick',
+                                    paramStr:
+                                      '{\n\t"record":this.item,\n\t"key": "delete"\n}',
+                                    relatedEventName: 'onMenuClick',
+                                    type: 'componentEvent',
+                                  },
+                                ],
+                                eventList: [
+                                  {
+                                    disabled: true,
+                                    name: 'onClick',
+                                    template:
+                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                  },
+                                ],
+                              }}
+                              block={false}
+                              danger={false}
+                              disabled={false}
+                              ghost={false}
+                              onClick={function () {
+                                return this.onMenuClick.apply(
+                                  this,
+                                  Array.prototype.slice.call(arguments).concat([
+                                    {
+                                      record: item,
+                                      key: 'delete',
+                                    },
+                                  ])
+                                );
+                              }.bind(__$$context)}
+                              shape="default"
+                              type="link"
+                            >
+                              {this.i18n('i18n-dpjl9tfj') /* 删除网络 */}
+                            </Button>
                           </Col>
-                          <Col __component_name="Col" />
+                          <Col />
                         </Row>,
                       ]}
                       bordered={false}
@@ -606,7 +655,18 @@ class Network$$Page extends React.Component {
                                       }}
                                     >
                                       {__$$eval(
-                                        () => `${item?.clusterSize}/${'-'}`
+                                        () =>
+                                          `${
+                                            item?.peers?.length !== undefined
+                                              ? item?.peers?.filter(
+                                                  (item) => item?.createdByMe
+                                                )?.length
+                                              : '-'
+                                          }/${
+                                            item?.peers?.length !== undefined
+                                              ? item?.peers?.length
+                                              : '-'
+                                          }`
                                       )}
                                     </Typography.Text>
                                   </Col>
@@ -661,7 +721,20 @@ class Network$$Page extends React.Component {
                                         fontSize: '28px',
                                       }}
                                     >
-                                      {__$$eval(() => `${'-'}/${'-'}`)}
+                                      {__$$eval(
+                                        () =>
+                                          `${
+                                            item?.channels?.length !== undefined
+                                              ? item?.channels?.filter(
+                                                  (item) => item.iamInvolved
+                                                )?.length
+                                              : '-'
+                                          }/${
+                                            item?.channels?.length !== undefined
+                                              ? item?.channels?.length
+                                              : '-'
+                                          }`
+                                      )}
                                     </Typography.Text>
                                   </Col>
                                 </Row>
@@ -739,12 +812,6 @@ class Network$$Page extends React.Component {
                         column={1}
                         items={[
                           {
-                            children: __$$eval(() => item.name),
-                            key: 'i61229f215s',
-                            label: this.i18n('i18n-vxubih1pqa') /* 网络 ID */,
-                            span: 1,
-                          },
-                          {
                             children: __$$eval(() => item.federation),
                             key: '58hhyu92zxg',
                             label: this.i18n('i18n-dlxiuotq6z4') /* 所属联盟 */,
@@ -754,6 +821,7 @@ class Network$$Page extends React.Component {
                             children: (
                               <Row
                                 __component_name="Row"
+                                align="middle"
                                 gutter={[0, 0]}
                                 h-gutter={0}
                                 v-gutter={0}
@@ -850,20 +918,19 @@ class Network$$Page extends React.Component {
                                     id: 'Created',
                                     type: 'success',
                                   },
+                                  {
+                                    children:
+                                      this.i18n('i18n-1vangoko4yf') /* 正常 */,
+                                    icon: 'CheckCircleFilled',
+                                    id: 'Deployed',
+                                    type: 'success',
+                                  },
                                 ]}
                               />
                             </Col>
                           </Row>
                         }
                       >
-                        <Descriptions.Item
-                          __component_name="Descriptions.Item"
-                          key="i61229f215s"
-                          label={this.i18n('i18n-vxubih1pqa') /* 网络 ID */}
-                          span={1}
-                        >
-                          {__$$eval(() => item.name)}
-                        </Descriptions.Item>
                         <Descriptions.Item
                           __component_name="Descriptions.Item"
                           key="58hhyu92zxg"
@@ -927,6 +994,71 @@ class Network$$Page extends React.Component {
           </Col>
         </Row>
         <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmDeleteModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmDeleteModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () => this.state.isOpenModal && this.state.modalType === 'delete'
+          )}
+          title={this.i18n('i18n-dpjl9tfj') /* 删除网络 */}
+        >
+          <Alert
+            message={this.i18n('i18n-10dfshpd') /* 删除后不可恢复，请慎重！ */}
+            showIcon={true}
+            type="warning"
+          />
+        </Modal>
+        <Modal
           __component_name="Modal"
           __events={{
             eventDataList: [
@@ -984,19 +1116,139 @@ class Network$$Page extends React.Component {
           open={__$$eval(
             () => this.state.isOpenModal && this.state.modalType === 'dissolve'
           )}
-          title={this.i18n('i18n-hlh9eenb9wn') /* 解散网络 */}
+          title={this.i18n('i18n-hlh9eenb9wn') /* 确认发起停止网络提议 */}
         >
           <Alert
             __component_name="Alert"
             bordered="none"
             message={
               this.i18n(
-                'i18n-c3oheknv0lu'
-              ) /* 网络将在提议通过后解散，是否继续 */
+                'i18n-yuz82i6v'
+              ) /* 所有网络通道成员将会收到提议，通过后网络通道服务不可用！ */
             }
             showIcon={true}
             type="warning"
           />
+        </Modal>
+        <Modal
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: false,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'dissolvesuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-741lsh8q') /* 停止网络提议已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
         </Modal>
       </Page>
     );

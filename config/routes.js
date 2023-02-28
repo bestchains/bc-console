@@ -49,6 +49,14 @@ const routes = [
         path: '/network/detail/:id',
         component: '@/pages/NetworkDetail',
       },
+      {
+        path: '/network/detail/:id/channel/:channelId',
+        component: '@/pages/NetworkChannelDetail',
+      },
+      {
+        path: '/network/detail/:id/contract/:contractId',
+        component: '@/pages/NetworkContractDetail',
+      },
     ],
   },
 ];

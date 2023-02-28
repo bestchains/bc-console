@@ -14,9 +14,9 @@ import {
   Typography,
   Icon,
   Table,
-  Status,
   Space,
   Input,
+  Status,
   Modal,
   FormilyForm,
   FormilySelect,
@@ -722,31 +722,6 @@ class FederationDetail$$Page extends React.Component {
                                     this.i18n('i18n-th9ag1qgsu') /* 认证信息 */,
                                 },
                                 {
-                                  dataIndex: 'status',
-                                  render: (text, record, index) =>
-                                    ((__$$context) => (
-                                      <Status
-                                        id="disabled"
-                                        types={[
-                                          {
-                                            children: '未知',
-                                            icon: 'tenx-ui-icon:Circle',
-                                            id: 'disabled',
-                                            type: 'disabled',
-                                          },
-                                        ]}
-                                      />
-                                    ))(
-                                      __$$createChildContext(__$$context, {
-                                        text,
-                                        record,
-                                        index,
-                                      })
-                                    ),
-                                  title:
-                                    this.i18n('i18n-bik6xl952y6') /* 状态 */,
-                                },
-                                {
                                   dataIndex: 'joinedAt',
                                   key: 'infomation',
                                   render: (text, record, index) =>
@@ -1114,6 +1089,24 @@ class FederationDetail$$Page extends React.Component {
                   {
                     dataIndex: 'ordererType',
                     key: 'ordererType',
+                    render: (text, record, index) =>
+                      ((__$$context) => (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                        >
+                          {__$$eval(() => record?.initiator?.admin || '-')}
+                        </Typography.Text>
+                      ))(
+                        __$$createChildContext(__$$context, {
+                          text,
+                          record,
+                          index,
+                        })
+                      ),
                     title: this.i18n('i18n-7ww60oxk') /* 创建者 */,
                   },
                   {
@@ -1128,7 +1121,11 @@ class FederationDetail$$Page extends React.Component {
                           strong={false}
                           style={{ fontSize: '' }}
                         >
-                          {__$$eval(() => text?.length || 0)}
+                          {__$$eval(() =>
+                            record?.organizations?.length
+                              ? record?.organizations?.length
+                              : '0'
+                          )}
                         </Typography.Text>
                       ))(
                         __$$createChildContext(__$$context, {
@@ -1142,6 +1139,24 @@ class FederationDetail$$Page extends React.Component {
                   {
                     dataIndex: 'clusterSize',
                     key: 'clusterSize',
+                    render: (text, record, index) =>
+                      ((__$$context) => (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                        >
+                          {__$$eval(() => record?.channels?.length || '0')}
+                        </Typography.Text>
+                      ))(
+                        __$$createChildContext(__$$context, {
+                          text,
+                          record,
+                          index,
+                        })
+                      ),
                     title: this.i18n('i18n-707onz6g') /* 通道数 */,
                   },
                   {
