@@ -60,6 +60,7 @@ class OrganizationDetail$$Page extends React.Component {
       filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
+      peers: [],
       record: {},
       searchKey: 'name',
       searchValue: undefined,
@@ -149,31 +150,53 @@ class OrganizationDetail$$Page extends React.Component {
   }
 
   confirmCreateNodelModal(e, payload) {
-    // const organization = this.props.useGetOrganization?.data?.organization || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   try {
-    //     const res = await this.props.appHelper.utils.bff.updateOrganization({
-    //       name: organization.name,
-    //       organization: {
-    //         users: (organization?.users || []).concat({
-    //           name: v.name,
-    //           isOrganizationAdmin: !!v.isOrganizationAdmin === 'true'
-    //         })?.map(item => item.name)
-    //       }
-    //     })
-    //     this.closeModal()
-    //     this.utils.notification.success({
-    //       message: this.i18n('i18n-x26twb9oy0l'),
-    //     })
-    //     this.props.useGetOrganization.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-43getajmxf3'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
+    var _this$props$useGetOrg,
+      _this$props$useGetOrg2,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre;
+    const organization =
+      ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
+      _this$props$useGetOrg === void 0
+        ? void 0
+        : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) === null ||
+          _this$props$useGetOrg2 === void 0
+        ? void 0
+        : _this$props$useGetOrg2.organization) || {};
+    const form =
+      (_this$$ = this.$('formily_create_node')) === null || _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      try {
+        const res = await this.props.appHelper.utils.bff.createIbppeer({
+          organization: organization.name,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-x26twb9oy0l'),
+        });
+        this.getIbppeers();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-43getajmxf3'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
   }
 
   async confirmDeleteModal(e, payload) {
@@ -281,6 +304,22 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  async getIbppeers() {
+    var _this$match, _this$match$params;
+    const res = await this.props.appHelper.utils.bff.getIbppeers({
+      organization:
+        (_this$match = this.match) === null || _this$match === void 0
+          ? void 0
+          : (_this$match$params = _this$match.params) === null ||
+            _this$match$params === void 0
+          ? void 0
+          : _this$match$params.id,
+    });
+    this.setState({
+      peers: (res === null || res === void 0 ? void 0 : res.ibppeers) || [],
+    });
+  }
+
   handleFilterChange(e) {
     this.setState({
       filter: e.target.value,
@@ -353,10 +392,52 @@ class OrganizationDetail$$Page extends React.Component {
   }
 
   openCreateNodeModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'createnode',
-    });
+    this.setState(
+      {
+        isOpenModal: true,
+        modalType: 'createnode',
+      },
+      () => {
+        setTimeout(() => {
+          var _this$props$useGetOrg,
+            _this$props$useGetOrg2,
+            _this$$,
+            _this$$$formRef,
+            _this$$$formRef$curre,
+            _this$state$peers;
+          const organization =
+            ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
+            _this$props$useGetOrg === void 0
+              ? void 0
+              : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) ===
+                  null || _this$props$useGetOrg2 === void 0
+              ? void 0
+              : _this$props$useGetOrg2.organization) || {};
+          const form =
+            (_this$$ = this.$('formily_create_node')) === null ||
+            _this$$ === void 0
+              ? void 0
+              : (_this$$$formRef = _this$$.formRef) === null ||
+                _this$$$formRef === void 0
+              ? void 0
+              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+                _this$$$formRef$curre === void 0
+              ? void 0
+              : _this$$$formRef$curre.form;
+          form.setValues({
+            organization: organization.name,
+            nodes:
+              ((_this$state$peers = this.state.peers) === null ||
+              _this$state$peers === void 0
+                ? void 0
+                : _this$state$peers.length) || 0,
+            number: 1,
+            storage: 1,
+            time: '',
+          });
+        }, 0);
+      }
+    );
   }
 
   openCreateSuccessModal() {
@@ -388,7 +469,9 @@ class OrganizationDetail$$Page extends React.Component {
     )}`;
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.getIbppeers();
+  }
 
   render() {
     const __$$context = this._context || this;
@@ -556,13 +639,14 @@ class OrganizationDetail$$Page extends React.Component {
                       >
                         {__$$eval(
                           () =>
-                            this.props.useGetOrganization?.data?.organization
-                              ?.lml || '-'
+                            this.props.useGetOrganization?.data?.organization?.networks
+                              ?.map((item) => item.name)
+                              ?.join(',') || '-'
                         )}
                       </Typography.Text>
                     ),
                     key: 'r4gchd14zz',
-                    label: this.i18n('i18n-miybp3ih') /* 所属联盟链 */,
+                    label: this.i18n('i18n-brhael1t') /* 所属网络 */,
                     span: 1,
                   },
                   {
@@ -588,8 +672,9 @@ class OrganizationDetail$$Page extends React.Component {
                   {
                     children: __$$eval(
                       () =>
-                        this.props.useGetOrganization?.data?.organization
-                          ?.chanel || '-'
+                        this.props.useGetOrganization?.data?.organization?.channels?.join(
+                          ','
+                        ) || '-'
                     ),
                     key: '5gva0owfbf9',
                     label: this.i18n('i18n-ci3cdwcy') /* 加入通道 */,
@@ -743,7 +828,7 @@ class OrganizationDetail$$Page extends React.Component {
                 <Descriptions.Item
                   __component_name="Descriptions.Item"
                   key="r4gchd14zz"
-                  label={this.i18n('i18n-miybp3ih') /* 所属联盟链 */}
+                  label={this.i18n('i18n-brhael1t') /* 所属网络 */}
                   span={1}
                   tab=""
                 >
@@ -757,8 +842,9 @@ class OrganizationDetail$$Page extends React.Component {
                     >
                       {__$$eval(
                         () =>
-                          this.props.useGetOrganization?.data?.organization
-                            ?.lml || '-'
+                          this.props.useGetOrganization?.data?.organization?.networks
+                            ?.map((item) => item.name)
+                            ?.join(',') || '-'
                       )}
                     </Typography.Text>
                   }
@@ -792,8 +878,9 @@ class OrganizationDetail$$Page extends React.Component {
                 >
                   {__$$eval(
                     () =>
-                      this.props.useGetOrganization?.data?.organization
-                        ?.chanel || '-'
+                      this.props.useGetOrganization?.data?.organization?.channels?.join(
+                        ','
+                      ) || '-'
                   )}
                 </Descriptions.Item>
                 <Descriptions.Item key="k20atuz7jte" label=" " span={1}>
@@ -1084,13 +1171,22 @@ class OrganizationDetail$$Page extends React.Component {
                                 render: (text, record, index) =>
                                   ((__$$context) => (
                                     <Status
-                                      id="disabled"
+                                      id="zc"
                                       types={[
                                         {
                                           children: '未知',
                                           icon: 'tenx-ui-icon:Circle',
                                           id: 'disabled',
                                           type: 'disabled',
+                                        },
+                                        {
+                                          children:
+                                            this.i18n(
+                                              'i18n-fifkprltibf'
+                                            ) /* 正常 */,
+                                          icon: 'CheckCircleFilled',
+                                          id: 'zc',
+                                          type: 'success',
                                         },
                                       ]}
                                     />
@@ -1522,20 +1618,115 @@ class OrganizationDetail$$Page extends React.Component {
                             title: this.i18n('i18n-60cjqhh2') /* 节点名 */,
                           },
                           {
-                            dataIndex: 'lml',
-                            key: 'lml',
-                            render: '',
+                            dataIndex: 'networks',
+                            key: 'networks',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () => record?.networks?.join(',') || '-'
+                                  )}
+                                </Typography.Text>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-rkrm1qsa') /* 加入联盟链 */,
                           },
                           {
                             dataIndex: 'channel',
                             key: 'channel',
-                            render: '',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () => record?.channels?.join(',') || '-'
+                                  )}
+                                </Typography.Text>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-ci3cdwcy') /* 加入通道 */,
                           },
                           {
                             dataIndex: 'node',
                             key: 'node',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Space
+                                  align="center"
+                                  direction="horizontal"
+                                  size={0}
+                                >
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {__$$eval(() =>
+                                      parseInt(record?.limits?.cpu)
+                                    )}
+                                  </Typography.Text>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {this.i18n('i18n-m8df8p4v') /* 核CPU */}
+                                  </Typography.Text>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {__$$eval(() =>
+                                      parseInt(
+                                        __$$context?.record?.limits?.memory
+                                      )
+                                    )}
+                                  </Typography.Text>
+                                  <Typography.Text
+                                    __component_name="Typography.Text"
+                                    disabled={false}
+                                    ellipsis={true}
+                                    strong={false}
+                                    style={{ fontSize: '' }}
+                                  >
+                                    {this.i18n('i18n-3y2g20xr') /* G内存 */}
+                                  </Typography.Text>
+                                </Space>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-zjmh7vtphh') /* 节点配置 */,
                           },
                           {
@@ -1546,7 +1737,9 @@ class OrganizationDetail$$Page extends React.Component {
                                 <Typography.Time
                                   format=""
                                   relativeTime={false}
-                                  time=""
+                                  time={__$$eval(
+                                    () => record?.creationTimestamp
+                                  )}
                                 />
                               ))(
                                 __$$createChildContext(__$$context, {
@@ -1563,13 +1756,34 @@ class OrganizationDetail$$Page extends React.Component {
                             render: (text, record, index) =>
                               ((__$$context) => (
                                 <Status
-                                  id="disabled"
+                                  id={__$$eval(() => record.status)}
                                   types={[
                                     {
-                                      children: '未知',
-                                      icon: 'tenx-ui-icon:Circle',
-                                      id: 'disabled',
-                                      type: 'disabled',
+                                      children:
+                                        this.i18n(
+                                          'i18n-fifkprltibf'
+                                        ) /* 正常 */,
+                                      icon: 'CheckCircleFilled',
+                                      id: 'Deployed',
+                                      type: 'success',
+                                    },
+                                    {
+                                      children:
+                                        this.i18n(
+                                          'i18n-fifkprltibf'
+                                        ) /* 正常 */,
+                                      icon: 'CheckCircleFilled',
+                                      id: 'Deploying',
+                                      type: 'success',
+                                    },
+                                    {
+                                      children:
+                                        this.i18n(
+                                          'i18n-xtno2l9qqog'
+                                        ) /* 异常 */,
+                                      icon: 'CloseCircleFilled',
+                                      id: 'Error',
+                                      type: 'error',
                                     },
                                   ]}
                                 />
@@ -1644,21 +1858,11 @@ class OrganizationDetail$$Page extends React.Component {
                           },
                         ]}
                         dataSource={__$$eval(() =>
-                          this.props.useGetOrganization?.data?.organization?.users
-                            ?.filter((item) => {
-                              const arr =
-                                this.state.filters?.isOrganizationAdmin;
-                              return arr?.length > 0
-                                ? arr.some(
-                                    (key) => item.isOrganizationAdmin === key
-                                  )
-                                : true;
-                            })
-                            ?.filter((item) => {
-                              return this.state.searchValue
-                                ? item.name?.includes(this.state.searchValue)
-                                : true;
-                            })
+                          this.state.peers?.filter((item) => {
+                            return this.state.searchValue
+                              ? item.name?.includes(this.state.searchValue)
+                              : true;
+                          })
                         )}
                         loading={__$$eval(
                           () => this.props.useGetOrganization?.loading
@@ -1696,14 +1900,11 @@ class OrganizationDetail$$Page extends React.Component {
                           size: 'default',
                           total: __$$eval(
                             () =>
-                              this.props.useGetOrganization?.data?.organization?.users
+                              this.state.peers
                                 ?.filter((item) => {
-                                  const arr =
-                                    this.state.filters?.isOrganizationAdmin;
-                                  return arr?.length > 0
-                                    ? arr.some(
-                                        (key) =>
-                                          item.isOrganizationAdmin === key
+                                  return this.state.searchValue
+                                    ? item.name?.includes(
+                                        this.state.searchValue
                                       )
                                     : true;
                                 })
@@ -2312,7 +2513,7 @@ class OrganizationDetail$$Page extends React.Component {
                   layout: 'horizontal',
                   wrapperCol: 20,
                 }}
-                ref={this._refsManager.linkRef('formily_node')}
+                ref={this._refsManager.linkRef('formily_create_node')}
               >
                 <FormilyInput
                   __component_name="FormilyInput"
@@ -2354,7 +2555,7 @@ class OrganizationDetail$$Page extends React.Component {
                   }}
                   decoratorProps={{ 'x-decorator-props': { size: 'default' } }}
                   fieldProps={{
-                    name: 'numberPicker',
+                    name: 'number',
                     title: this.i18n('i18n-rjt0ywiz') /* 新增节点数量 */,
                     'x-validator': [],
                   }}

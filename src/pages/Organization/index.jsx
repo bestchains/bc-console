@@ -1058,7 +1058,7 @@ class Organization$$Page extends React.Component {
                               );
                             }.bind(__$$context)}
                             shape="default"
-                            type="text"
+                            type="link"
                           >
                             {this.i18n('i18n-ias68eipm18') /* 删除 */}
                           </Button>

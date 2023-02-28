@@ -4,24 +4,32 @@ import React from 'react';
 
 import {
   Page,
-  Row,
-  Col,
-  Button,
-  Card,
-  Tabs,
-  Spin,
-  Descriptions,
-  Typography,
-  Status,
-  Table,
-  Icon,
-  Space,
-  Input,
   Modal,
   FormilyForm,
   FormilyInput,
-  FormilySelect,
   FormilyTextArea,
+  FormilySelect,
+  FormilyFormItem,
+  FormilyArrayCards,
+  FormilyUpload,
+  Button,
+  Icon,
+  Alert,
+  Space,
+  Typography,
+  UnifiedLink,
+  Row,
+  Col,
+  Transfer,
+  Tabs,
+  Spin,
+  Card,
+  Divider,
+  Descriptions,
+  Status,
+  Table,
+  Input,
+  Steps,
 } from '@tenx-ui/materials';
 
 import { useLocation, history, matchPath } from '@umijs/max';
@@ -55,17 +63,45 @@ class NetworkDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      channelCurrent: 1,
-      channelRecord: {},
-      channelSize: 10,
-      current: 1,
-      filter: 'ALL',
+      allPeers: [],
+      channel: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+        step: 0,
+      },
+      channelPeers: [],
+      contract: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+      },
       isOpenModal: false,
       modalType: 'addchannel',
+      organization: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+      },
       organizations: [],
-      searchKey: 'name',
-      searchValue: undefined,
-      size: 10,
+      peers: [],
+      strategy: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+      },
     };
   }
 
@@ -79,18 +115,8 @@ class NetworkDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-    });
-  }
-
-  confirmAddChannelModal(e, payload) {
-    var _this$props$useGetNet,
-      _this$props$useGetNet2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
+  async channelAddModalConfirm(e, payload) {
+    var _this$props$useGetNet, _this$props$useGetNet2;
     const network =
       ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
       _this$props$useGetNet === void 0
@@ -99,8 +125,61 @@ class NetworkDetail$$Page extends React.Component {
           _this$props$useGetNet2 === void 0
         ? void 0
         : _this$props$useGetNet2.network) || {};
+    try {
+      var _this$state, _this$state$channel, _this$state$channelPe;
+      const res = await this.props.appHelper.utils.bff.createChannel({
+        network: network === null || network === void 0 ? void 0 : network.name,
+        channel: {
+          ...(((_this$state = this.state) === null || _this$state === void 0
+            ? void 0
+            : (_this$state$channel = _this$state.channel) === null ||
+              _this$state$channel === void 0
+            ? void 0
+            : _this$state$channel.addData) || {}),
+          peers:
+            (_this$state$channelPe = this.state.channelPeers) === null ||
+            _this$state$channelPe === void 0
+              ? void 0
+              : _this$state$channelPe.map((key) => {
+                  var _this$state$allPeers;
+                  const item =
+                    (_this$state$allPeers = this.state.allPeers) === null ||
+                    _this$state$allPeers === void 0
+                      ? void 0
+                      : _this$state$allPeers.find((item) => item.key === key);
+                  return {
+                    name: item.name,
+                    namespace: item.namespace,
+                  };
+                }),
+        },
+      });
+      // this.closeModal()
+      // this.utils.notification.success({
+      //   message: this.i18n('i18n-l8fybssesij'),
+      // })
+      this.openAddChannelSuccessModal();
+      this.props.useGetNetwork.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-85kkwp67i5u'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  channelAddModalNext() {
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
     const form =
-      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_create_channel')) === null ||
+      _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -110,32 +189,166 @@ class NetworkDetail$$Page extends React.Component {
         ? void 0
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
-      console.log(v);
-      try {
-        // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
-        //   name: network?.name,
-        //   organizations: v.organizations,
-        //   initiator: network?.initiator?.name
-        // })
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-l8fybssesij'),
+      this.getPeers(v);
+      setTimeout(() => {
+        this.setState({
+          channel: {
+            ...this.state.channel,
+            addData: v,
+            step: 1,
+          },
         });
-        this.props.useGetNetwork.mutate();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-85kkwp67i5u'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
+      }, 0);
     });
+  }
+
+  channelAddModalPre() {
+    this.setState(
+      {
+        channel: {
+          ...this.state.channel,
+          step: 0,
+        },
+      },
+      () => {
+        var _this$$, _this$$$formRef, _this$$$formRef$curre;
+        const form =
+          (_this$$ = this.$('formily_create_channel')) === null ||
+          _this$$ === void 0
+            ? void 0
+            : (_this$$$formRef = _this$$.formRef) === null ||
+              _this$$$formRef === void 0
+            ? void 0
+            : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+              _this$$$formRef$curre === void 0
+            ? void 0
+            : _this$$$formRef$curre.form;
+        form.setValues(this.state.channel.addData);
+      }
+    );
+  }
+
+  channelAddOrganizationModalConfirm(e, payload) {
+    this.openAddChannelOrganizationSuccessModal();
+    console.log(this.state.channel, 'ccccccccccccccccccccc');
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openAddChannelSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
+  channelAddPeerModalConfirm(e, payload) {
+    console.log(this.state.channel, 'ccccccccccccccccccccc');
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openAddChannelSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
+  channelPeersChange(channelPeers) {
+    this.setState({
+      channelPeers,
+    });
+  }
+
+  closeModal() {
+    this.setState({
+      isOpenModal: false,
+    });
+  }
+
+  confirmAddContractModal(e, payload) {
+    // this.openAddChannelOrganizationSuccessModal()
+    console.log(this.state.contract, 'ccccccccccccccccccccc');
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openAddChannelSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
+  confirmAddStrategyModal(e, payload) {
+    // this.openAddChannelOrganizationSuccessModal()
+    console.log(this.state.strategy, 'ccccccccccccccccccccc');
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openAddChannelSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
   }
 
   async confirmDeleteChannelModal(e, payload) {
@@ -159,24 +372,232 @@ class NetworkDetail$$Page extends React.Component {
     // }
   }
 
+  async confirmDeleteContractModal(e, payload) {
+    console.log(this.state.contract, 'cccccccccccc');
+    // const federation = this.props.useGetFederation?.data?.federation || {}
+    // try {
+    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
+    //     name: federation?.name,
+    //     organization: this.state.channelRecord?.name,
+    //     initiator: federation?.initiator?.name
+    //   })
+    //   this.closeModal()
+    //   this.utils.notification.success({
+    //     message: this.i18n('i18n-yy3f9rxigm'),
+    //   })
+    //   this.props.useGetFederation.mutate()
+    // } catch (error) {
+    //   this.utils.notification.warnings({
+    //     message: this.i18n('i18n-p5gea1q7fem'),
+    //     errors: error?.response?.errors
+    //   })
+    // }
+  }
+
+  confirmDeploymentContractModal(e, payload) {
+    this.openDeploymentContractSuccessModal();
+    console.log(this.state.contract, 'ccccccccccccccccccccc');
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openDeploymentContractSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
+  confirmUpgradeContractModal(e, payload) {
+    // this.openAddChannelOrganizationSuccessModal()
+    console.log(this.state.contract, 'ccccccccccccccccccccc');
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openAddChannelSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
+  async getPeers(v) {
+    var _res$ibppeersForCreat, _res$ibppeersForCreat2, _res$ibppeersForCreat3;
+    const { initiator, organizations } = v;
+    const res =
+      await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
+        members: [initiator, ...organizations],
+      });
+    const allPeers = [];
+    res === null || res === void 0
+      ? void 0
+      : (_res$ibppeersForCreat = res.ibppeersForCreateChannel) === null ||
+        _res$ibppeersForCreat === void 0
+      ? void 0
+      : _res$ibppeersForCreat.forEach((item) => {
+          var _item$ibppeers;
+          (_item$ibppeers = item.ibppeers) === null || _item$ibppeers === void 0
+            ? void 0
+            : _item$ibppeers.forEach((peer) => {
+                allPeers.push({
+                  name: peer.name,
+                  namespace: item.name,
+                  key: item.name + peer.name,
+                });
+              });
+        });
+    const peers =
+      (res === null || res === void 0
+        ? void 0
+        : (_res$ibppeersForCreat2 = res.ibppeersForCreateChannel) === null ||
+          _res$ibppeersForCreat2 === void 0
+        ? void 0
+        : (_res$ibppeersForCreat3 = _res$ibppeersForCreat2.map((item) => {
+            var _item$ibppeers2;
+            return {
+              key: item.name,
+              title: item.name,
+              children:
+                (_item$ibppeers2 = item.ibppeers) === null ||
+                _item$ibppeers2 === void 0
+                  ? void 0
+                  : _item$ibppeers2.map((peer) => ({
+                      key: item.name + peer.name,
+                      title: peer.name,
+                    })),
+            };
+          })) === null || _res$ibppeersForCreat3 === void 0
+        ? void 0
+        : _res$ibppeersForCreat3.filter((item) => {
+            var _item$children;
+            return (
+              (item === null || item === void 0
+                ? void 0
+                : (_item$children = item.children) === null ||
+                  _item$children === void 0
+                ? void 0
+                : _item$children.length) > 0
+            );
+          })) || [];
+    this.setState({
+      peers,
+      allPeers,
+    });
+  }
+
   handleChannelPaginationChange(c, s) {
     this.setState({
-      size: s,
-      current: c,
+      channel: {
+        ...this.state.channel,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleChannelSearchValueChange(e) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        searchValue: e.target.value,
+      },
     });
   }
 
   handleChannelTableChange(pagination, filters, sorter, extra) {
     this.setState({
-      pagination,
-      filters,
-      sorter,
+      channel: {
+        ...this.state.channel,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handleContractPaginationChange(c, s) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleContractSearchValueChange(e) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleContractTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        pagination,
+        filters,
+        sorter,
+      },
     });
   }
 
   handleFilterChange(e) {
     this.setState({
       filter: e.target.value,
+    });
+  }
+
+  handleOrganizationPaginationChange(c, s) {
+    this.setState({
+      organization: {
+        ...this.state.organization,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleOrganizationTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      organization: {
+        ...this.state.organization,
+        pagination,
+        filters,
+        sorter,
+      },
     });
   }
 
@@ -190,6 +611,36 @@ class NetworkDetail$$Page extends React.Component {
   handleSearchValueChange(e) {
     this.setState({
       searchValue: e.target.value,
+    });
+  }
+
+  handleStrategyPaginationChange(c, s) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleStrategySearchValueChange(e) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleStrategyTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        pagination,
+        filters,
+        sorter,
+      },
     });
   }
 
@@ -208,12 +659,105 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
+  openAddChannelOrganizationModal(e, payload) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'addchannelorganization',
+    });
+  }
+
+  openAddChannelOrganizationSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelorganizationsuccess',
+    });
+  }
+
+  openAddChannelPeerModal(e, payload) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'addchannelpeer',
+    });
+  }
+
+  openAddChannelSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelsuccess',
+    });
+  }
+
+  openAddContractModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addcontract',
+    });
+  }
+
+  openAddStrategyModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addstrategy',
+    });
+  }
+
   openDeleteChannelModal(e, payload) {
     this.setState({
       isOpenModal: true,
       modalType: 'delete',
-      channelRecord:
-        payload === null || payload === void 0 ? void 0 : payload.record,
+      channel: {
+        ...this.state.channel,
+        record:
+          payload === null || payload === void 0 ? void 0 : payload.record,
+      },
+    });
+  }
+
+  openDeleteContractModal(e, payload) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletecontract',
+    });
+  }
+
+  openDeploymentContractModal(e, payload) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deploymentcontract',
+    });
+  }
+
+  openDeploymentContractSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'deploymentcontractsuccess',
+    });
+  }
+
+  openUpgradeContractModal(e, payload) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'upgradecontract',
     });
   }
 
@@ -248,6 +792,1062 @@ class NetworkDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmAddStrategyModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmAddStrategyModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal && this.state.modalType === 'addstrategy'
+          )}
+          title={this.i18n('i18n-6pygp0ks') /* 新增背书策略 */}
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 4,
+              layout: 'horizontal',
+              wrapperCol: 20,
+            }}
+            ref={this._refsManager.linkRef('formily_ji1wx62rpa8')}
+          >
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  placeholder: this.i18n('i18n-iz3eoa9s') /* 请输入策略名称 */,
+                },
+              }}
+              fieldProps={{
+                name: 'name',
+                required: true,
+                title: this.i18n('i18n-87kp314f') /* 策略名称 */,
+                'x-validator': [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    message:
+                      this.i18n(
+                        'i18n-1icnfyd1'
+                      ) /* 策略名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
+                    pattern: '^[a-zA-Z0-9_]{3,10}$',
+                    type: 'disabled',
+                  },
+                ],
+              }}
+            />
+            <FormilyTextArea
+              __component_name="FormilyTextArea"
+              componentProps={{
+                'x-component-props': {
+                  placeholder: this.i18n('i18n-rw0h41prk6') /* 请输入描述 */,
+                },
+              }}
+              fieldProps={{
+                name: 'description',
+                required: true,
+                title: this.i18n('i18n-w3qy6omh') /* 策略描述 */,
+                'x-component': 'Input.TextArea',
+                'x-validator': [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    message:
+                      this.i18n(
+                        'i18n-0xg7a1uj'
+                      ) /* 策略描述由 0 ~ 200 字符组成 */,
+                    pattern: '^.{0,200}$',
+                    type: 'disabled',
+                  },
+                ],
+              }}
+            />
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  allowClear: false,
+                  disabled: false,
+                  placeholder: this.i18n('i18n-59plmy1n') /* 请选择通道 */,
+                },
+              }}
+              fieldProps={{
+                name: 'channel',
+                required: true,
+                title: this.i18n('i18n-4wgfgnn6') /* 通道 */,
+                'x-validator': [],
+              }}
+            />
+            <FormilyFormItem
+              __component_name="FormilyFormItem"
+              componentProps={{ 'x-component-props': {} }}
+              fieldProps={{
+                name: 'FormilyFormItem',
+                required: true,
+                title: this.i18n('i18n-tcgbsroi') /* 策略内容 */,
+                'x-component': 'FormilyFormItem',
+                'x-validator': [],
+              }}
+            >
+              <FormilyArrayCards
+                __component_name="FormilyArrayCards"
+                componentProps={{ 'x-component-props': {} }}
+                fieldProps={{
+                  items: {
+                    properties: {
+                      Index: {
+                        type: 'void',
+                        'x-component': 'FormilyArrayCards.Index',
+                        'x-decorator': 'FormItem',
+                      },
+                      Remove: {
+                        type: 'void',
+                        'x-component': 'FormilyArrayCards.Remove',
+                        'x-decorator': 'FormItem',
+                      },
+                    },
+                    type: 'object',
+                  },
+                  name: 'name',
+                  properties: {
+                    add: {
+                      title: this.i18n('i18n-z29zhp7a') /* 新增一行“or 条件” */,
+                      type: 'void',
+                      'x-component': 'FormilyArrayCards.Addition',
+                    },
+                  },
+                  title: {},
+                  type: 'array',
+                  'x-validator': [],
+                }}
+              >
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      allowClear: false,
+                      disabled: false,
+                      mode: 'multiple',
+                      placeholder:
+                        this.i18n('i18n-92kkrrjc') /* 添加“and 条件” */,
+                    },
+                  }}
+                  fieldProps={{
+                    _unsafe_MixedSetter_title_select: 'I18nSetter',
+                    name: 'Select',
+                    title: {},
+                    'x-validator': [],
+                  }}
+                />
+              </FormilyArrayCards>
+            </FormilyFormItem>
+          </FormilyForm>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmUpgradeContractModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmUpgradeContractModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'upgradecontract'
+          )}
+          title={this.i18n('i18n-nihrz6ys') /* 合约升级 */}
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 5,
+              layout: 'horizontal',
+              wrapperCol: 20,
+            }}
+            ref={this._refsManager.linkRef('formily_contract_upgrade')}
+          >
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  placeholder: this.i18n('i18n-b3d2mz7i') /* 请输入合约名称 */,
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_default_select: 'VariableSetter',
+                default: __$$eval(() => this.state.contract?.record?.name),
+                name: 'name',
+                required: true,
+                title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
+                'x-pattern': 'disabled',
+                'x-validator': [],
+              }}
+            />
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  placeholder:
+                    this.i18n(
+                      'i18n-2ielocre'
+                    ) /* 合约版本供识别与维护使用，建议格式： v1.0 */,
+                },
+              }}
+              fieldProps={{
+                name: 'name1',
+                required: true,
+                title: this.i18n('i18n-a20yo7fz') /* 当前版本号 */,
+                'x-pattern': 'disabled',
+                'x-validator': [],
+              }}
+            />
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  placeholder:
+                    this.i18n(
+                      'i18n-e0ey37p3'
+                    ) /* 合约版本供识别与维护使用，建议和当前保持类型一致 */,
+                },
+              }}
+              fieldProps={{
+                name: 'version_update',
+                required: true,
+                title: this.i18n('i18n-1qxjy0jv') /* 升级后版本号 */,
+                'x-validator': [],
+              }}
+            />
+            <FormilyUpload
+              __component_name="FormilyUpload"
+              fieldProps={{
+                name: 'Upload',
+                required: true,
+                title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
+                'x-component': 'FormilyUpload',
+                'x-validator': [],
+              }}
+            >
+              <Button
+                __component_name="Button"
+                block={false}
+                danger={false}
+                disabled={false}
+                ghost={false}
+                icon={
+                  <Icon
+                    __component_name="Icon"
+                    size={12}
+                    style={{ marginRight: 3 }}
+                    type="PlusOutlined"
+                  />
+                }
+                shape="default"
+                type="default"
+              >
+                {this.i18n('i18n-l9xc0l1g') /* 选择上传的文件 */}
+              </Button>
+            </FormilyUpload>
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  allowClear: false,
+                  disabled: false,
+                  placeholder: this.i18n('i18n-928f3hdn') /* 请选择语言 */,
+                },
+              }}
+              fieldProps={{
+                enum: [
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: 'Go',
+                    type: 'disabled',
+                    value: 'Go',
+                  },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: 'Java',
+                    type: 'disabled',
+                    value: 'Java',
+                  },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: 'Node',
+                    type: 'disabled',
+                    value: 'Node',
+                  },
+                ],
+                name: 'Select',
+                title: this.i18n('i18n-7usiozsk') /* 选择语言 */,
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmDeleteContractModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmDeleteContractModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'deletecontract'
+          )}
+          title={this.i18n('i18n-kllir0y1') /* 合约删除 */}
+        >
+          <Alert
+            __component_name="Alert"
+            message={
+              <Space align="center" direction="horizontal">
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {this.i18n('i18n-12xa4wid') /* 确认删除合约 */}
+                </Typography.Text>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(() => this.state.contract?.record?.name || '-')}
+                </Typography.Text>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {this.i18n('i18n-88tr11kq') /* 吗？ */}
+                </Typography.Text>
+              </Space>
+            }
+            showIcon={true}
+            type="warning"
+          />
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: false,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __component_name="Button"
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'deploymentcontractsuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-2rnclk3j') /* 部署中，请等待投票 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {__$$eval(() => this.state.contract?.record?.name)}
+            </Typography.Text>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-5kpzkt0b') /* 合约部署提议已发送， */}
+            </Typography.Text>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                paramStr: '{\n \t "record":this.record \n}',
+                relatedEventName: 'confirmDeploymentContractModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmDeploymentContractModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([
+                {
+                  record: this.record,
+                },
+              ])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'deploymentcontract'
+          )}
+          title={this.i18n('i18n-tqaysbds') /* 安装部署合约 */}
+        >
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={24}>
+              <Typography.Text
+                __component_name="Typography.Text"
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ color: '', fontSize: '' }}
+                type="danger"
+              >
+                {
+                  this.i18n(
+                    'i18n-sc2b0neb'
+                  ) /* 合约安装部署提交后，组织需要根据投票策略进行投票 */
+                }
+              </Typography.Text>
+            </Col>
+            <Col __component_name="Col" span={24}>
+              <FormilyForm
+                __component_name="FormilyForm"
+                componentProps={{
+                  colon: false,
+                  labelAlign: 'left',
+                  labelCol: 4,
+                  layout: 'horizontal',
+                  wrapperCol: 20,
+                }}
+                ref={this._refsManager.linkRef('formily_4sd81nnptby')}
+              >
+                <FormilyInput
+                  __component_name="FormilyInput"
+                  componentProps={{
+                    'x-component-props': {
+                      placeholder:
+                        this.i18n('i18n-b3d2mz7i') /* 请输入合约名称 */,
+                    },
+                  }}
+                  fieldProps={{
+                    name: 'name',
+                    title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
+                    'x-pattern': 'disabled',
+                    'x-validator': [],
+                  }}
+                />
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      allowClear: false,
+                      disabled: false,
+                      notFoundContent: {},
+                      placeholder:
+                        this.i18n('i18n-o4a5p44k') /* 选择自己的节点，可多选 */,
+                    },
+                  }}
+                  fieldProps={{
+                    name: 'peer',
+                    required: true,
+                    title: this.i18n('i18n-wlv4nr0d') /* 安装节点 */,
+                    'x-validator': [],
+                  }}
+                />
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      allowClear: false,
+                      disabled: false,
+                      mode: 'multiple',
+                      notFoundContent: {},
+                      placeholder: this.i18n('i18n-59plmy1n') /* 请选择通道 */,
+                    },
+                  }}
+                  fieldProps={{
+                    name: 'channel',
+                    required: true,
+                    title: this.i18n('i18n-uyu5gd4c') /* 部署通道 */,
+                    'x-validator': [],
+                  }}
+                />
+                <FormilySelect
+                  __component_name="FormilySelect"
+                  componentProps={{
+                    'x-component-props': {
+                      allowClear: false,
+                      disabled: false,
+                      notFoundContent: {},
+                      placeholder:
+                        this.i18n('i18n-e0gcsyat') /* 请选择背书策略 */,
+                    },
+                  }}
+                  fieldProps={{
+                    name: 'cl',
+                    title: this.i18n('i18n-wh9bw5j9') /* 背书策略 */,
+                    'x-validator': [],
+                  }}
+                />
+              </FormilyForm>
+            </Col>
+          </Row>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'channelAddPeerModalConfirm',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.channelAddPeerModalConfirm.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'addchannelpeer'
+          )}
+          title={this.i18n('i18n-bxsxgogh') /* 加入节点 */}
+        >
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={24}>
+              <Space align="center" direction="horizontal">
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {this.i18n('i18n-xcopya8d') /* 请选择加入通道 */}
+                </Typography.Text>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(() => this.state.channel?.record?.name || '-')}
+                </Typography.Text>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {this.i18n('i18n-4r61pybs') /* 的节点 */}
+                </Typography.Text>
+              </Space>
+            </Col>
+            <Col __component_name="Col" span={24}>
+              <Transfer
+                __component_name="Transfer"
+                dataSource={[]}
+                disabled={false}
+                oneWay={false}
+                render={function () {
+                  const self = this;
+                  try {
+                    return function renderItem(record, extParams) {
+                      return record.title;
+                    }.apply(self, arguments);
+                  } catch (e) {
+                    logger.warn(
+                      'call function which parsed by lowcode failed: ',
+                      e
+                    );
+                    return e.message;
+                  }
+                }}
+                selectAllLabels={[]}
+                showSearch={false}
+                showSelectAll={true}
+                titles={[]}
+              />
+            </Col>
+          </Row>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: false,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __component_name="Button"
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'addchannelsuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-s4aho8fc') /* 邀请加入通道已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
+        </Modal>
         <Row __component_name="Row" wrap={true}>
           <Col
             __component_name="Col"
@@ -261,490 +1861,1703 @@ class NetworkDetail$$Page extends React.Component {
             />
           </Col>
           <Col __component_name="Col" span={24}>
-            <Card
-              __component_name="Card"
-              actions={[]}
-              bordered={false}
-              hoverable={false}
-              loading={false}
-              size="default"
-              type="default"
-            >
-              <Tabs
-                __component_name="Tabs"
-                destroyInactiveTabPane="true"
-                items={[
-                  {
-                    children: (
-                      <Spin
-                        __component_name="Spin"
-                        spinning={__$$eval(
-                          () => this.props.useGetNetwork?.loading
-                        )}
+            <Tabs
+              __component_name="Tabs"
+              destroyInactiveTabPane="true"
+              items={[
+                {
+                  children: (
+                    <Spin
+                      __component_name="Spin"
+                      spinning={__$$eval(
+                        () => this.props.useGetNetwork?.loading
+                      )}
+                    >
+                      <Row
+                        style={{ marginLeft: '-30px', marginTop: '-16px' }}
+                        wrap={true}
                       >
-                        <Descriptions
-                          __component_name="Descriptions"
-                          bordered={false}
-                          colon={false}
-                          column={1}
-                          items={[
-                            {
-                              children: __$$eval(
-                                () =>
-                                  this.props.useGetNetwork?.data?.network
-                                    ?.initiator?.admin || '-'
-                              ),
-                              key: 'r4gchd14zz',
-                              label: this.i18n('i18n-yyexdt18ora') /* 创建人 */,
-                              span: 1,
-                            },
-                            {
-                              children: (
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '' }}
-                                >
-                                  {__$$eval(
-                                    () =>
-                                      this.props.useGetNetwork?.data?.network
-                                        ?.organizations?.length || '0'
-                                  )}
-                                </Typography.Text>
-                              ),
-                              key: 'bdr5go2aun',
-                              label:
-                                this.i18n('i18n-4btnh7pqt1m') /* 成员个数 */,
-                              span: 1,
-                            },
-                            {
-                              children: (
-                                <Typography.Time
-                                  __component_name="Typography.Time"
-                                  format=""
-                                  relativeTime={false}
-                                  time={__$$eval(
-                                    () =>
-                                      this.props.useGetNetwork?.data?.network
-                                        ?.creationTimestamp
-                                  )}
-                                />
-                              ),
-                              key: 'o0cvbxwkrj',
-                              label:
-                                this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
-                              span: 1,
-                            },
-                            {
-                              children: (
-                                <Typography.Time
-                                  __component_name="Typography.Time"
-                                  format=""
-                                  relativeTime={false}
-                                  time={__$$eval(
-                                    () =>
-                                      this.props.useGetNetwork?.data?.network
-                                        ?.joinedAt
-                                  )}
-                                />
-                              ),
-                              key: '8ei6l6dk6xn',
-                              label:
-                                this.i18n('i18n-watjije0jk') /* 更新时间 */,
-                              span: 1,
-                            },
-                            {
-                              children: __$$eval(
-                                () =>
-                                  this.props.useGetNetwork?.data?.network
-                                    ?.version || '-'
-                              ),
-                              key: 'mljbt4bcmo',
-                              label: this.i18n('i18n-hbf63hki898') /* 版本 */,
-                              span: 1,
-                            },
-                            {
-                              children: (
-                                <Descriptions
-                                  __component_name="Descriptions"
+                        <Col span={24}>
+                          <Card
+                            actions={[]}
+                            bordered={false}
+                            hoverable={false}
+                            loading={false}
+                            size="default"
+                            type="default"
+                          >
+                            <Row wrap={true}>
+                              <Col span={24}>
+                                <Row justify="space-between" wrap={false}>
+                                  <Col>
+                                    <Typography.Title
+                                      bold={true}
+                                      bordered={false}
+                                      ellipsis={true}
+                                      level={1}
+                                    >
+                                      {
+                                        this.i18n(
+                                          'i18n-9erhew6n'
+                                        ) /* 快速上链 */
+                                      }
+                                    </Typography.Title>
+                                  </Col>
+                                  <Col>
+                                    <Space
+                                      align="center"
+                                      direction="horizontal"
+                                    >
+                                      <Icon
+                                        color="#9b9b9b"
+                                        size={12}
+                                        type="EyeInvisibleOutlined"
+                                      />
+                                      <Typography.Text
+                                        disabled={false}
+                                        ellipsis={true}
+                                        strong={false}
+                                        style={{ fontSize: '' }}
+                                        type="secondary"
+                                      >
+                                        {this.i18n('i18n-v1exwbga') /* 隐藏 */}
+                                      </Typography.Text>
+                                    </Space>
+                                  </Col>
+                                </Row>
+                              </Col>
+                              <Col span={24}>
+                                <Row gutter={[0, 0]} h-gutter={0} wrap={true}>
+                                  <Col
+                                    span={1}
+                                    style={{ paddingTop: '28px' }}
+                                  />
+                                  <Col span={4}>
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      style={{ textAlign: 'center' }}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          paddingBottom: '8px',
+                                        }}
+                                      >
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={true}
+                                          style={{
+                                            alignItems: 'center',
+                                            backgroundColor:
+                                              'rgba(254,143,53,0.1)',
+                                            borderRadius: '30px',
+                                            borderWidth: '0px',
+                                            color: '#fe8f35',
+                                            display: 'flex',
+                                            fontSize: '18',
+                                            height: '33px',
+                                            justifyContent: 'center',
+                                            textAlign: 'center',
+                                            width: '33px',
+                                          }}
+                                        >
+                                          1
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-snaon3b2fni'
+                                            ) /* 新建通道 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-vx0dwibl'
+                                            ) /* 每一个通道即为一条逻 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-i4bwnz1b'
+                                            ) /* 辑上的区块链 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <UnifiedLink
+                                          target="_blank"
+                                          to="/network/detail/${this.match?.params?.id}?tab=&#39;channel&#39;"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-pjvvvoe9'
+                                            ) /* 通道管理 */
+                                          }
+                                        </UnifiedLink>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col span={2} style={{ paddingTop: '28px' }}>
+                                    <Divider
+                                      __component_name="Divider"
+                                      dashed={true}
+                                      defaultOpen={false}
+                                      mode="line"
+                                    />
+                                  </Col>
+                                  <Col span={4}>
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      style={{ textAlign: 'center' }}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          paddingBottom: '8px',
+                                        }}
+                                      >
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={true}
+                                          style={{
+                                            alignItems: 'center',
+                                            backgroundColor:
+                                              'rgba(254,143,53,0.1)',
+                                            borderRadius: '30px',
+                                            borderWidth: '0px',
+                                            color: '#fe8f35',
+                                            display: 'flex',
+                                            fontSize: '18',
+                                            height: '33px',
+                                            justifyContent: 'center',
+                                            textAlign: 'center',
+                                            width: '33px',
+                                          }}
+                                        >
+                                          2
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-4nr880g9'
+                                            ) /* 编写并部署合约 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-ni3p31po'
+                                            ) /* 只能合约是用户与区块 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-hzr79mlu'
+                                            ) /* 链进行交互的重要途径 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <UnifiedLink
+                                          target="_blank"
+                                          to="/network/detail/${this.match?.params?.id}?tab=&#39;contract&#39;"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-5wdi9bc5'
+                                            ) /* 合约管理 */
+                                          }
+                                        </UnifiedLink>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col span={2} style={{ paddingTop: '28px' }}>
+                                    <Divider
+                                      __component_name="Divider"
+                                      dashed={true}
+                                      defaultOpen={false}
+                                      mode="line"
+                                    />
+                                  </Col>
+                                  <Col span={4}>
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      style={{ textAlign: 'center' }}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          paddingBottom: '8px',
+                                        }}
+                                      >
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={true}
+                                          style={{
+                                            alignItems: 'center',
+                                            backgroundColor:
+                                              'rgba(254,143,53,0.1)',
+                                            borderRadius: '30px',
+                                            borderWidth: '0px',
+                                            color: '#fe8f35',
+                                            display: 'flex',
+                                            fontSize: '18',
+                                            height: '33px',
+                                            justifyContent: 'center',
+                                            textAlign: 'center',
+                                            width: '33px',
+                                          }}
+                                        >
+                                          3
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-zj5zwqud'
+                                            ) /* 业务对接 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-popfra0p'
+                                            ) /* SDK 开发性能优越 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-7s93ic9s'
+                                            ) /* API 开发上手轻便 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <UnifiedLink target="_blank" to="/">
+                                          {
+                                            this.i18n(
+                                              'i18n-5ne2amb2'
+                                            ) /* API 指南 */
+                                          }
+                                        </UnifiedLink>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col span={2} style={{ paddingTop: '28px' }}>
+                                    <Divider
+                                      __component_name="Divider"
+                                      dashed={true}
+                                      defaultOpen={false}
+                                      mode="line"
+                                    />
+                                  </Col>
+                                  <Col span={4}>
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      style={{ textAlign: 'center' }}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{
+                                          display: 'flex',
+                                          justifyContent: 'center',
+                                          paddingBottom: '8px',
+                                        }}
+                                      >
+                                        <Typography.Text
+                                          __component_name="Typography.Text"
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={true}
+                                          style={{
+                                            alignItems: 'center',
+                                            backgroundColor:
+                                              'rgba(254,143,53,0.1)',
+                                            borderRadius: '30px',
+                                            borderWidth: '0px',
+                                            color: '#fe8f35',
+                                            display: 'flex',
+                                            fontSize: '18',
+                                            height: '33px',
+                                            justifyContent: 'center',
+                                            textAlign: 'center',
+                                            width: '33px',
+                                          }}
+                                        >
+                                          4
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-akik0eji'
+                                            ) /* 查看浏览器 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-sluhnzoa'
+                                            ) /* 发起交易后，即可在浏 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Typography.Text
+                                          disabled={false}
+                                          ellipsis={true}
+                                          strong={false}
+                                          style={{ fontSize: '' }}
+                                          type="secondary"
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-ey0ypm67'
+                                            ) /* 览器查看详细数据 */
+                                          }
+                                        </Typography.Text>
+                                      </Col>
+                                      <Col span={24}>
+                                        <UnifiedLink target="_blank" to="/">
+                                          {
+                                            this.i18n(
+                                              'i18n-gyh9gtql'
+                                            ) /* 区块链浏览器 */
+                                          }
+                                        </UnifiedLink>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                </Row>
+                              </Col>
+                            </Row>
+                          </Card>
+                        </Col>
+                        <Col span={24}>
+                          <Card
+                            actions={[]}
+                            bordered={false}
+                            hoverable={false}
+                            loading={false}
+                            size="default"
+                            style={{ height: '210px' }}
+                            type="default"
+                          >
+                            <Row wrap={true}>
+                              <Col span={24}>
+                                <Typography.Title
+                                  bold={true}
                                   bordered={false}
-                                  colon={true}
-                                  column={1}
-                                  items={[
-                                    {
-                                      children: null,
-                                      key: 'ufknvxft0u',
-                                      label:
-                                        this.i18n(
-                                          'i18n-twykcar3l6l'
-                                        ) /* 共识算法 */,
-                                      span: 1,
-                                    },
-                                    {
-                                      children: null,
-                                      key: '81dsq3cni9b',
-                                      label:
-                                        this.i18n(
-                                          'i18n-ax4swl3ryv7'
-                                        ) /* 集群大小 */,
-                                      span: 1,
-                                    },
-                                    {
-                                      children: null,
-                                      key: '634p9mdxipk',
-                                      label:
-                                        this.i18n(
-                                          'i18n-kqc5q3s99wo'
-                                        ) /* 节点数据库 */,
-                                      span: 1,
-                                    },
-                                  ]}
-                                  labelStyle={{ width: 100 }}
-                                  layout="horizontal"
-                                  size="default"
-                                  title=""
+                                  ellipsis={true}
+                                  level={1}
                                 >
-                                  <Descriptions.Item
-                                    __component_name="Descriptions.Item"
-                                    key="ufknvxft0u"
-                                    label={
-                                      this.i18n(
-                                        'i18n-twykcar3l6l'
-                                      ) /* 共识算法 */
-                                    }
-                                    span={1}
+                                  {this.i18n('i18n-ob165u7p') /* 关键指标 */}
+                                </Typography.Title>
+                              </Col>
+                              <Col span={24}>
+                                <Row gutter={[0, 0]} h-gutter={0} wrap={true}>
+                                  <Col
+                                    span={6}
+                                    style={{
+                                      borderRightColor: 'rgba(49,62,89,0.2)',
+                                      borderRightStyle: 'solid',
+                                      borderRightWidth: '1px',
+                                      paddingLeft: '56px',
+                                    }}
                                   >
-                                    {null}
-                                  </Descriptions.Item>
-                                  <Descriptions.Item
-                                    __component_name="Descriptions.Item"
-                                    key="81dsq3cni9b"
-                                    label={
-                                      this.i18n(
-                                        'i18n-ax4swl3ryv7'
-                                      ) /* 集群大小 */
-                                    }
-                                    span={1}
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{ marginBottom: '8px' }}
+                                      >
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-groe806b'
+                                            ) /* 我的通道 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '34px' }}
+                                            type="default"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.channels?.filter(
+                                                  (item) =>
+                                                    item.createdByMe ||
+                                                    item.iamInvolved
+                                                )?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="default"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-hui8agoc'
+                                              ) /* 个 */
+                                            }
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-5jwxi1nlnsm'
+                                              ) /* 我创建的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.channels?.filter(
+                                                  (item) => item.iamInvolved
+                                                )?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-55qv32wl'
+                                              ) /* 我加入的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.channels?.filter(
+                                                  (item) => item.iamInvolved
+                                                )?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col
+                                    span={6}
+                                    style={{
+                                      borderRightColor: 'rgba(49,62,89,0.2)',
+                                      borderRightStyle: 'solid',
+                                      borderRightWidth: '1px',
+                                      paddingLeft: '56px',
+                                    }}
                                   >
-                                    {null}
-                                  </Descriptions.Item>
-                                  <Descriptions.Item
-                                    __component_name="Descriptions.Item"
-                                    key="634p9mdxipk"
-                                    label={
-                                      this.i18n(
-                                        'i18n-kqc5q3s99wo'
-                                      ) /* 节点数据库 */
-                                    }
-                                    span={1}
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{ marginBottom: '8px' }}
+                                      >
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-fwad0qrg'
+                                            ) /* 智能合约 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '34px' }}
+                                            type="default"
+                                          >
+                                            0
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="default"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-hui8agoc'
+                                              ) /* 个 */
+                                            }
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-ailf3q4x'
+                                              ) /* 我发起的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            text
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-0oad4726'
+                                              ) /* 他人发起的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            text
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col
+                                    span={6}
+                                    style={{
+                                      borderRightColor: 'rgba(49,62,89,0.2)',
+                                      borderRightStyle: 'solid',
+                                      borderRightWidth: '1px',
+                                      paddingLeft: '56px',
+                                    }}
                                   >
-                                    {null}
-                                  </Descriptions.Item>
-                                </Descriptions>
-                              ),
-                              key: 'i1zeuy7pn4n',
-                              label: this.i18n('i18n-xgyxfdl8q') /* 共识组件 */,
-                              span: 1,
-                            },
-                            {
-                              children: (
-                                <Status
-                                  __component_name="Status"
-                                  id={__$$eval(
-                                    () =>
-                                      this.props.useGetNetwork?.data?.network
-                                        ?.status
-                                  )}
-                                  types={[
-                                    {
-                                      children:
-                                        this.i18n(
-                                          'i18n-zrowlr7zwx'
-                                        ) /* 运行中 */,
-                                      icon: 'CheckCircleFilled',
-                                      id: 'NetworkCreated',
-                                      type: 'success',
-                                    },
-                                    {
-                                      children:
-                                        this.i18n(
-                                          'i18n-j3czm9su41'
-                                        ) /* 已解散 */,
-                                      icon: 'CloseCircleFilled',
-                                      id: 'NetworkDissolved',
-                                      type: 'error',
-                                    },
-                                    {
-                                      children:
-                                        this.i18n(
-                                          'i18n-xtno2l9qqog'
-                                        ) /* 异常 */,
-                                      icon: 'CloseCircleFilled',
-                                      id: 'Error',
-                                      type: 'error',
-                                    },
-                                  ]}
-                                />
-                              ),
-                              key: 's3t5k3dk449',
-                              label: this.i18n('i18n-bik6xl952y6') /* 状态 */,
-                              span: 1,
-                            },
-                          ]}
-                          labelStyle={{ width: 100 }}
-                          layout="horizontal"
-                          size="default"
-                          title={__$$eval(
-                            () => this.props.useGetNetwork?.data?.network?.name
-                          )}
-                        >
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="r4gchd14zz"
-                            label={this.i18n('i18n-yyexdt18ora') /* 创建人 */}
-                            span={1}
-                            tab=""
-                          >
-                            {__$$eval(
-                              () =>
-                                this.props.useGetNetwork?.data?.network
-                                  ?.initiator?.admin || '-'
-                            )}
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="bdr5go2aun"
-                            label={this.i18n('i18n-4btnh7pqt1m') /* 成员个数 */}
-                            span={1}
-                            tab=""
-                          >
-                            {
-                              <Typography.Text
-                                __component_name="Typography.Text"
-                                disabled={false}
-                                ellipsis={true}
-                                strong={false}
-                                style={{ fontSize: '' }}
-                              >
-                                {__$$eval(
-                                  () =>
-                                    this.props.useGetNetwork?.data?.network
-                                      ?.organizations?.length || '0'
-                                )}
-                              </Typography.Text>
-                            }
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="o0cvbxwkrj"
-                            label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
-                            span={1}
-                          >
-                            {
-                              <Typography.Time
-                                __component_name="Typography.Time"
-                                format=""
-                                relativeTime={false}
-                                time={__$$eval(
-                                  () =>
-                                    this.props.useGetNetwork?.data?.network
-                                      ?.creationTimestamp
-                                )}
-                              />
-                            }
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="8ei6l6dk6xn"
-                            label={this.i18n('i18n-watjije0jk') /* 更新时间 */}
-                            span={1}
-                          >
-                            {
-                              <Typography.Time
-                                __component_name="Typography.Time"
-                                format=""
-                                relativeTime={false}
-                                time={__$$eval(
-                                  () =>
-                                    this.props.useGetNetwork?.data?.network
-                                      ?.lastHeartbeatTime
-                                )}
-                              />
-                            }
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="mljbt4bcmo"
-                            label={this.i18n('i18n-hbf63hki898') /* 版本 */}
-                            span={1}
-                          >
-                            {__$$eval(
-                              () =>
-                                this.props.useGetNetwork?.data?.network
-                                  ?.version || '-'
-                            )}
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="i1zeuy7pn4n"
-                            label={this.i18n('i18n-xgyxfdl8q') /* 共识组件 */}
-                            span={1}
-                          >
-                            {
-                              <Descriptions
-                                __component_name="Descriptions"
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{ marginBottom: '8px' }}
+                                      >
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-hyuo2wtk'
+                                            ) /* 网络节点 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '34px' }}
+                                            type="default"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data
+                                                  ?.network?.peers?.length ||
+                                                '0'
+                                            )}
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="default"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-hui8agoc'
+                                              ) /* 个 */
+                                            }
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-5jwxi1nlnsm'
+                                              ) /* 我创建的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.peers?.filter(
+                                                  (item) => item.createdByMe
+                                                )?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-9hsvtpuh'
+                                              ) /* 他人创建的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.peers?.filter(
+                                                  (item) => !item.createdByMe
+                                                )?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col span={6} style={{ paddingLeft: '56px' }}>
+                                    <Row
+                                      gutter={[0, 0]}
+                                      h-gutter={0}
+                                      v-gutter={0}
+                                      wrap={true}
+                                    >
+                                      <Col
+                                        span={24}
+                                        style={{ marginBottom: '8px' }}
+                                      >
+                                        <Typography.Title
+                                          bold={true}
+                                          bordered={false}
+                                          ellipsis={true}
+                                          level={2}
+                                        >
+                                          {
+                                            this.i18n(
+                                              'i18n-tmdw6s6q'
+                                            ) /* 网络组织 */
+                                          }
+                                        </Typography.Title>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '34px' }}
+                                            type="default"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data
+                                                  ?.network?.organizations
+                                                  ?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="default"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-hui8agoc'
+                                              ) /* 个 */
+                                            }
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-5jwxi1nlnsm'
+                                              ) /* 我创建的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.organizations?.filter(
+                                                  (item) =>
+                                                    item.admin ===
+                                                    this.props.authData?.user
+                                                      ?.name
+                                                )?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                      <Col span={24}>
+                                        <Space
+                                          align="center"
+                                          direction="horizontal"
+                                        >
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-9hsvtpuh'
+                                              ) /* 他人创建的 */
+                                            }
+                                          </Typography.Text>
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                            type="secondary"
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.organizations?.filter(
+                                                  (item) =>
+                                                    item.admin !==
+                                                    this.props.authData?.user
+                                                      ?.name
+                                                )?.length || '0'
+                                            )}
+                                          </Typography.Text>
+                                        </Space>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                </Row>
+                              </Col>
+                            </Row>
+                          </Card>
+                        </Col>
+                        <Col span={24}>
+                          <Row wrap={true}>
+                            <Col span={12}>
+                              <Card
+                                __component_name="Card"
+                                actions={[]}
                                 bordered={false}
-                                colon={true}
-                                column={1}
-                                items={[
-                                  {
-                                    children: __$$eval(
-                                      () =>
-                                        this.props.useGetNetwork?.data?.network
-                                          ?.ordererType
-                                    ),
-                                    key: 'ufknvxft0u',
-                                    label:
-                                      this.i18n(
-                                        'i18n-twykcar3l6l'
-                                      ) /* 共识算法 */,
-                                    span: 1,
-                                  },
-                                  {
-                                    _unsafe_MixedSetter_children_select:
-                                      'VariableSetter',
-                                    children: __$$eval(
-                                      () =>
-                                        this.props.useGetNetwork?.data?.network
-                                          ?.clusterSize
-                                    ),
-                                    key: '81dsq3cni9b',
-                                    label:
-                                      this.i18n(
-                                        'i18n-ax4swl3ryv7'
-                                      ) /* 集群大小 */,
-                                    span: 1,
-                                  },
-                                  {
-                                    children: null,
-                                    key: '634p9mdxipk',
-                                    label:
-                                      this.i18n(
-                                        'i18n-kqc5q3s99wo'
-                                      ) /* 节点数据库 */,
-                                    span: 1,
-                                  },
-                                ]}
-                                labelStyle={{ width: 100 }}
-                                layout="horizontal"
+                                hoverable={false}
+                                loading={false}
                                 size="default"
-                                title=""
+                                style={{ height: '280px' }}
+                                type="default"
                               >
-                                <Descriptions.Item
-                                  __component_name="Descriptions.Item"
-                                  key="ufknvxft0u"
-                                  label={
-                                    this.i18n('i18n-twykcar3l6l') /* 共识算法 */
-                                  }
-                                  span={1}
-                                >
-                                  {__$$eval(
-                                    () =>
-                                      this.props.useGetNetwork?.data?.network
-                                        ?.ordererType
-                                  )}
-                                </Descriptions.Item>
-                                <Descriptions.Item
-                                  __component_name="Descriptions.Item"
-                                  key="81dsq3cni9b"
-                                  label={
-                                    this.i18n('i18n-ax4swl3ryv7') /* 集群大小 */
-                                  }
-                                  span={1}
-                                >
-                                  {__$$eval(
-                                    () =>
-                                      this.props.useGetNetwork?.data?.network
-                                        ?.clusterSize
-                                  )}
-                                </Descriptions.Item>
-                                <Descriptions.Item
-                                  __component_name="Descriptions.Item"
-                                  key="634p9mdxipk"
-                                  label={
-                                    this.i18n(
-                                      'i18n-kqc5q3s99wo'
-                                    ) /* 节点数据库 */
-                                  }
-                                  span={1}
-                                >
-                                  {null}
-                                </Descriptions.Item>
-                              </Descriptions>
-                            }
-                          </Descriptions.Item>
-                          <Descriptions.Item
-                            __component_name="Descriptions.Item"
-                            key="s3t5k3dk449"
-                            label={this.i18n('i18n-bik6xl952y6') /* 状态 */}
-                            span={1}
-                          >
-                            {
-                              <Status
-                                __component_name="Status"
-                                id={__$$eval(
-                                  () =>
-                                    this.props.useGetNetwork?.data?.network
-                                      ?.status
-                                )}
-                                types={[
-                                  {
-                                    children:
-                                      this.i18n('i18n-zrowlr7zwx') /* 运行中 */,
-                                    icon: 'CheckCircleFilled',
-                                    id: 'NetworkCreated',
-                                    type: 'success',
-                                  },
-                                  {
-                                    children:
-                                      this.i18n('i18n-j3czm9su41') /* 已解散 */,
-                                    icon: 'CloseCircleFilled',
-                                    id: 'NetworkDissolved',
-                                    type: 'error',
-                                  },
-                                  {
-                                    children:
-                                      this.i18n('i18n-xtno2l9qqog') /* 异常 */,
-                                    icon: 'CloseCircleFilled',
-                                    id: 'Error',
-                                    type: 'error',
-                                  },
-                                  {
-                                    children:
-                                      this.i18n('i18n-1vangoko4yf') /* 正常 */,
-                                    icon: 'CheckCircleFilled',
-                                    id: 'Created',
-                                    type: 'success',
-                                  },
-                                ]}
-                              />
-                            }
-                          </Descriptions.Item>
-                        </Descriptions>
-                      </Spin>
-                    ),
-                    key: 'tab-item-1',
-                    label: this.i18n('i18n-y0o0zplhhom') /* 网络信息 */,
-                  },
-                  {
-                    children: (
-                      <Spin
-                        __component_name="Spin"
-                        spinning={__$$eval(
-                          () => this.props.useGetNetwork?.loading
-                        )}
+                                <Row wrap={true}>
+                                  <Col span={24}>
+                                    <Typography.Title
+                                      bold={true}
+                                      bordered={false}
+                                      ellipsis={true}
+                                      level={1}
+                                    >
+                                      {
+                                        this.i18n(
+                                          'i18n-w2pedy31'
+                                        ) /* 网络基础信息 */
+                                      }
+                                    </Typography.Title>
+                                  </Col>
+                                  <Col span={24}>
+                                    <Descriptions
+                                      bordered={false}
+                                      colon={false}
+                                      column={1}
+                                      items={[
+                                        {
+                                          children: __$$eval(
+                                            () =>
+                                              this.props.useGetNetwork?.data
+                                                ?.network?.name || '-'
+                                          ),
+                                          key: 'qzw93o3a9x',
+                                          label:
+                                            this.i18n(
+                                              'i18n-03e0p0acqmaf'
+                                            ) /* 网络名称 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: __$$eval(
+                                            () =>
+                                              this.props.useGetNetwork?.data
+                                                ?.network?.federation || '-'
+                                          ),
+                                          key: '8471pte3l38',
+                                          label:
+                                            this.i18n(
+                                              'i18n-dlxiuotq6z4'
+                                            ) /* 所属联盟 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: (
+                                            <Typography.Time
+                                              __component_name="Typography.Time"
+                                              format=""
+                                              relativeTime={false}
+                                              time={__$$eval(
+                                                () =>
+                                                  this.props.useGetNetwork?.data
+                                                    ?.network?.creationTimestamp
+                                              )}
+                                            />
+                                          ),
+                                          key: '1rtg8bikh7x',
+                                          label:
+                                            this.i18n(
+                                              'i18n-9ox4rx1wtwv'
+                                            ) /* 创建时间 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: (
+                                            <Typography.Time
+                                              __component_name="Typography.Time"
+                                              format=""
+                                              relativeTime={false}
+                                              time={__$$eval(
+                                                () =>
+                                                  this.props.useGetNetwork?.data
+                                                    ?.network?.lastHeartbeatTime
+                                              )}
+                                            />
+                                          ),
+                                          key: 'kwee4p37z5',
+                                          label:
+                                            this.i18n(
+                                              'i18n-watjije0jk'
+                                            ) /* 更新时间 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: (
+                                            <Status
+                                              __component_name="Status"
+                                              id={__$$eval(
+                                                () =>
+                                                  this.props.useGetNetwork?.data
+                                                    ?.network?.status
+                                              )}
+                                              types={[
+                                                {
+                                                  children:
+                                                    this.i18n(
+                                                      'i18n-zrowlr7zwx'
+                                                    ) /* 运行中 */,
+                                                  icon: 'CheckCircleFilled',
+                                                  id: 'NetworkCreated',
+                                                  type: 'success',
+                                                },
+                                                {
+                                                  children:
+                                                    this.i18n(
+                                                      'i18n-j3czm9su41'
+                                                    ) /* 已解散 */,
+                                                  icon: 'CloseCircleFilled',
+                                                  id: 'NetworkDissolved',
+                                                  type: 'error',
+                                                },
+                                                {
+                                                  children:
+                                                    this.i18n(
+                                                      'i18n-xtno2l9qqog'
+                                                    ) /* 异常 */,
+                                                  icon: 'CloseCircleFilled',
+                                                  id: 'Error',
+                                                  type: 'error',
+                                                },
+                                                {
+                                                  children:
+                                                    this.i18n(
+                                                      'i18n-1vangoko4yf'
+                                                    ) /* 正常 */,
+                                                  icon: 'CheckCircleFilled',
+                                                  id: 'Created',
+                                                  type: 'success',
+                                                },
+                                              ]}
+                                            />
+                                          ),
+                                          key: '63ec1gobtoj',
+                                          label:
+                                            this.i18n(
+                                              'i18n-bik6xl952y6'
+                                            ) /* 状态 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: __$$eval(
+                                            () =>
+                                              this.props.useGetNetwork?.data
+                                                ?.network?.description || '-'
+                                          ),
+                                          key: 't6buqal9rl7',
+                                          label:
+                                            this.i18n(
+                                              'i18n-wlgvrke3jz9'
+                                            ) /* 介绍 */,
+                                          span: 1,
+                                        },
+                                      ]}
+                                      labelStyle={{ width: 100 }}
+                                      layout="horizontal"
+                                      size="default"
+                                      title=" "
+                                    >
+                                      <Descriptions.Item
+                                        key="qzw93o3a9x"
+                                        label={
+                                          this.i18n(
+                                            'i18n-03e0p0acqmaf'
+                                          ) /* 网络名称 */
+                                        }
+                                        span={1}
+                                      >
+                                        {__$$eval(
+                                          () =>
+                                            this.props.useGetNetwork?.data
+                                              ?.network?.name || '-'
+                                        )}
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        key="8471pte3l38"
+                                        label={
+                                          this.i18n(
+                                            'i18n-dlxiuotq6z4'
+                                          ) /* 所属联盟 */
+                                        }
+                                        span={1}
+                                      >
+                                        {__$$eval(
+                                          () =>
+                                            this.props.useGetNetwork?.data
+                                              ?.network?.federation || '-'
+                                        )}
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        key="1rtg8bikh7x"
+                                        label={
+                                          this.i18n(
+                                            'i18n-9ox4rx1wtwv'
+                                          ) /* 创建时间 */
+                                        }
+                                        span={1}
+                                      >
+                                        {
+                                          <Typography.Time
+                                            __component_name="Typography.Time"
+                                            format=""
+                                            relativeTime={false}
+                                            time={__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data
+                                                  ?.network?.creationTimestamp
+                                            )}
+                                          />
+                                        }
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        key="kwee4p37z5"
+                                        label={
+                                          this.i18n(
+                                            'i18n-watjije0jk'
+                                          ) /* 更新时间 */
+                                        }
+                                        span={1}
+                                      >
+                                        {
+                                          <Typography.Time
+                                            __component_name="Typography.Time"
+                                            format=""
+                                            relativeTime={false}
+                                            time={__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data
+                                                  ?.network?.lastHeartbeatTime
+                                            )}
+                                          />
+                                        }
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        key="63ec1gobtoj"
+                                        label={
+                                          this.i18n(
+                                            'i18n-bik6xl952y6'
+                                          ) /* 状态 */
+                                        }
+                                        span={1}
+                                      >
+                                        {
+                                          <Status
+                                            __component_name="Status"
+                                            id={__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data
+                                                  ?.network?.status
+                                            )}
+                                            types={[
+                                              {
+                                                children:
+                                                  this.i18n(
+                                                    'i18n-zrowlr7zwx'
+                                                  ) /* 运行中 */,
+                                                icon: 'CheckCircleFilled',
+                                                id: 'NetworkCreated',
+                                                type: 'success',
+                                              },
+                                              {
+                                                children:
+                                                  this.i18n(
+                                                    'i18n-j3czm9su41'
+                                                  ) /* 已解散 */,
+                                                icon: 'CloseCircleFilled',
+                                                id: 'NetworkDissolved',
+                                                type: 'error',
+                                              },
+                                              {
+                                                children:
+                                                  this.i18n(
+                                                    'i18n-xtno2l9qqog'
+                                                  ) /* 异常 */,
+                                                icon: 'CloseCircleFilled',
+                                                id: 'Error',
+                                                type: 'error',
+                                              },
+                                              {
+                                                children:
+                                                  this.i18n(
+                                                    'i18n-1vangoko4yf'
+                                                  ) /* 正常 */,
+                                                icon: 'CheckCircleFilled',
+                                                id: 'Created',
+                                                type: 'success',
+                                              },
+                                              {
+                                                children:
+                                                  this.i18n(
+                                                    'i18n-1vangoko4yf'
+                                                  ) /* 正常 */,
+                                                icon: 'CheckCircleFilled',
+                                                id: 'Deployed',
+                                                type: 'success',
+                                              },
+                                            ]}
+                                          />
+                                        }
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        key="t6buqal9rl7"
+                                        label={
+                                          this.i18n(
+                                            'i18n-wlgvrke3jz9'
+                                          ) /* 介绍 */
+                                        }
+                                        span={1}
+                                      >
+                                        {__$$eval(
+                                          () =>
+                                            this.props.useGetNetwork?.data
+                                              ?.network?.description || '-'
+                                        )}
+                                      </Descriptions.Item>
+                                    </Descriptions>
+                                  </Col>
+                                </Row>
+                              </Card>
+                            </Col>
+                            <Col span={12}>
+                              <Card
+                                actions={[]}
+                                bordered={false}
+                                hoverable={false}
+                                loading={false}
+                                size="default"
+                                style={{ height: '280px' }}
+                                type="default"
+                              >
+                                <Row wrap={true}>
+                                  <Col span={24}>
+                                    <Typography.Title
+                                      bold={true}
+                                      bordered={false}
+                                      ellipsis={true}
+                                      level={1}
+                                    >
+                                      {
+                                        this.i18n(
+                                          'i18n-9axrd1ro'
+                                        ) /* 网络配置信息 */
+                                      }
+                                    </Typography.Title>
+                                  </Col>
+                                  <Col span={24}>
+                                    <Descriptions
+                                      __component_name="Descriptions"
+                                      bordered={false}
+                                      colon={false}
+                                      column={1}
+                                      items={[
+                                        {
+                                          children: __$$eval(
+                                            () =>
+                                              this.props.useGetNetwork?.data
+                                                ?.network?.version || '-'
+                                          ),
+                                          key: 'mljbt4bcmo',
+                                          label:
+                                            this.i18n(
+                                              'i18n-hbf63hki898'
+                                            ) /* 版本 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: (
+                                            <Space
+                                              align="center"
+                                              direction="horizontal"
+                                              size={0}
+                                            >
+                                              <Typography.Text
+                                                __component_name="Typography.Text"
+                                                disabled={false}
+                                                ellipsis={true}
+                                                strong={false}
+                                                style={{ fontSize: '' }}
+                                              >
+                                                {__$$eval(
+                                                  () =>
+                                                    this.props.useGetNetwork
+                                                      ?.data?.network?.limits
+                                                      ?.cpu || '-'
+                                                )}
+                                              </Typography.Text>
+                                              <Typography.Text
+                                                __component_name="Typography.Text"
+                                                disabled={false}
+                                                ellipsis={true}
+                                                strong={false}
+                                                style={{ fontSize: '' }}
+                                              >
+                                                {
+                                                  this.i18n(
+                                                    'i18n-m8df8p4v'
+                                                  ) /* 核CPU */
+                                                }
+                                              </Typography.Text>
+                                              <Typography.Text
+                                                __component_name="Typography.Text"
+                                                disabled={false}
+                                                ellipsis={true}
+                                                strong={false}
+                                                style={{ fontSize: '' }}
+                                              >
+                                                {__$$eval(
+                                                  () =>
+                                                    parseInt(
+                                                      this.props.useGetNetwork
+                                                        ?.data?.network?.limits
+                                                        ?.memory
+                                                    ) || '-'
+                                                )}
+                                              </Typography.Text>
+                                              <Typography.Text
+                                                __component_name="Typography.Text"
+                                                children=""
+                                                disabled={false}
+                                                ellipsis={true}
+                                                strong={false}
+                                                style={{ fontSize: '' }}
+                                              />
+                                              <Typography.Text
+                                                __component_name="Typography.Text"
+                                                disabled={false}
+                                                ellipsis={true}
+                                                strong={false}
+                                                style={{ fontSize: '' }}
+                                              >
+                                                {
+                                                  this.i18n(
+                                                    'i18n-3y2g20xr'
+                                                  ) /* G内存 */
+                                                }
+                                              </Typography.Text>
+                                            </Space>
+                                          ),
+                                          key: 'i1zeuy7pn4n',
+                                          label:
+                                            this.i18n(
+                                              'i18n-zjmh7vtphh'
+                                            ) /* 节点配置 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: (
+                                            <Typography.Text
+                                              disabled={false}
+                                              ellipsis={true}
+                                              strong={false}
+                                              style={{ fontSize: '' }}
+                                            >
+                                              200G
+                                            </Typography.Text>
+                                          ),
+                                          key: 'kj2e1dpjaw9',
+                                          label:
+                                            this.i18n(
+                                              'i18n-cbhoi5g6'
+                                            ) /* 节点存储 */,
+                                          span: 1,
+                                        },
+                                        {
+                                          children: 'LevelDB',
+                                          key: '5b1alq6y2aq',
+                                          label:
+                                            this.i18n(
+                                              'i18n-dgb9yehb'
+                                            ) /* 状态数据库类型 */,
+                                          span: 1,
+                                        },
+                                      ]}
+                                      labelStyle={{ width: 100 }}
+                                      layout="horizontal"
+                                      size="default"
+                                    >
+                                      <Descriptions.Item
+                                        __component_name="Descriptions.Item"
+                                        key="mljbt4bcmo"
+                                        label={
+                                          this.i18n(
+                                            'i18n-hbf63hki898'
+                                          ) /* 版本 */
+                                        }
+                                        span={1}
+                                      >
+                                        {__$$eval(
+                                          () =>
+                                            this.props.useGetNetwork?.data
+                                              ?.network?.version || '-'
+                                        )}
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        __component_name="Descriptions.Item"
+                                        key="i1zeuy7pn4n"
+                                        label={
+                                          this.i18n(
+                                            'i18n-zjmh7vtphh'
+                                          ) /* 节点配置 */
+                                        }
+                                        span={1}
+                                      >
+                                        {
+                                          <Space
+                                            align="center"
+                                            direction="horizontal"
+                                            size={0}
+                                          >
+                                            <Typography.Text
+                                              __component_name="Typography.Text"
+                                              disabled={false}
+                                              ellipsis={true}
+                                              strong={false}
+                                              style={{ fontSize: '' }}
+                                            >
+                                              {__$$eval(
+                                                () =>
+                                                  this.props.useGetNetwork?.data
+                                                    ?.network?.limits?.cpu ||
+                                                  '-'
+                                              )}
+                                            </Typography.Text>
+                                            <Typography.Text
+                                              __component_name="Typography.Text"
+                                              disabled={false}
+                                              ellipsis={true}
+                                              strong={false}
+                                              style={{ fontSize: '' }}
+                                            >
+                                              {
+                                                this.i18n(
+                                                  'i18n-m8df8p4v'
+                                                ) /* 核CPU */
+                                              }
+                                            </Typography.Text>
+                                            <Typography.Text
+                                              __component_name="Typography.Text"
+                                              disabled={false}
+                                              ellipsis={true}
+                                              strong={false}
+                                              style={{ fontSize: '' }}
+                                            >
+                                              {__$$eval(
+                                                () =>
+                                                  parseInt(
+                                                    this.props.useGetNetwork
+                                                      ?.data?.network?.limits
+                                                      ?.memory
+                                                  ) || '-'
+                                              )}
+                                            </Typography.Text>
+                                            <Typography.Text
+                                              __component_name="Typography.Text"
+                                              children=""
+                                              disabled={false}
+                                              ellipsis={true}
+                                              strong={false}
+                                              style={{ fontSize: '' }}
+                                            />
+                                            <Typography.Text
+                                              __component_name="Typography.Text"
+                                              disabled={false}
+                                              ellipsis={true}
+                                              strong={false}
+                                              style={{ fontSize: '' }}
+                                            >
+                                              {
+                                                this.i18n(
+                                                  'i18n-3y2g20xr'
+                                                ) /* G内存 */
+                                              }
+                                            </Typography.Text>
+                                          </Space>
+                                        }
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        key="kj2e1dpjaw9"
+                                        label={
+                                          this.i18n(
+                                            'i18n-cbhoi5g6'
+                                          ) /* 节点存储 */
+                                        }
+                                        span={1}
+                                      >
+                                        {
+                                          <Typography.Text
+                                            disabled={false}
+                                            ellipsis={true}
+                                            strong={false}
+                                            style={{ fontSize: '' }}
+                                          >
+                                            {__$$eval(
+                                              () =>
+                                                parseInt(
+                                                  this.props.useGetNetwork?.data
+                                                    ?.network?.storage
+                                                ) + 'G'
+                                            )}
+                                          </Typography.Text>
+                                        }
+                                      </Descriptions.Item>
+                                      <Descriptions.Item
+                                        key="5b1alq6y2aq"
+                                        label={
+                                          this.i18n(
+                                            'i18n-dgb9yehb'
+                                          ) /* 状态数据库类型 */
+                                        }
+                                        span={1}
+                                      >
+                                        LevelDB
+                                      </Descriptions.Item>
+                                    </Descriptions>
+                                  </Col>
+                                </Row>
+                              </Card>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Spin>
+                  ),
+                  key: 'network',
+                  label: this.i18n('i18n-frfw3d7j') /* 网络概览 */,
+                },
+                {
+                  children: (
+                    <Spin
+                      __component_name="Spin"
+                      spinning={__$$eval(
+                        () => this.props.useGetNetwork?.loading
+                      )}
+                    >
+                      <Card
+                        actions={[]}
+                        bordered={false}
+                        hoverable={false}
+                        loading={false}
+                        size="default"
+                        style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                        type="default"
                       >
                         <Table
                           __component_name="Table"
@@ -752,17 +3565,20 @@ class NetworkDetail$$Page extends React.Component {
                             eventDataList: [
                               {
                                 name: 'onChange',
-                                relatedEventName: 'handleUserTableChange',
+                                relatedEventName:
+                                  'handleOrganizationTableChange',
                                 type: 'componentEvent',
                               },
                               {
                                 name: 'pagination.onChange',
-                                relatedEventName: 'handleUserPaginationChange',
+                                relatedEventName:
+                                  'handleOrganizationPaginationChange',
                                 type: 'componentEvent',
                               },
                               {
                                 name: 'pagination.onShowSizeChange',
-                                relatedEventName: 'handleUserPaginationChange',
+                                relatedEventName:
+                                  'handleOrganizationPaginationChange',
                                 type: 'componentEvent',
                               },
                             ],
@@ -804,11 +3620,16 @@ class NetworkDetail$$Page extends React.Component {
                               dataIndex: 'name',
                               key: 'name',
                               title:
-                                this.i18n('i18n-gmx7l7tolvj') /* 成员组织 */,
+                                this.i18n('i18n-ycr2zketd3o') /* 组织名称 */,
                             },
                             {
-                              dataIndex: 'age',
+                              dataIndex: 'admin',
                               key: 'age',
+                              title: this.i18n('i18n-7ww60oxk') /* 创建者 */,
+                            },
+                            {
+                              dataIndex: 'ibppeers',
+                              key: 'num',
                               render: (text, record, index) =>
                                 ((__$$context) => (
                                   <Typography.Text
@@ -818,11 +3639,9 @@ class NetworkDetail$$Page extends React.Component {
                                     strong={false}
                                     style={{ fontSize: '' }}
                                   >
-                                    {
-                                      this.i18n(
-                                        'i18n-1g6cw1w1uv4'
-                                      ) /* 实名认证 */
-                                    }
+                                    {__$$eval(
+                                      () => record?.ibppeers?.length || '0'
+                                    )}
                                   </Typography.Text>
                                 ))(
                                   __$$createChildContext(__$$context, {
@@ -832,13 +3651,7 @@ class NetworkDetail$$Page extends React.Component {
                                   })
                                 ),
                               title:
-                                this.i18n('i18n-th9ag1qgsu') /* 认证信息 */,
-                            },
-                            {
-                              dataIndex: 'num',
-                              key: 'num',
-                              title:
-                                this.i18n('i18n-rs16rywzo') /* 加入节点个数 */,
+                                this.i18n('i18n-tzncutaq') /* 组织节点数 */,
                             },
                             {
                               dataIndex: 'joinedAt',
@@ -848,7 +3661,8 @@ class NetworkDetail$$Page extends React.Component {
                                   <Typography.Time
                                     __component_name="Typography.Time"
                                     format=""
-                                    time={__$$eval(() => text)}
+                                    relativeTime={false}
+                                    time={__$$eval(() => record?.joinedAt)}
                                   />
                                 ))(
                                   __$$createChildContext(__$$context, {
@@ -858,9 +3672,64 @@ class NetworkDetail$$Page extends React.Component {
                                   })
                                 ),
                               title:
-                                this.i18n(
-                                  'i18n-iku70tej4ja'
-                                ) /* 节点最近加入时间 */,
+                                this.i18n('i18n-c0d66z03kpk') /* 加入时间 */,
+                            },
+                            {
+                              dataIndex: 'status',
+                              key: 'status',
+                              render: (text, record, index) =>
+                                ((__$$context) => (
+                                  <Status
+                                    __component_name="Status"
+                                    id={__$$eval(() => record?.status)}
+                                    types={[
+                                      {
+                                        children:
+                                          this.i18n(
+                                            'i18n-1vangoko4yf'
+                                          ) /* 正常 */,
+                                        icon: 'CheckCircleFilled',
+                                        id: 'Deployed',
+                                        type: 'success',
+                                      },
+                                    ]}
+                                  />
+                                ))(
+                                  __$$createChildContext(__$$context, {
+                                    text,
+                                    record,
+                                    index,
+                                  })
+                                ),
+                              title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
+                            },
+                            {
+                              dataIndex: 'op',
+                              key: 'op',
+                              render: (text, record, index) =>
+                                ((__$$context) => (
+                                  <Button
+                                    __component_name="Button"
+                                    block={false}
+                                    danger={false}
+                                    disabled={false}
+                                    ghost={false}
+                                    href={__$$eval(
+                                      () => `/organization/${record.name}`
+                                    )}
+                                    shape="default"
+                                    type="link"
+                                  >
+                                    {this.i18n('i18n-m6n5fnxybu') /* 详情 */}
+                                  </Button>
+                                ))(
+                                  __$$createChildContext(__$$context, {
+                                    text,
+                                    record,
+                                    index,
+                                  })
+                                ),
+                              title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
                             },
                           ]}
                           dataSource={__$$eval(() =>
@@ -881,29 +3750,33 @@ class NetworkDetail$$Page extends React.Component {
                             })
                           )}
                           loading={__$$eval(
-                            () => this.props.useGetFederation?.loading
+                            () => this.props.useGetNetwork?.loading
                           )}
                           onChange={function () {
-                            this.handleUserTableChange.apply(
+                            return this.handleOrganizationTableChange.apply(
                               this,
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this)}
                           pagination={{
-                            current: __$$eval(() => this.state.userCurrent),
+                            current: __$$eval(
+                              () => this.state.organization.current
+                            ),
                             onChange: function () {
-                              this.handleUserPaginationChange.apply(
+                              return this.handleOrganizationPaginationChange.apply(
                                 this,
                                 Array.prototype.slice.call(arguments).concat([])
                               );
                             }.bind(this),
                             onShowSizeChange: function () {
-                              this.handleUserPaginationChange.apply(
+                              return this.handleOrganizationPaginationChange.apply(
                                 this,
                                 Array.prototype.slice.call(arguments).concat([])
                               );
                             }.bind(this),
-                            pageSize: __$$eval(() => this.state.userSize),
+                            pageSize: __$$eval(
+                              () => this.state.organization.size
+                            ),
                             showQuickJumper: false,
                             showSizeChanger: false,
                             showTotal: function () {
@@ -917,7 +3790,7 @@ class NetworkDetail$$Page extends React.Component {
                             total: __$$eval(
                               () =>
                                 (
-                                  this.props.useGetFederation?.data?.federation
+                                  this.props.useGetNetwork?.data?.network
                                     ?.organizations || []
                                 )?.length
                             ),
@@ -927,388 +3800,1438 @@ class NetworkDetail$$Page extends React.Component {
                           showHeader={true}
                           size="default"
                         />
-                      </Spin>
-                    ),
-                    key: 'tab-item-2',
-                    label: this.i18n('i18n-xinrdc2qk1f') /* 网络成员 */,
-                  },
-                ]}
-                size="large"
-                style={{ marginTop: '-20px' }}
-                tabPosition="top"
-                type="line"
-              />
-            </Card>
-          </Col>
-          <Col __component_name="Col" span={24}>
-            <Row __component_name="Row" justify="space-between" wrap={false}>
-              <Col __component_name="Col">
-                <Button
-                  __component_name="Button"
-                  __events={{
-                    eventDataList: [
-                      {
-                        name: 'onClick',
-                        relatedEventName: 'openAddChannelModal',
-                        type: 'componentEvent',
-                      },
-                    ],
-                    eventList: [
-                      {
-                        disabled: true,
-                        name: 'onClick',
-                        template:
-                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
-                      },
-                    ],
-                  }}
-                  block={false}
-                  danger={false}
-                  disabled={false}
-                  ghost={false}
-                  href=""
-                  icon={
-                    <Icon
-                      __component_name="Icon"
-                      size={12}
-                      style={{ marginRight: 3 }}
-                      type="PlusOutlined"
-                    />
-                  }
-                  onClick={function () {
-                    this.openAddChannelModal.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this)}
-                  shape="default"
-                  target="_self"
-                  type="primary"
-                >
-                  {this.i18n('i18n-snaon3b2fni') /* 新建通道 */}
-                </Button>
-              </Col>
-              <Col __component_name="Col">
-                <Space
-                  __component_name="Space"
-                  align="center"
-                  direction="horizontal"
-                  size="large"
-                >
-                  <Input.Search
-                    __component_name="Input.Search"
-                    __events={{
-                      eventDataList: [
-                        {
-                          name: 'onChange',
-                          relatedEventName: 'handleSearchValueChange',
-                          type: 'componentEvent',
-                        },
-                      ],
-                      eventList: [
-                        {
-                          disabled: true,
-                          name: 'onChange',
-                          template:
-                            "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onPressEnter',
-                          template:
-                            "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onSearch',
-                          template:
-                            "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onFocus',
-                          template:
-                            "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onKeyDown',
-                          template:
-                            "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onKeyPress',
-                          template:
-                            "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onKeyUp',
-                          template:
-                            "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
-                        },
-                        {
-                          disabled: false,
-                          name: 'onBlur',
-                          template:
-                            "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
-                        },
-                      ],
-                    }}
-                    onChange={function () {
-                      this.handleSearchValueChange.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this)}
-                    placeholder={
-                      this.i18n('i18n-ajsvl5v284r') /* 输入通道名称查询 */
-                    }
-                  />
-                </Space>
-              </Col>
-            </Row>
-          </Col>
-          <Col __component_name="Col" span={24}>
-            <Card
-              __component_name="Card"
-              actions={[]}
-              bordered={false}
-              hoverable={false}
-              loading={false}
-              size="default"
-              type="default"
-            >
-              <Table
-                __component_name="Table"
-                __events={{
-                  eventDataList: [
-                    {
-                      name: 'onChange',
-                      relatedEventName: 'handleTableChange',
-                      type: 'componentEvent',
-                    },
-                    {
-                      name: 'pagination.onChange',
-                      relatedEventName: 'handlePaginationChange',
-                      type: 'componentEvent',
-                    },
-                    {
-                      name: 'pagination.onShowSizeChange',
-                      relatedEventName: 'handlePaginationChange',
-                      type: 'componentEvent',
-                    },
-                  ],
-                  eventList: [
-                    {
-                      disabled: true,
-                      name: 'onChange',
-                      template:
-                        "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
-                    },
-                    {
-                      disabled: false,
-                      name: 'rowSelection.onChange',
-                      template:
-                        "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
-                    },
-                    {
-                      disabled: false,
-                      name: 'expandable.onExpand',
-                      template:
-                        "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
-                    },
-                    {
-                      disabled: true,
-                      name: 'pagination.onChange',
-                      template:
-                        "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
-                    },
-                    {
-                      disabled: true,
-                      name: 'pagination.onShowSizeChange',
-                      template:
-                        "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
-                    },
-                  ],
-                }}
-                columns={[
-                  {
-                    dataIndex: 'name',
-                    key: 'name',
-                    title: this.i18n('i18n-6oadzcxin7k') /* 通道名称 */,
-                  },
-                  {
-                    dataIndex: 'creator',
-                    key: 'creator',
-                    title: this.i18n('i18n-wctt13ld2x') /* 发起者 */,
-                  },
-                  {
-                    dataIndex: 'proposal',
-                    key: 'proposal',
-                    render: (text, record, index) =>
-                      ((__$$context) => (
-                        <Typography.Text
-                          __component_name="Typography.Text"
-                          disabled={false}
-                          ellipsis={true}
-                          strong={false}
-                          style={{ fontSize: '' }}
-                        >
-                          {__$$eval(() => text?.length || 0)}
-                        </Typography.Text>
-                      ))(
-                        __$$createChildContext(__$$context, {
-                          text,
-                          record,
-                          index,
-                        })
-                      ),
-                    title: this.i18n('i18n-4idd49uxsod') /* 相关提议 */,
-                  },
-                  {
-                    dataIndex: 'clusterSize',
-                    key: 'clusterSize',
-                    title: this.i18n('i18n-4btnh7pqt1m') /* 成员个数 */,
-                  },
-                  {
-                    dataIndex: 'creationTimestamp',
-                    key: 'creationTimestamp',
-                    render: (text, record, index) =>
-                      ((__$$context) => (
-                        <Typography.Time
-                          __component_name="Typography.Time"
-                          format=""
-                          relativeTime={false}
-                          time={__$$eval(() => text)}
-                        />
-                      ))(
-                        __$$createChildContext(__$$context, {
-                          text,
-                          record,
-                          index,
-                        })
-                      ),
-                    title: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
-                  },
-                  {
-                    dataIndex: 'number',
-                    key: 'number',
-                    render: (text, record, index) =>
-                      ((__$$context) => (
-                        <Typography.Time
-                          __component_name="Typography.Time"
-                          format=""
-                          time={__$$eval(() => text)}
-                        />
-                      ))(
-                        __$$createChildContext(__$$context, {
-                          text,
-                          record,
-                          index,
-                        })
-                      ),
-                    title: this.i18n('i18n-kh6e0jr0i7b') /* 节点数量 */,
-                  },
-                  {
-                    dataIndex: 'status',
-                    key: 'status',
-                    title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
-                  },
-                  {
-                    dataIndex: 'op',
-                    key: 'op',
-                    title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
-                  },
-                ]}
-                dataSource={__$$eval(() =>
-                  (
-                    this.props.useGetFederation?.data?.federation?.networks ||
-                    []
-                  )
-                    ?.filter((item) => {
-                      return this.state.searchValue
-                        ? item.name?.includes(this.state.searchValue)
-                        : true;
-                    })
-                    ?.sort((a, b) => {
-                      if (this.state.sorter?.order !== 'ascend') {
-                        return (
-                          new Date(b.creationTimestamp).getTime() -
-                          new Date(a.creationTimestamp).getTime()
-                        );
-                      }
-                      return (
-                        new Date(a.creationTimestamp).getTime() -
-                        new Date(b.creationTimestamp).getTime()
-                      );
-                    })
-                )}
-                loading={__$$eval(() => this.props.useGetNetwork?.loading)}
-                onChange={function () {
-                  this.handleTableChange.apply(
-                    this,
-                    Array.prototype.slice.call(arguments).concat([])
-                  );
-                }.bind(this)}
-                pagination={{
-                  current: __$$eval(() => this.state.current),
-                  onChange: function () {
-                    this.handlePaginationChange.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  onShowSizeChange: function () {
-                    this.handlePaginationChange.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  pageSize: __$$eval(() => this.state.size),
-                  showQuickJumper: false,
-                  showSizeChanger: false,
-                  showTotal: function () {
-                    return this.paginationShowTotal.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  simple: false,
-                  size: 'default',
-                  total: __$$eval(
-                    () =>
-                      ((
-                        this.props.useGetFederation?.data?.federation
-                          ?.networks || []
-                      )
-                        ?.filter((item) => {
-                          return this.state.searchValue
-                            ? item.name?.includes(this.state.searchValue)
-                            : true;
-                        })
-                        ?.sort((a, b) => {
-                          if (this.state.sorter?.order !== 'ascend') {
-                            return (
-                              new Date(b.creationTimestamp).getTime() -
-                              new Date(a.creationTimestamp).getTime()
-                            );
-                          }
-                          return (
-                            new Date(a.creationTimestamp).getTime() -
-                            new Date(b.creationTimestamp).getTime()
-                          );
-                        })).length
+                      </Card>
+                    </Spin>
                   ),
-                }}
-                rowKey="name"
-                scroll={{ scrollToFirstRowOnChange: true }}
-                showHeader={true}
-                size="default"
-                style={{ marginTop: '-20px' }}
-              />
-            </Card>
+                  key: 'organization',
+                  label: this.i18n('i18n-54sfaqivd5i') /* 组织管理 */,
+                },
+                {
+                  children: (
+                    <Card
+                      actions={[]}
+                      bordered={false}
+                      hoverable={false}
+                      loading={false}
+                      size="default"
+                      style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                      type="default"
+                    >
+                      <Row wrap={true}>
+                        <Col __component_name="Col" span={24}>
+                          <Row
+                            __component_name="Row"
+                            justify="space-between"
+                            wrap={false}
+                          >
+                            <Col __component_name="Col">
+                              <Button
+                                __component_name="Button"
+                                __events={{
+                                  eventDataList: [
+                                    {
+                                      name: 'onClick',
+                                      relatedEventName: 'openAddChannelModal',
+                                      type: 'componentEvent',
+                                    },
+                                  ],
+                                  eventList: [
+                                    {
+                                      disabled: true,
+                                      name: 'onClick',
+                                      template:
+                                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    },
+                                  ],
+                                }}
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                href=""
+                                icon={
+                                  <Icon
+                                    __component_name="Icon"
+                                    size={12}
+                                    style={{ marginRight: 3 }}
+                                    type="PlusOutlined"
+                                  />
+                                }
+                                onClick={function () {
+                                  this.openAddChannelModal.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([])
+                                  );
+                                }.bind(this)}
+                                shape="default"
+                                target="_self"
+                                type="primary"
+                              >
+                                {this.i18n('i18n-snaon3b2fni') /* 新建通道 */}
+                              </Button>
+                            </Col>
+                            <Col __component_name="Col">
+                              <Space
+                                __component_name="Space"
+                                align="center"
+                                direction="horizontal"
+                                size="large"
+                              >
+                                <Input.Search
+                                  __component_name="Input.Search"
+                                  __events={{
+                                    eventDataList: [
+                                      {
+                                        name: 'onChange',
+                                        relatedEventName:
+                                          'handleChannelSearchValueChange',
+                                        type: 'componentEvent',
+                                      },
+                                    ],
+                                    eventList: [
+                                      {
+                                        disabled: true,
+                                        name: 'onChange',
+                                        template:
+                                          "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onPressEnter',
+                                        template:
+                                          "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onSearch',
+                                        template:
+                                          "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onFocus',
+                                        template:
+                                          "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyDown',
+                                        template:
+                                          "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyPress',
+                                        template:
+                                          "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyUp',
+                                        template:
+                                          "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onBlur',
+                                        template:
+                                          "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
+                                      },
+                                    ],
+                                  }}
+                                  onChange={function () {
+                                    return this.handleChannelSearchValueChange.apply(
+                                      this,
+                                      Array.prototype.slice
+                                        .call(arguments)
+                                        .concat([])
+                                    );
+                                  }.bind(this)}
+                                  placeholder={
+                                    this.i18n(
+                                      'i18n-ajsvl5v284r'
+                                    ) /* 输入通道名称查询 */
+                                  }
+                                />
+                              </Space>
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col __component_name="Col" span={24}>
+                          <Table
+                            __component_name="Table"
+                            __events={{
+                              eventDataList: [
+                                {
+                                  name: 'onChange',
+                                  relatedEventName: 'handleChannelTableChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onChange',
+                                  relatedEventName:
+                                    'handleChannelPaginationChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onShowSizeChange',
+                                  relatedEventName:
+                                    'handleChannelPaginationChange',
+                                  type: 'componentEvent',
+                                },
+                              ],
+                              eventList: [
+                                {
+                                  disabled: true,
+                                  name: 'onChange',
+                                  template:
+                                    "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
+                                },
+                                {
+                                  disabled: false,
+                                  name: 'rowSelection.onChange',
+                                  template:
+                                    "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
+                                },
+                                {
+                                  disabled: false,
+                                  name: 'expandable.onExpand',
+                                  template:
+                                    "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
+                                },
+                                {
+                                  disabled: true,
+                                  name: 'pagination.onChange',
+                                  template:
+                                    "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
+                                },
+                                {
+                                  disabled: true,
+                                  name: 'pagination.onShowSizeChange',
+                                  template:
+                                    "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
+                                },
+                              ],
+                            }}
+                            columns={[
+                              {
+                                dataIndex: 'name',
+                                key: 'name',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Button
+                                      __component_name="Button"
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      href={__$$eval(
+                                        () =>
+                                          `/network/detail/${__$$context.match?.params?.id}/channel/${record?.name}`
+                                      )}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {__$$eval(() => record.name || '-')}
+                                    </Button>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title:
+                                  this.i18n('i18n-6oadzcxin7k') /* 通道名称 */,
+                              },
+                              {
+                                dataIndex: 'members',
+                                key: 'members',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {__$$eval(
+                                        () => record?.members?.length || '0'
+                                      )}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title:
+                                  this.i18n('i18n-76uxs6ht') /* 组织数量 */,
+                              },
+                              {
+                                dataIndex: 'peers',
+                                key: 'peers',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {__$$eval(
+                                        () =>
+                                          record?.peers?.map(
+                                            (item) => item.name
+                                          ) || '-'
+                                      )}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title:
+                                  this.i18n('i18n-4cpogden') /* 我的节点 */,
+                              },
+                              {
+                                dataIndex: 'creationTimestamp',
+                                key: 'creationTimestamp',
+                                title:
+                                  this.i18n('i18n-4lrtaenb') /* 合约数量 */,
+                              },
+                              {
+                                dataIndex: 'joinedAt',
+                                key: 'joinedAt',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Time
+                                      __component_name="Typography.Time"
+                                      format=""
+                                      relativeTime={false}
+                                      time={__$$eval(() => record?.joinedAt)}
+                                    />
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title:
+                                  this.i18n('i18n-c0d66z03kpk') /* 加入时间 */,
+                              },
+                              {
+                                dataIndex: 'status',
+                                key: 'status',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Status
+                                      __component_name="Status"
+                                      id="disabled"
+                                      types={[
+                                        {
+                                          children:
+                                            this.i18n(
+                                              'i18n-1vangoko4yf'
+                                            ) /* 正常 */,
+                                          icon: 'CheckCircleFilled',
+                                          id: 'Deployed',
+                                          type: 'success',
+                                        },
+                                        {
+                                          children:
+                                            this.i18n(
+                                              'i18n-1vangoko4yf'
+                                            ) /* 正常 */,
+                                          icon: 'CheckCircleFilled',
+                                          id: 'Deploying',
+                                          type: 'success',
+                                        },
+                                        {
+                                          children:
+                                            this.i18n(
+                                              'i18n-xtno2l9qqog'
+                                            ) /* 异常 */,
+                                          icon: 'CloseCircleFilled',
+                                          id: 'Error',
+                                          type: 'error',
+                                        },
+                                      ]}
+                                    />
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
+                              },
+                              {
+                                dataIndex: 'op',
+                                key: 'op',
+                                render: (text, record, index) =>
+                                  ((__$$context) => [
+                                    <Button
+                                      __component_name="Button"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            name: 'onClick',
+                                            paramStr:
+                                              '{\n \t "record": this.record \n}',
+                                            relatedEventName:
+                                              'openAddChannelOrganizationModal',
+                                            type: 'componentEvent',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            disabled: true,
+                                            name: 'onClick',
+                                            template:
+                                              "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          },
+                                        ],
+                                      }}
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      onClick={function () {
+                                        return this.openAddChannelOrganizationModal.apply(
+                                          this,
+                                          Array.prototype.slice
+                                            .call(arguments)
+                                            .concat([
+                                              {
+                                                record: record,
+                                              },
+                                            ])
+                                        );
+                                      }.bind(__$$context)}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {
+                                        this.i18n(
+                                          'i18n-ddvens87'
+                                        ) /* 邀请组织 */
+                                      }
+                                    </Button>,
+                                    <Button
+                                      __component_name="Button"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            name: 'onClick',
+                                            paramStr:
+                                              '{\n \t "record":this.record \n}',
+                                            relatedEventName:
+                                              'openAddChannelPeerModal',
+                                            type: 'componentEvent',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            disabled: true,
+                                            name: 'onClick',
+                                            template:
+                                              "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          },
+                                        ],
+                                      }}
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      onClick={function () {
+                                        return this.openAddChannelPeerModal.apply(
+                                          this,
+                                          Array.prototype.slice
+                                            .call(arguments)
+                                            .concat([
+                                              {
+                                                record: record,
+                                              },
+                                            ])
+                                        );
+                                      }.bind(__$$context)}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {
+                                        this.i18n(
+                                          'i18n-bxsxgogh'
+                                        ) /* 加入节点 */
+                                      }
+                                    </Button>,
+                                  ])(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
+                              },
+                            ]}
+                            dataSource={__$$eval(() =>
+                              (
+                                this.props.useGetNetwork?.data?.network
+                                  ?.channels || []
+                              )
+                                ?.filter((item) => {
+                                  return this.state.channel.searchValue
+                                    ? item.name?.includes(
+                                        this.state.channel.searchValue
+                                      )
+                                    : true;
+                                })
+                                ?.sort((a, b) => {
+                                  if (this.state.sorter?.order !== 'ascend') {
+                                    return (
+                                      new Date(b.joinedAt).getTime() -
+                                      new Date(a.joinedAt).getTime()
+                                    );
+                                  }
+                                  return (
+                                    new Date(a.joinedAt).getTime() -
+                                    new Date(b.joinedAt).getTime()
+                                  );
+                                })
+                            )}
+                            loading={__$$eval(
+                              () => this.props.useGetNetwork?.loading
+                            )}
+                            onChange={function () {
+                              return this.handleChannelTableChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            pagination={{
+                              current: __$$eval(
+                                () => this.state.channel.current
+                              ),
+                              onChange: function () {
+                                return this.handleChannelPaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              onShowSizeChange: function () {
+                                return this.handleChannelPaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              pageSize: __$$eval(() => this.state.channel.size),
+                              showQuickJumper: false,
+                              showSizeChanger: false,
+                              showTotal: function () {
+                                return this.paginationShowTotal.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              simple: false,
+                              size: 'default',
+                              total: __$$eval(
+                                () =>
+                                  ((
+                                    this.props.useGetNetwork?.data?.network
+                                      ?.channels || []
+                                  )?.filter((item) => {
+                                    return this.state.channel.searchValue
+                                      ? item.name?.includes(
+                                          this.state.channel.searchValue
+                                        )
+                                      : true;
+                                  })).length
+                              ),
+                            }}
+                            rowKey="name"
+                            scroll={{ scrollToFirstRowOnChange: true }}
+                            showHeader={true}
+                            size="default"
+                            style={{ marginTop: '-20px' }}
+                          />
+                        </Col>
+                      </Row>
+                    </Card>
+                  ),
+                  key: 'channel',
+                  label: this.i18n('i18n-pjvvvoe9') /* 通道管理 */,
+                },
+                {
+                  children: (
+                    <Card
+                      actions={[]}
+                      bordered={false}
+                      hoverable={false}
+                      loading={false}
+                      size="default"
+                      style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                      type="default"
+                    >
+                      <Row wrap={true}>
+                        <Col __component_name="Col" span={24}>
+                          <Row
+                            __component_name="Row"
+                            justify="space-between"
+                            wrap={false}
+                          >
+                            <Col __component_name="Col">
+                              <Button
+                                __component_name="Button"
+                                __events={{
+                                  eventDataList: [
+                                    {
+                                      name: 'onClick',
+                                      relatedEventName: 'openAddContractModal',
+                                      type: 'componentEvent',
+                                    },
+                                  ],
+                                  eventList: [
+                                    {
+                                      disabled: true,
+                                      name: 'onClick',
+                                      template:
+                                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    },
+                                  ],
+                                }}
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                href=""
+                                icon={
+                                  <Icon
+                                    __component_name="Icon"
+                                    size={12}
+                                    style={{ marginRight: 3 }}
+                                    type="PlusOutlined"
+                                  />
+                                }
+                                onClick={function () {
+                                  return this.openAddContractModal.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([])
+                                  );
+                                }.bind(this)}
+                                shape="default"
+                                target="_self"
+                                type="primary"
+                              >
+                                {this.i18n('i18n-2rczbtzx') /* 新建合约 */}
+                              </Button>
+                            </Col>
+                            <Col __component_name="Col">
+                              <Space
+                                __component_name="Space"
+                                align="center"
+                                direction="horizontal"
+                                size="large"
+                              >
+                                <Input.Search
+                                  __component_name="Input.Search"
+                                  __events={{
+                                    eventDataList: [
+                                      {
+                                        name: 'onChange',
+                                        relatedEventName:
+                                          'handleContractSearchValueChange',
+                                        type: 'componentEvent',
+                                      },
+                                    ],
+                                    eventList: [
+                                      {
+                                        disabled: true,
+                                        name: 'onChange',
+                                        template:
+                                          "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onPressEnter',
+                                        template:
+                                          "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onSearch',
+                                        template:
+                                          "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onFocus',
+                                        template:
+                                          "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyDown',
+                                        template:
+                                          "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyPress',
+                                        template:
+                                          "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyUp',
+                                        template:
+                                          "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onBlur',
+                                        template:
+                                          "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
+                                      },
+                                    ],
+                                  }}
+                                  onChange={function () {
+                                    return this.handleContractSearchValueChange.apply(
+                                      this,
+                                      Array.prototype.slice
+                                        .call(arguments)
+                                        .concat([])
+                                    );
+                                  }.bind(this)}
+                                  placeholder={
+                                    this.i18n(
+                                      'i18n-rlwqgw1a'
+                                    ) /* 输入合约名称查询 */
+                                  }
+                                />
+                              </Space>
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col __component_name="Col" span={24}>
+                          <Table
+                            __component_name="Table"
+                            __events={{
+                              eventDataList: [
+                                {
+                                  name: 'onChange',
+                                  relatedEventName: 'handleChannelTableChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onChange',
+                                  relatedEventName:
+                                    'handleChannelPaginationChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onShowSizeChange',
+                                  relatedEventName:
+                                    'handleChannelPaginationChange',
+                                  type: 'componentEvent',
+                                },
+                              ],
+                              eventList: [
+                                {
+                                  disabled: true,
+                                  name: 'onChange',
+                                  template:
+                                    "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
+                                },
+                                {
+                                  disabled: false,
+                                  name: 'rowSelection.onChange',
+                                  template:
+                                    "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
+                                },
+                                {
+                                  disabled: false,
+                                  name: 'expandable.onExpand',
+                                  template:
+                                    "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
+                                },
+                                {
+                                  disabled: true,
+                                  name: 'pagination.onChange',
+                                  template:
+                                    "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
+                                },
+                                {
+                                  disabled: true,
+                                  name: 'pagination.onShowSizeChange',
+                                  template:
+                                    "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
+                                },
+                              ],
+                            }}
+                            columns={[
+                              {
+                                dataIndex: 'name',
+                                key: 'name',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Button
+                                      __component_name="Button"
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      href={__$$eval(
+                                        () =>
+                                          `/network/detail/${__$$context.match?.params?.id}/contract/${record?.name}`
+                                      )}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {__$$eval(() => record.name)}
+                                    </Button>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title:
+                                  this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
+                              },
+                              {
+                                dataIndex: 'version',
+                                key: 'version',
+                                title: this.i18n('i18n-hbf63hki898') /* 版本 */,
+                              },
+                              {
+                                dataIndex: 'source',
+                                key: 'source',
+                                render: '',
+                                title:
+                                  this.i18n('i18n-1vlhlgh9') /* 合约来源 */,
+                              },
+                              {
+                                dataIndex: 'node',
+                                key: 'node',
+                                title:
+                                  this.i18n('i18n-jhpf4qg9') /* 部署节点 */,
+                              },
+                              {
+                                dataIndex: 'channels',
+                                key: 'channels',
+                                title:
+                                  this.i18n('i18n-dmz1d3cr') /* 部署通道数 */,
+                              },
+                              {
+                                dataIndex: 'creationTimestamp',
+                                key: 'creationTimestamp',
+                                title:
+                                  this.i18n('i18n-4lrtaenb') /* 合约数量 */,
+                              },
+                              {
+                                dataIndex: 'op',
+                                key: 'op',
+                                render: (text, record, index) =>
+                                  ((__$$context) => [
+                                    <Button
+                                      __component_name="Button"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            name: 'onClick',
+                                            paramStr:
+                                              '{\n \t "record": this.record \n}',
+                                            relatedEventName:
+                                              'openDeploymentContractModal',
+                                            type: 'componentEvent',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            disabled: true,
+                                            name: 'onClick',
+                                            template:
+                                              "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          },
+                                        ],
+                                      }}
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      onClick={function () {
+                                        return this.openDeploymentContractModal.apply(
+                                          this,
+                                          Array.prototype.slice
+                                            .call(arguments)
+                                            .concat([
+                                              {
+                                                record: record,
+                                              },
+                                            ])
+                                        );
+                                      }.bind(__$$context)}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {this.i18n('i18n-7xujsaya') /* 部署 */}
+                                    </Button>,
+                                    <Button
+                                      __component_name="Button"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            name: 'onClick',
+                                            paramStr:
+                                              '{\n \t "record": this.record \n}',
+                                            relatedEventName:
+                                              'openUpgradeContractModal',
+                                            type: 'componentEvent',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            disabled: true,
+                                            name: 'onClick',
+                                            template:
+                                              "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          },
+                                        ],
+                                      }}
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      onClick={function () {
+                                        return this.openUpgradeContractModal.apply(
+                                          this,
+                                          Array.prototype.slice
+                                            .call(arguments)
+                                            .concat([
+                                              {
+                                                record: record,
+                                              },
+                                            ])
+                                        );
+                                      }.bind(__$$context)}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {this.i18n('i18n-w8nbxtmd') /* 升级 */}
+                                    </Button>,
+                                    <Button
+                                      __component_name="Button"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            name: 'onClick',
+                                            paramStr:
+                                              '{\n \t "record":this.record \n}',
+                                            relatedEventName:
+                                              'openDeleteContractModal',
+                                            type: 'componentEvent',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            disabled: true,
+                                            name: 'onClick',
+                                            template:
+                                              "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          },
+                                        ],
+                                      }}
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      onClick={function () {
+                                        return this.openDeleteContractModal.apply(
+                                          this,
+                                          Array.prototype.slice
+                                            .call(arguments)
+                                            .concat([
+                                              {
+                                                record: record,
+                                              },
+                                            ])
+                                        );
+                                      }.bind(__$$context)}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {this.i18n('i18n-ias68eipm18') /* 删除 */}
+                                    </Button>,
+                                  ])(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
+                              },
+                            ]}
+                            dataSource={__$$eval(() =>
+                              (
+                                this.props.useGetNetwork?.data?.network?.hy ||
+                                []
+                              )
+                                ?.filter((item) => {
+                                  return this.state.channel.searchValue
+                                    ? item.name?.includes(
+                                        this.state.channel.searchValue
+                                      )
+                                    : true;
+                                })
+                                ?.sort((a, b) => {
+                                  if (this.state.sorter?.order !== 'ascend') {
+                                    return (
+                                      new Date(b.joinedAt).getTime() -
+                                      new Date(a.joinedAt).getTime()
+                                    );
+                                  }
+                                  return (
+                                    new Date(a.joinedAt).getTime() -
+                                    new Date(b.joinedAt).getTime()
+                                  );
+                                })
+                            )}
+                            loading={__$$eval(
+                              () => this.props.useGetNetwork?.loading
+                            )}
+                            onChange={function () {
+                              return this.handleChannelTableChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            pagination={{
+                              current: __$$eval(
+                                () => this.state.contract.current
+                              ),
+                              onChange: function () {
+                                return this.handleChannelPaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              onShowSizeChange: function () {
+                                return this.handleChannelPaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              pageSize: __$$eval(
+                                () => this.state.contract.size
+                              ),
+                              showQuickJumper: false,
+                              showSizeChanger: false,
+                              showTotal: function () {
+                                return this.paginationShowTotal.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              simple: false,
+                              size: 'default',
+                              total: __$$eval(
+                                () =>
+                                  ((
+                                    this.props.useGetNetwork?.data?.network
+                                      ?.hy || []
+                                  )?.filter((item) => {
+                                    return this.state.channel.searchValue
+                                      ? item.name?.includes(
+                                          this.state.channel.searchValue
+                                        )
+                                      : true;
+                                  })).length
+                              ),
+                            }}
+                            rowKey="name"
+                            scroll={{ scrollToFirstRowOnChange: true }}
+                            showHeader={true}
+                            size="default"
+                            style={{ marginTop: '-20px' }}
+                          />
+                        </Col>
+                      </Row>
+                    </Card>
+                  ),
+                  key: 'contract',
+                  label: this.i18n('i18n-5wdi9bc5') /* 合约管理 */,
+                },
+                {
+                  children: (
+                    <Card
+                      actions={[]}
+                      bordered={false}
+                      hoverable={false}
+                      loading={false}
+                      size="default"
+                      style={{ marginLeft: '-20px', marginTop: '-16px' }}
+                      type="default"
+                    >
+                      <Row wrap={true}>
+                        <Col __component_name="Col" span={24}>
+                          <Row
+                            __component_name="Row"
+                            justify="space-between"
+                            wrap={false}
+                          >
+                            <Col __component_name="Col">
+                              <Button
+                                __component_name="Button"
+                                __events={{
+                                  eventDataList: [
+                                    {
+                                      name: 'onClick',
+                                      relatedEventName: 'openAddStrategyModal',
+                                      type: 'componentEvent',
+                                    },
+                                  ],
+                                  eventList: [
+                                    {
+                                      disabled: true,
+                                      name: 'onClick',
+                                      template:
+                                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    },
+                                  ],
+                                }}
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                href=""
+                                icon={
+                                  <Icon
+                                    __component_name="Icon"
+                                    size={12}
+                                    style={{ marginRight: 3 }}
+                                    type="PlusOutlined"
+                                  />
+                                }
+                                onClick={function () {
+                                  return this.openAddStrategyModal.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([])
+                                  );
+                                }.bind(this)}
+                                shape="default"
+                                target="_self"
+                                type="primary"
+                              >
+                                {this.i18n('i18n-6pygp0ks') /* 新增背书策略 */}
+                              </Button>
+                            </Col>
+                            <Col __component_name="Col">
+                              <Space
+                                __component_name="Space"
+                                align="center"
+                                direction="horizontal"
+                                size="large"
+                              >
+                                <Input.Search
+                                  __component_name="Input.Search"
+                                  __events={{
+                                    eventDataList: [
+                                      {
+                                        name: 'onChange',
+                                        relatedEventName:
+                                          'handleContractSearchValueChange',
+                                        type: 'componentEvent',
+                                      },
+                                    ],
+                                    eventList: [
+                                      {
+                                        disabled: true,
+                                        name: 'onChange',
+                                        template:
+                                          "onChange(event,${extParams}){\n// 输入框内容变化时的回调\nconsole.log('onChange',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onPressEnter',
+                                        template:
+                                          "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onSearch',
+                                        template:
+                                          "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onFocus',
+                                        template:
+                                          "onFocus(event,${extParams}){\n// 获取焦点回调\nconsole.log('onFocus',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyDown',
+                                        template:
+                                          "onKeyDown(event,${extParams}){\n// 按键按下时的回调\nconsole.log('onKeyDown',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyPress',
+                                        template:
+                                          "onKeyPress(event,${extParams}){\n// 按键按下后的回调\nconsole.log('onKeyPress',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onKeyUp',
+                                        template:
+                                          "onKeyUp(event,${extParams}){\n// 按键释放回调\nconsole.log('onKeyUp',event);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'onBlur',
+                                        template:
+                                          "onBlur(event,${extParams}){\n// 按键释放回调\nconsole.log('onBlur',event);}",
+                                      },
+                                    ],
+                                  }}
+                                  onChange={function () {
+                                    return this.handleContractSearchValueChange.apply(
+                                      this,
+                                      Array.prototype.slice
+                                        .call(arguments)
+                                        .concat([])
+                                    );
+                                  }.bind(this)}
+                                  placeholder={
+                                    this.i18n(
+                                      'i18n-rlwqgw1a'
+                                    ) /* 输入合约名称查询 */
+                                  }
+                                />
+                              </Space>
+                            </Col>
+                          </Row>
+                        </Col>
+                        <Col __component_name="Col" span={24}>
+                          <Table
+                            __component_name="Table"
+                            __events={{
+                              eventDataList: [
+                                {
+                                  name: 'onChange',
+                                  relatedEventName: 'handleStrategyTableChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onChange',
+                                  relatedEventName:
+                                    'handleStrategyPaginationChange',
+                                  type: 'componentEvent',
+                                },
+                                {
+                                  name: 'pagination.onShowSizeChange',
+                                  relatedEventName:
+                                    'handleStrategyPaginationChange',
+                                  type: 'componentEvent',
+                                },
+                              ],
+                              eventList: [
+                                {
+                                  disabled: true,
+                                  name: 'onChange',
+                                  template:
+                                    "onChange(pagination,filters,sorter,extra,${extParams}){\n// 表格翻页事件\nconsole.log('onChange', pagination);}",
+                                },
+                                {
+                                  disabled: false,
+                                  name: 'rowSelection.onChange',
+                                  template:
+                                    "onRowSelectionChange(selectedRowKeys,selectedRows,${extParams}){\n// 选中项发生变化时的回调\nconsole.log('onRowSelectionChange', selectedRowKeys, selectedRows);}",
+                                },
+                                {
+                                  disabled: false,
+                                  name: 'expandable.onExpand',
+                                  template:
+                                    "onExpandableExpand(expanded,record){\n// 点击展开图标时触发\nconsole.log('onRowSelectionChange', expanded, record);}",
+                                },
+                                {
+                                  disabled: true,
+                                  name: 'pagination.onChange',
+                                  template:
+                                    "onPaginationChange(page, pageSize){\n// 页码或 pageSize 改变的回调  \nconsole.log('onPaginationChange', page, pageSize);}",
+                                },
+                                {
+                                  disabled: true,
+                                  name: 'pagination.onShowSizeChange',
+                                  template:
+                                    "onPaginationShowSizeChange(current, size){\n// pageSize 变化的回调\nconsole.log('onPaginationShowSizeChange', current, size);}",
+                                },
+                              ],
+                            }}
+                            columns={[
+                              {
+                                dataIndex: 'name',
+                                key: 'name',
+                                title:
+                                  this.i18n('i18n-87kp314f') /* 策略名称 */,
+                              },
+                              {
+                                dataIndex: 'version',
+                                key: 'version',
+                                title:
+                                  this.i18n('i18n-gnw09zuy') /* 应用通道 */,
+                              },
+                              {
+                                dataIndex: 'source',
+                                key: 'source',
+                                render: '',
+                                title:
+                                  this.i18n('i18n-qg8otk6r') /* 应用合约 */,
+                              },
+                              {
+                                dataIndex: 'node',
+                                key: 'node',
+                                title:
+                                  this.i18n('i18n-w3qy6omh') /* 策略描述 */,
+                              },
+                              {
+                                dataIndex: 'channels',
+                                key: 'channels',
+                                title:
+                                  this.i18n('i18n-watjije0jk') /* 更新时间 */,
+                              },
+                            ]}
+                            dataSource={__$$eval(() =>
+                              (
+                                this.props.useGetNetwork?.data?.network?.cl ||
+                                []
+                              )
+                                ?.filter((item) => {
+                                  return this.state.channel.searchValue
+                                    ? item.name?.includes(
+                                        this.state.channel.searchValue
+                                      )
+                                    : true;
+                                })
+                                ?.sort((a, b) => {
+                                  if (this.state.sorter?.order !== 'ascend') {
+                                    return (
+                                      new Date(b.joinedAt).getTime() -
+                                      new Date(a.joinedAt).getTime()
+                                    );
+                                  }
+                                  return (
+                                    new Date(a.joinedAt).getTime() -
+                                    new Date(b.joinedAt).getTime()
+                                  );
+                                })
+                            )}
+                            loading={__$$eval(
+                              () => this.props.useGetNetwork?.loading
+                            )}
+                            onChange={function () {
+                              return this.handleStrategyTableChange.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this)}
+                            pagination={{
+                              current: __$$eval(
+                                () => this.state.strategy.current
+                              ),
+                              onChange: function () {
+                                return this.handleStrategyPaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              onShowSizeChange: function () {
+                                return this.handleStrategyPaginationChange.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              pageSize: __$$eval(
+                                () => this.state.strategy.size
+                              ),
+                              showQuickJumper: false,
+                              showSizeChanger: false,
+                              showTotal: function () {
+                                return this.paginationShowTotal.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this),
+                              simple: false,
+                              size: 'default',
+                              total: __$$eval(
+                                () =>
+                                  ((
+                                    this.props.useGetNetwork?.data?.network
+                                      ?.hy || []
+                                  )?.filter((item) => {
+                                    return this.state.channel.searchValue
+                                      ? item.name?.includes(
+                                          this.state.channel.searchValue
+                                        )
+                                      : true;
+                                  })).length
+                              ),
+                            }}
+                            rowKey="name"
+                            scroll={{ scrollToFirstRowOnChange: true }}
+                            showHeader={true}
+                            size="default"
+                            style={{ marginTop: '-20px' }}
+                          />
+                        </Col>
+                      </Row>
+                    </Card>
+                  ),
+                  key: 'policy',
+                  label: this.i18n('i18n-7zhxmxra') /* 策略管理 */,
+                },
+              ]}
+              size="large"
+              style={{ marginTop: '-20px', paddingLeft: '20px' }}
+              tabPosition="top"
+              type="line"
+            />
           </Col>
         </Row>
         <Modal
@@ -1350,6 +5273,155 @@ class NetworkDetail$$Page extends React.Component {
           centered={false}
           confirmLoading={false}
           destroyOnClose={true}
+          footer={
+            <Space align="center" direction="horizontal">
+              {!!__$$eval(() => this.state.channel.step === 0) && (
+                <Button
+                  __component_name="Button"
+                  __events={{
+                    eventDataList: [
+                      {
+                        name: 'onClick',
+                        relatedEventName: 'channelAddModalNext',
+                        type: 'componentEvent',
+                      },
+                    ],
+                    eventList: [
+                      {
+                        disabled: true,
+                        name: 'onClick',
+                        template:
+                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                      },
+                    ],
+                  }}
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon=""
+                  onClick={function () {
+                    return this.channelAddModalNext.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  type="primary"
+                >
+                  {this.i18n('i18n-p17ll5b2') /* 下一步 */}
+                </Button>
+              )}
+              {!!__$$eval(() => this.state.channel.step === 0) && (
+                <Button
+                  __component_name="Button"
+                  __events={{
+                    eventDataList: [
+                      {
+                        name: 'onClick',
+                        relatedEventName: 'closeModal',
+                        type: 'componentEvent',
+                      },
+                    ],
+                    eventList: [
+                      {
+                        disabled: true,
+                        name: 'onClick',
+                        template:
+                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                      },
+                    ],
+                  }}
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  icon=""
+                  onClick={function () {
+                    return this.closeModal.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  type="default"
+                >
+                  {this.i18n('i18n-l8xumyvnlya') /* 取消 */}
+                </Button>
+              )}
+              {!!__$$eval(() => this.state.channel.step === 1) && (
+                <Button
+                  __component_name="Button"
+                  __events={{
+                    eventDataList: [
+                      {
+                        name: 'onClick',
+                        relatedEventName: 'channelAddModalPre',
+                        type: 'componentEvent',
+                      },
+                    ],
+                    eventList: [
+                      {
+                        disabled: true,
+                        name: 'onClick',
+                        template:
+                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                      },
+                    ],
+                  }}
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  onClick={function () {
+                    return this.channelAddModalPre.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                  type="primary"
+                >
+                  {this.i18n('i18n-o9r9z4vz') /* 上一步 */}
+                </Button>
+              )}
+              {!!__$$eval(() => this.state.channel.step === 1) && (
+                <Button
+                  __component_name="Button"
+                  __events={{
+                    eventDataList: [
+                      {
+                        name: 'onClick',
+                        relatedEventName: 'channelAddModalConfirm',
+                        type: 'componentEvent',
+                      },
+                    ],
+                    eventList: [
+                      {
+                        disabled: true,
+                        name: 'onClick',
+                        template:
+                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                      },
+                    ],
+                  }}
+                  block={false}
+                  danger={false}
+                  disabled={false}
+                  ghost={false}
+                  onClick={function () {
+                    return this.channelAddModalConfirm.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  shape="default"
+                >
+                  {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+                </Button>
+              )}
+            </Space>
+          }
           forceRender={false}
           keyboard={true}
           mask={true}
@@ -1372,6 +5444,560 @@ class NetworkDetail$$Page extends React.Component {
           )}
           title={this.i18n('i18n-snaon3b2fni') /* 新建通道 */}
         >
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={24}>
+              <Row __component_name="Row" wrap={true}>
+                <Col __component_name="Col" span={12}>
+                  <Steps
+                    __component_name="Steps"
+                    current={__$$eval(() => this.state.channel.step)}
+                    items={[
+                      { title: this.i18n('i18n-fl4pb7jd') /* 通道信息 */ },
+                      { title: this.i18n('i18n-bxsxgogh') /* 加入节点 */ },
+                    ]}
+                    size="small"
+                    type="navigation"
+                  />
+                </Col>
+              </Row>
+            </Col>
+            <Col __component_name="Col" span={24}>
+              {!!__$$eval(() => this.state.channel.step === 0) && (
+                <FormilyForm
+                  __component_name="FormilyForm"
+                  componentProps={{
+                    colon: false,
+                    labelAlign: 'left',
+                    labelCol: 5,
+                    layout: 'horizontal',
+                    wrapperCol: 20,
+                  }}
+                  ref={this._refsManager.linkRef('formily_create_channel')}
+                >
+                  <FormilyInput
+                    __component_name="FormilyInput"
+                    componentProps={{
+                      'x-component-props': {
+                        bordered: true,
+                        placeholder:
+                          this.i18n('i18n-ienrgm2j5p9') /* 请输入通道名称 */,
+                      },
+                    }}
+                    fieldProps={{
+                      name: 'name',
+                      required: true,
+                      title: this.i18n('i18n-9e87qfos') /* 名称 */,
+                      'x-validator': [
+                        {
+                          message:
+                            this.i18n(
+                              'i18n-0u5pwt0jtl4'
+                            ) /* 通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成 */,
+                          pattern: '^[a-zA-Z0-9_]{3,10}$',
+                          required: true,
+                          whitespace: true,
+                        },
+                      ],
+                    }}
+                  />
+                  <FormilySelect
+                    __component_name="FormilySelect"
+                    componentProps={{
+                      'x-component-props': {
+                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                        allowClear: false,
+                        disabled: false,
+                        enum: __$$eval(
+                          () =>
+                            this.props.useGetNetwork?.data?.network?.organizations?.map(
+                              (item) => ({
+                                value: item.name,
+                                label: `${item.name}(${item.admin})`,
+                              })
+                            ) || []
+                        ),
+                        placeholder:
+                          this.i18n('i18n-nezb9wehqyh') /* 请选择发起者 */,
+                      },
+                    }}
+                    fieldProps={{
+                      name: 'initiator',
+                      required: true,
+                      title: this.i18n('i18n-v6gmjbqnol') /* 设置发起者 */,
+                      'x-validator': [],
+                    }}
+                  />
+                  <FormilySelect
+                    __component_name="FormilySelect"
+                    componentProps={{
+                      'x-component-props': {
+                        _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                        allowClear: false,
+                        disabled: false,
+                        enum: __$$eval(
+                          () =>
+                            this.props.useGetNetwork?.data?.network?.organizations?.map(
+                              (item) => ({
+                                value: item.name,
+                                label: `${item.name}(${item.admin})`,
+                              })
+                            ) || []
+                        ),
+                        mode: 'multiple',
+                        placeholder:
+                          this.i18n('i18n-bko8c4ii1ad') /* 请选择成员 */,
+                      },
+                    }}
+                    fieldProps={{
+                      _unsafe_MixedSetter_description_select: 'SlotSetter',
+                      description: (
+                        <Typography.Text
+                          __component_name="Typography.Text"
+                          disabled={false}
+                          ellipsis={true}
+                          strong={false}
+                          style={{ fontSize: '' }}
+                          type="secondary"
+                        >
+                          {
+                            this.i18n(
+                              'i18n-dgsy7jhb'
+                            ) /* 通道内成员组织的变更需要根据联盟投票策略，获得足够的组织同意 */
+                          }
+                        </Typography.Text>
+                      ),
+                      name: 'organizations',
+                      required: true,
+                      title: this.i18n('i18n-cprrxhrkty') /* 配置成员 */,
+                      'x-validator': [],
+                    }}
+                  />
+                  <FormilyTextArea
+                    __component_name="FormilyTextArea"
+                    componentProps={{
+                      'x-component-props': {
+                        placeholder:
+                          this.i18n('i18n-rw0h41prk6') /* 请输入描述 */,
+                      },
+                    }}
+                    fieldProps={{
+                      _unsafe_MixedSetter_default_select: 'StringSetter',
+                      default: '',
+                      name: 'description',
+                      title: this.i18n('i18n-8weq4mfy9lf') /* 描述 */,
+                      'x-component': 'Input.TextArea',
+                      'x-validator': [
+                        {
+                          message:
+                            this.i18n(
+                              'i18n-5eitggraalr'
+                            ) /* 通道描述由 0 ~ 200 字符组成 */,
+                          pattern: '^.{0,200}$',
+                        },
+                      ],
+                    }}
+                  />
+                </FormilyForm>
+              )}
+            </Col>
+          </Row>
+          {!!__$$eval(() => this.state.channel.step === 1) && (
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" span={24}>
+                <Space align="center" direction="horizontal">
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {this.i18n('i18n-xcopya8d') /* 请选择加入通道 */}
+                  </Typography.Text>
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(() => this.state.channel.addData?.name)}
+                  </Typography.Text>
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {this.i18n('i18n-4r61pybs') /* 的节点 */}
+                  </Typography.Text>
+                </Space>
+              </Col>
+              <Col __component_name="Col" span={24}>
+                <Transfer
+                  __component_name="Transfer"
+                  __events={{
+                    eventDataList: [
+                      {
+                        name: 'onChange',
+                        relatedEventName: 'channelPeersChange',
+                        type: 'componentEvent',
+                      },
+                    ],
+                    eventList: [
+                      {
+                        disabled: true,
+                        name: 'onChange',
+                        template:
+                          "onChange(targetKeys,direction,moveKeys,${extParams}){\n// 选项在两栏之间转移时的回调函数\nconsole.log('onChange',targetKeys,direction,moveKeys);}",
+                      },
+                      {
+                        disabled: false,
+                        name: 'onScroll',
+                        template:
+                          "onScroll(direction,event,${extParams}){\n// 选项列表滚动时的回调函数\nconsole.log('onScroll',direction,event);}",
+                      },
+                      {
+                        disabled: false,
+                        name: 'onSearch',
+                        template:
+                          "onSearch(direction,value,${extParams}){\n// 搜索框内容时改变时的回调函数\nconsole.log('onSearch',direction,value);}",
+                      },
+                      {
+                        disabled: false,
+                        name: 'onSelectChange',
+                        template:
+                          "onSelectChange(sourceSelectedKeys,targetSelectedKeys,${extParams}){\n// 选中项发生改变时的回调函数\nconsole.log('onSelectChange',sourceSelectedKeys,targetSelectedKeys);}",
+                      },
+                    ],
+                  }}
+                  dataSource={__$$eval(() => this.state.peers)}
+                  disabled={false}
+                  onChange={function () {
+                    return this.channelPeersChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this)}
+                  oneWay={false}
+                  render={function () {
+                    const self = this;
+                    try {
+                      return function renderItem(record, extParams) {
+                        return record.title;
+                      }.apply(self, arguments);
+                    } catch (e) {
+                      logger.warn(
+                        'call function which parsed by lowcode failed: ',
+                        e
+                      );
+                      return e.message;
+                    }
+                  }}
+                  selectAllLabels={[]}
+                  selectedKeys={__$$eval(() => this.state.channelPeers)}
+                  showSearch={false}
+                  showSelectAll={true}
+                  titles={[]}
+                />
+              </Col>
+            </Row>
+          )}
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: false,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Button
+              __component_name="Button"
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onClick',
+                    relatedEventName: 'closeModal',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onClick',
+                    template:
+                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                  },
+                ],
+              }}
+              block={false}
+              danger={false}
+              disabled={false}
+              ghost={false}
+              icon=""
+              onClick={function () {
+                return this.closeModal.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              shape="default"
+              type="primary"
+            >
+              {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
+            </Button>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'addchannelorganizationsuccess'
+          )}
+          title={
+            <Space align="center" direction="horizontal">
+              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <Typography.Text
+                disabled={false}
+                ellipsis={true}
+                strong={false}
+                style={{ fontSize: '' }}
+              >
+                {this.i18n('i18n-s4aho8fc') /* 邀请加入通道已发送 */}
+              </Typography.Text>
+            </Space>
+          }
+        >
+          <Space align="center" direction="horizontal">
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-10n3sqsc') /* 请在 */}
+            </Typography.Text>
+            <UnifiedLink target="_blank" to="/proposal">
+              {this.i18n('i18n-e72wfods') /* 提议管理 */}
+            </UnifiedLink>
+            <Typography.Text
+              disabled={false}
+              ellipsis={true}
+              strong={false}
+              style={{ fontSize: '' }}
+            >
+              {this.i18n('i18n-l8vvga48') /* 查看进度 */}
+            </Typography.Text>
+          </Space>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'channelAddOrganizationModalConfirm',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.channelAddOrganizationModalConfirm.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'addchannelorganization'
+          )}
+          title={this.i18n('i18n-ddvens87') /* 邀请组织 */}
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 4,
+              layout: 'horizontal',
+              wrapperCol: 20,
+            }}
+            ref={this._refsManager.linkRef(
+              'formily_create_channel_organization'
+            )}
+          >
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  allowClear: false,
+                  disabled: false,
+                  placeholder: this.i18n('i18n-vg3668rl') /* 请选择组织 */,
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_description_select: 'SlotSetter',
+                description: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                    type="secondary"
+                  >
+                    {
+                      this.i18n(
+                        'i18n-xf6wcwuc'
+                      ) /* 当通道中有其他用户组织时，需要其他用户投票同意，才能加入成功 */
+                    }
+                  </Typography.Text>
+                ),
+                name: 'Select',
+                required: true,
+                title: this.i18n('i18n-ddvens87') /* 邀请组织 */,
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmAddContractModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmAddContractModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal && this.state.modalType === 'addcontract'
+          )}
+          title={this.i18n('i18n-2rczbtzx') /* 新建合约 */}
+        >
           <FormilyForm
             __component_name="FormilyForm"
             componentProps={{
@@ -1381,63 +6007,94 @@ class NetworkDetail$$Page extends React.Component {
               layout: 'horizontal',
               wrapperCol: 20,
             }}
-            ref={this._refsManager.linkRef('formily_create')}
+            ref={this._refsManager.linkRef('formily_create_contract')}
           >
             <FormilyInput
               __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
-                  bordered: true,
-                  placeholder:
-                    this.i18n('i18n-ienrgm2j5p9') /* 请输入通道名称 */,
+                  placeholder: this.i18n('i18n-b3d2mz7i') /* 请输入合约名称 */,
                 },
               }}
               fieldProps={{
                 name: 'name',
                 required: true,
-                title: this.i18n('i18n-6oadzcxin7k') /* 通道名称 */,
+                title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
                 'x-validator': [
                   {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
                     message:
                       this.i18n(
-                        'i18n-0u5pwt0jtl4'
-                      ) /* 通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成 */,
+                        'i18n-1h2618xx'
+                      ) /* 合约名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
                     pattern: '^[a-zA-Z0-9_]{3,10}$',
-                    required: true,
-                    whitespace: true,
+                    type: 'disabled',
                   },
                 ],
               }}
             />
-            <FormilySelect
-              __component_name="FormilySelect"
+            <FormilyInput
+              __component_name="FormilyInput"
               componentProps={{
                 'x-component-props': {
-                  allowClear: false,
-                  disabled: false,
-                  placeholder: this.i18n('i18n-nezb9wehqyh') /* 请选择发起者 */,
+                  placeholder:
+                    this.i18n(
+                      'i18n-2ielocre'
+                    ) /* 合约版本供识别与维护使用，建议格式： v1.0 */,
                 },
               }}
               fieldProps={{
-                name: 'Select',
+                name: 'version',
                 required: true,
-                title: this.i18n('i18n-v6gmjbqnol') /* 设置发起者 */,
+                title: this.i18n('i18n-6othsg2w') /* 合约版本号 */,
                 'x-validator': [],
               }}
             />
+            <FormilyUpload
+              __component_name="FormilyUpload"
+              fieldProps={{
+                name: 'file',
+                required: true,
+                title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
+                'x-component': 'FormilyUpload',
+                'x-validator': [],
+              }}
+            >
+              <Button
+                __component_name="Button"
+                block={false}
+                danger={false}
+                disabled={false}
+                ghost={false}
+                icon={
+                  <Icon
+                    __component_name="Icon"
+                    size={12}
+                    style={{ marginRight: 3 }}
+                    type="PlusOutlined"
+                  />
+                }
+                shape="default"
+                type="default"
+              >
+                {this.i18n('i18n-l9xc0l1g') /* 选择上传的文件 */}
+              </Button>
+            </FormilyUpload>
             <FormilySelect
               __component_name="FormilySelect"
               componentProps={{
                 'x-component-props': {
                   allowClear: false,
                   disabled: false,
-                  placeholder: this.i18n('i18n-bko8c4ii1ad') /* 请选择成员 */,
+                  notFoundContent: {},
+                  placeholder: this.i18n('i18n-928f3hdn') /* 请选择语言 */,
                 },
               }}
               fieldProps={{
-                name: 'Select1',
-                required: true,
-                title: this.i18n('i18n-0bo5igd908x') /* 选择成员 */,
+                name: 'language',
+                title: this.i18n('i18n-7usiozsk') /* 选择语言 */,
                 'x-validator': [],
               }}
             />
@@ -1449,18 +6106,20 @@ class NetworkDetail$$Page extends React.Component {
                 },
               }}
               fieldProps={{
-                _unsafe_MixedSetter_default_select: 'StringSetter',
-                default: '',
                 name: 'description',
-                title: this.i18n('i18n-k3l0vmchhq') /* 通道描述 */,
+                title: this.i18n('i18n-8weq4mfy9lf') /* 描述 */,
                 'x-component': 'Input.TextArea',
                 'x-validator': [
                   {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
                     message:
                       this.i18n(
-                        'i18n-5eitggraalr'
-                      ) /* 通道描述由 0 ~ 200 字符组成 */,
+                        'i18n-ol5awdwa'
+                      ) /* 合约描述由 0 ~ 200 字符组成 */,
                     pattern: '^.{0,200}$',
+                    type: 'disabled',
                   },
                 ],
               }}

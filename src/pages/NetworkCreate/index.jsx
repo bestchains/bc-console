@@ -9,12 +9,13 @@ import {
   Typography,
   Card,
   FormilyForm,
+  FormilyInput,
   FormilySelect,
   Space,
   UnifiedLink,
   FormilyRadio,
   FormilyNumberPicker,
-  FormilyInput,
+  FormilyTextArea,
   Divider,
   Button,
 } from '@tenx-ui/materials';
@@ -68,7 +69,6 @@ class NetworkCreate$$Page extends React.Component {
 
   confirm(e, payload) {
     var _this$$, _this$$$formRef, _this$$$formRef$curre;
-
     // const network = this.props.useGetNetwork?.data?.network || {}
     const form =
       (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
@@ -91,9 +91,7 @@ class NetworkCreate$$Page extends React.Component {
             ? void 0
             : _JSON$parse.name),
       };
-      console.log(v, params);
-      delete params.jdpz;
-      delete params.sc;
+      delete params.db;
       try {
         const res = await this.props.appHelper.utils.bff.createNetwork({
           network: params,
@@ -199,7 +197,13 @@ class NetworkCreate$$Page extends React.Component {
                 }}
                 ref={this._refsManager.linkRef('formily_create')}
               >
-                <Row __component_name="Row" wrap={true}>
+                <Row
+                  __component_name="Row"
+                  gutter={[0, 20]}
+                  h-gutter={0}
+                  v-gutter={20}
+                  wrap={true}
+                >
                   <Col __component_name="Col" span={24}>
                     <Typography.Title
                       __component_name="Typography.Title"
@@ -211,7 +215,40 @@ class NetworkCreate$$Page extends React.Component {
                       {this.i18n('i18n-98hectg940s') /* 基本信息 */}
                     </Typography.Title>
                   </Col>
-                  <Col __component_name="Col" span={24}>
+                  <Col
+                    __component_name="Col"
+                    span={24}
+                    style={{ marginBottom: '-20px', marginLeft: '50px' }}
+                  >
+                    <FormilyInput
+                      __component_name="FormilyInput"
+                      componentProps={{
+                        'x-component-props': {
+                          placeholder:
+                            this.i18n(
+                              'i18n-zkmmrz6f'
+                            ) /* 请输入网络名称，最多 20 个字符 */,
+                        },
+                      }}
+                      fieldProps={{
+                        name: 'name',
+                        required: true,
+                        title: this.i18n('i18n-03e0p0acqmaf') /* 网络名称 */,
+                        'x-validator': [
+                          {
+                            children: '未知',
+                            icon: 'tenx-ui-icon:Circle',
+                            id: 'disabled',
+                            message:
+                              this.i18n(
+                                'i18n-4v5vky0x'
+                              ) /* 网络名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
+                            pattern: '^[a-zA-Z0-9_]{3,20}$',
+                            type: 'disabled',
+                          },
+                        ],
+                      }}
+                    />
                     <FormilySelect
                       __component_name="FormilySelect"
                       componentProps={{
@@ -267,17 +304,32 @@ class NetworkCreate$$Page extends React.Component {
                             >
                               {this.i18n('i18n-i69exda650e') /* 新建联盟 */}
                             </UnifiedLink>
-                            <UnifiedLink
-                              __component_name="UnifiedLink"
-                              target="_blank"
-                              to="https://alibaba.com"
-                            >
-                              {this.i18n('i18n-xlmv8ef2bsq') /* 了解详情 */}
-                            </UnifiedLink>
                           </Space>
                         ),
                         name: 'federation',
+                        required: true,
                         title: this.i18n('i18n-dlxiuotq6z4') /* 所属联盟 */,
+                        'x-validator': [],
+                      }}
+                    />
+                    <FormilySelect
+                      __component_name="FormilySelect"
+                      componentProps={{
+                        'x-component-props': {
+                          _unsafe_MixedSetter_enum_select: 'StringSetter',
+                          allowClear: false,
+                          disabled: false,
+                          enum: "{{ $form?.values?.federation ? (JSON.parse($form?.values?.federation)?.curOrganizations?.map(item => ({ label: `${item.name}(${item.admin || '-'})`, value: item.name })) ||[]) : []}}",
+                          placeholder:
+                            this.i18n(
+                              'i18n-3cphsjan5d2'
+                            ) /* 选择自己拥有的组织 */,
+                        },
+                      }}
+                      fieldProps={{
+                        name: 'initiator',
+                        required: true,
+                        title: this.i18n('i18n-v6gmjbqnol') /* 设置发起者 */,
                         'x-validator': [],
                       }}
                     />
@@ -314,32 +366,12 @@ class NetworkCreate$$Page extends React.Component {
                                 ) /* 节点默认配置为 4核CPU 8G内存 200G磁盘，详见 */
                               }
                             </Typography.Text>
-                            <UnifiedLink
-                              __component_name="UnifiedLink"
-                              target="_blank"
-                              to="https://alibaba.com"
-                            >
-                              {this.i18n('i18n-3g6iq8ncfsh') /* 版本详细介绍 */}
-                            </UnifiedLink>
                           </Space>
                         ),
                         enum: [
                           {
                             label: this.i18n('i18n-pg663sglzcs') /* 标准版 */,
                             value: 'Standard',
-                          },
-                          {
-                            label: this.i18n('i18n-6ndnzzhki9k') /* 企业版 */,
-                            value: 'Enterprise',
-                          },
-                          {
-                            children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
-                            id: 'disabled',
-                            label:
-                              this.i18n('i18n-csjzk2p708j') /* 金融安全版 */,
-                            type: 'disabled',
-                            value: 'Finance',
                           },
                         ],
                         name: 'version',
@@ -349,88 +381,63 @@ class NetworkCreate$$Page extends React.Component {
                     />
                   </Col>
                   <Col __component_name="Col" span={24}>
-                    <Typography.Title
-                      __component_name="Typography.Title"
-                      bold={true}
-                      bordered={true}
-                      ellipsis={true}
-                      level={1}
-                    >
-                      {this.i18n('i18n-tb85t2eb0c') /* 组织成员配置 */}
-                    </Typography.Title>
-                  </Col>
-                  <Col __component_name="Col" span={24}>
-                    <FormilySelect
-                      __component_name="FormilySelect"
-                      componentProps={{
-                        'x-component-props': {
-                          _unsafe_MixedSetter_enum_select: 'StringSetter',
-                          allowClear: false,
-                          disabled: false,
-                          enum: "{{ $form?.values?.federation ? (JSON.parse($form?.values?.federation)?.organizations?.map(item => ({ label: `${item.name}(${item.admin || '-'})`, value: item.name })) ||[]) : []}}",
-                          mode: 'multiple',
-                          placeholder:
-                            this.i18n(
-                              'i18n-nbke0i5upzc'
-                            ) /* 组织名称，建议格式 xxxOrg */,
-                        },
-                      }}
-                      fieldProps={{
-                        _unsafe_MixedSetter_default_select: 'I18nSetter',
-                        _unsafe_MixedSetter_description_select: 'SlotSetter',
-                        description: (
-                          <Space
-                            __component_name="Space"
-                            align="center"
-                            direction="horizontal"
-                          >
-                            <Typography.Text
-                              __component_name="Typography.Text"
-                              disabled={false}
-                              ellipsis={true}
-                              strong={false}
-                              style={{ fontSize: '' }}
+                    {!!false && (
+                      <FormilySelect
+                        __component_name="FormilySelect"
+                        componentProps={{
+                          'x-component-props': {
+                            _unsafe_MixedSetter_enum_select: 'StringSetter',
+                            allowClear: false,
+                            disabled: false,
+                            enum: "{{ $form?.values?.federation ? (JSON.parse($form?.values?.federation)?.organizations?.map(item => ({ label: `${item.name}(${item.admin || '-'})`, value: item.name })) ||[]) : []}}",
+                            mode: 'multiple',
+                            placeholder:
+                              this.i18n(
+                                'i18n-nbke0i5upzc'
+                              ) /* 组织名称，建议格式 xxxOrg */,
+                          },
+                        }}
+                        fieldProps={{
+                          _unsafe_MixedSetter_default_select: 'I18nSetter',
+                          _unsafe_MixedSetter_description_select: 'SlotSetter',
+                          description: (
+                            <Space
+                              __component_name="Space"
+                              align="center"
+                              direction="horizontal"
                             >
-                              {
-                                this.i18n(
-                                  'i18n-dr1hx3bw3v'
-                                ) /* 组织名称须以字母开头，12 位以内数字和字母组成。只有网络初创者可以新建多个组织 */
-                              }
-                            </Typography.Text>
-                            <UnifiedLink
-                              __component_name="UnifiedLink"
-                              target="_blank"
-                              to="https://alibaba.com"
-                            >
-                              {this.i18n('i18n-xlmv8ef2bsq') /*  了解详情>> */}
-                            </UnifiedLink>
-                          </Space>
-                        ),
-                        name: 'organizations',
-                        title: this.i18n('i18n-cprrxhrkty') /* 配置成员 */,
-                        'x-validator': [],
-                      }}
-                    />
-                    <FormilySelect
-                      __component_name="FormilySelect"
-                      componentProps={{
-                        'x-component-props': {
-                          _unsafe_MixedSetter_enum_select: 'StringSetter',
-                          allowClear: false,
-                          disabled: false,
-                          enum: "{{ $form?.values?.federation ? (JSON.parse($form?.values?.federation)?.curOrganizations?.map(item => ({ label: `${item.name}(${item.admin || '-'})`, value: item.name })) ||[]) : []}}",
-                          placeholder:
-                            this.i18n(
-                              'i18n-3cphsjan5d2'
-                            ) /* 选择自己拥有的组织 */,
-                        },
-                      }}
-                      fieldProps={{
-                        name: 'initiator',
-                        title: this.i18n('i18n-v6gmjbqnol') /* 设置发起者 */,
-                        'x-validator': [],
-                      }}
-                    />
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                disabled={false}
+                                ellipsis={true}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                              >
+                                {
+                                  this.i18n(
+                                    'i18n-dr1hx3bw3v'
+                                  ) /* 组织名称须以字母开头，12 位以内数字和字母组成。只有网络初创者可以新建多个组织 */
+                                }
+                              </Typography.Text>
+                              <UnifiedLink
+                                __component_name="UnifiedLink"
+                                target="_blank"
+                                to="https://alibaba.com"
+                              >
+                                {
+                                  this.i18n(
+                                    'i18n-xlmv8ef2bsq'
+                                  ) /*  了解详情>> */
+                                }
+                              </UnifiedLink>
+                            </Space>
+                          ),
+                          name: 'organizations',
+                          title: this.i18n('i18n-cprrxhrkty') /* 配置成员 */,
+                          'x-validator': [],
+                        }}
+                      />
+                    )}
                   </Col>
                   <Col __component_name="Col" span={24}>
                     <Typography.Title
@@ -443,7 +450,11 @@ class NetworkCreate$$Page extends React.Component {
                       {this.i18n('i18n-hjgnfbc9iew') /* 共识配置 */}
                     </Typography.Title>
                   </Col>
-                  <Col __component_name="Col" span={24}>
+                  <Col
+                    __component_name="Col"
+                    span={24}
+                    style={{ marginBottom: '-20px', marginLeft: '50px' }}
+                  >
                     <FormilySelect
                       __component_name="FormilySelect"
                       componentProps={{
@@ -494,13 +505,42 @@ class NetworkCreate$$Page extends React.Component {
                         },
                       }}
                       fieldProps={{
-                        name: 'jdpz',
-                        title: this.i18n('i18n-zjmh7vtphh') /* 节点配置 */,
+                        _unsafe_MixedSetter_default_select: 'StringSetter',
+                        default: 'LevelDB',
+                        name: 'db',
+                        title: this.i18n('i18n-dgb9yehb') /* 状态数据库类型 */,
+                        'x-pattern': 'disabled',
                         'x-validator': [],
                       }}
                     />
+                    <FormilyTextArea
+                      __component_name="FormilyTextArea"
+                      componentProps={{
+                        'x-component-props': {
+                          placeholder:
+                            this.i18n('i18n-rw0h41prk6') /* 请输入描述 */,
+                        },
+                      }}
+                      fieldProps={{
+                        name: 'description',
+                        title: this.i18n('i18n-8weq4mfy9lf') /* 描述 */,
+                        'x-component': 'Input.TextArea',
+                        'x-validator': [
+                          {
+                            children: '未知',
+                            icon: 'tenx-ui-icon:Circle',
+                            id: 'disabled',
+                            message:
+                              this.i18n(
+                                'i18n-qsvtbgvf'
+                              ) /* 网络描述由 0 ~ 200 字符组成 */,
+                            pattern: '^.{0,200}$',
+                            type: 'disabled',
+                          },
+                        ],
+                      }}
+                    />
                   </Col>
-                  <Col __component_name="Col" span={24} />
                 </Row>
               </FormilyForm>
               <Divider
@@ -510,7 +550,7 @@ class NetworkCreate$$Page extends React.Component {
                 mode="line"
               />
               <Row __component_name="Row" wrap={false}>
-                <Col __component_name="Col" flex="120px" />
+                <Col __component_name="Col" flex="170px" />
                 <Col __component_name="Col" flex="auto">
                   <Space
                     __component_name="Space"
