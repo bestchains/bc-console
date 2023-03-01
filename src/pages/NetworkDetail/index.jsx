@@ -101,6 +101,8 @@ class NetworkDetail$$Page extends React.Component {
         size: 10,
         current: 1,
         record: {},
+        list: [],
+        channels: [],
       },
     };
   }
@@ -189,8 +191,7 @@ class NetworkDetail$$Page extends React.Component {
         ? void 0
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
-      this.getPeers(v);
-      setTimeout(() => {
+      this.getPeers(v, () => {
         this.setState({
           channel: {
             ...this.state.channel,
@@ -198,7 +199,7 @@ class NetworkDetail$$Page extends React.Component {
             step: 1,
           },
         });
-      }, 0);
+      });
     });
   }
 
@@ -236,7 +237,7 @@ class NetworkDetail$$Page extends React.Component {
     // form.submit(async v => {
     //   console.log(v)
     //   try {
-    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
+    //     // const res = await this.props.appHelper.utils.bff.updateChannel({
     //     //   name: network?.name,
     //     //   organizations: v.organizations,
     //     //   initiator: network?.initiator?.name
@@ -256,31 +257,67 @@ class NetworkDetail$$Page extends React.Component {
     // })
   }
 
-  channelAddPeerModalConfirm(e, payload) {
-    console.log(this.state.channel, 'ccccccccccccccccccccc');
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openAddChannelSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
+  async channelAddPeerModalConfirm(e, payload) {
+    var _this$props$useGetNet, _this$props$useGetNet2;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    try {
+      var _this$state$channel, _this$state$channel$r, _this$state$channelPe;
+      const res = await this.props.appHelper.utils.bff.updateChannel({
+        name:
+          (_this$state$channel = this.state.channel) === null ||
+          _this$state$channel === void 0
+            ? void 0
+            : (_this$state$channel$r = _this$state$channel.record) === null ||
+              _this$state$channel$r === void 0
+            ? void 0
+            : _this$state$channel$r.name,
+        channel: {
+          operate: 'add',
+          // remove
+          peers:
+            (_this$state$channelPe = this.state.channelPeers) === null ||
+            _this$state$channelPe === void 0
+              ? void 0
+              : _this$state$channelPe.map((key) => {
+                  var _this$state$allPeers;
+                  const item =
+                    (_this$state$allPeers = this.state.allPeers) === null ||
+                    _this$state$allPeers === void 0
+                      ? void 0
+                      : _this$state$allPeers.find((item) => item.key === key);
+                  return {
+                    name: item.name,
+                    namespace: item.namespace,
+                  };
+                }),
+        },
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-knuex06q'),
+      });
+      // this.openAddChannelSuccessModal()
+      this.props.useGetNetwork.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-sunw6qwy'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
   }
 
   channelPeersChange(channelPeers) {
@@ -292,6 +329,7 @@ class NetworkDetail$$Page extends React.Component {
   closeModal() {
     this.setState({
       isOpenModal: false,
+      channelPeers: [],
     });
   }
 
@@ -324,31 +362,93 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   confirmAddStrategyModal(e, payload) {
-    // this.openAddChannelOrganizationSuccessModal()
-    console.log(this.state.strategy, 'ccccccccccccccccccccc');
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openAddChannelSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
+    var _this$props$useGetNet,
+      _this$props$useGetNet2,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    const form =
+      (_this$$ = this.$('formily_create_strategy')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      var _JSON$parse, _v$content, _v$content$value, _v$content$value$map;
+      const epolicy = {
+        channel:
+          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
+          _JSON$parse === void 0
+            ? void 0
+            : _JSON$parse.name,
+        description: v.description,
+        name: v.name,
+        value:
+          'OR(' +
+          ((_v$content = v.content) === null || _v$content === void 0
+            ? void 0
+            : (_v$content$value = _v$content.value) === null ||
+              _v$content$value === void 0
+            ? void 0
+            : (_v$content$value$map = _v$content$value.map((valueitem) => {
+                var _valueitem$item, _valueitem$item$map;
+                return (_valueitem$item = valueitem.item) === null ||
+                  _valueitem$item === void 0
+                  ? void 0
+                  : (_valueitem$item$map = _valueitem$item.map((item, i) => {
+                      item = `'${item}'`;
+                      if (i === 0) {
+                        return 'AND(' + item;
+                      }
+                      if (i === valueitem.item.length - 1) {
+                        return item + ')';
+                      }
+                      return item;
+                    })) === null || _valueitem$item$map === void 0
+                  ? void 0
+                  : _valueitem$item$map.join(',');
+              })) === null || _v$content$value$map === void 0
+            ? void 0
+            : _v$content$value$map.join(',')) +
+          ')',
+      };
+      try {
+        const res = await this.props.appHelper.utils.bff.createEpolicy({
+          epolicy,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-636u5idg'),
+        });
+        this.props.useGetNetwork.mutate();
+        this.getEpolicies();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-sivjo10j'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
   }
 
   async confirmDeleteChannelModal(e, payload) {
@@ -450,12 +550,69 @@ class NetworkDetail$$Page extends React.Component {
     // })
   }
 
-  async getPeers(v) {
-    var _res$ibppeersForCreat, _res$ibppeersForCreat2, _res$ibppeersForCreat3;
+  async getChannelsForCreateEpolicy(callback) {
+    var _this$match, _this$match$params, _res$channelsForCreat;
+    const res =
+      await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
+        network:
+          (_this$match = this.match) === null || _this$match === void 0
+            ? void 0
+            : (_this$match$params = _this$match.params) === null ||
+              _this$match$params === void 0
+            ? void 0
+            : _this$match$params.id,
+      });
+    this.setState(
+      {
+        strategy: {
+          ...this.state.strategy,
+          channels:
+            (res === null || res === void 0
+              ? void 0
+              : (_res$channelsForCreat = res.channelsForCreateEpolicy) ===
+                  null || _res$channelsForCreat === void 0
+              ? void 0
+              : _res$channelsForCreat.map((item) => ({
+                  value: JSON.stringify(item),
+                  label: item.name,
+                }))) || [],
+        },
+      },
+      callback
+    );
+  }
+
+  async getEpolicies() {
+    var _this$match, _this$match$params;
+    const res = await this.props.appHelper.utils.bff.getEpolicies({
+      network:
+        (_this$match = this.match) === null || _this$match === void 0
+          ? void 0
+          : (_this$match$params = _this$match.params) === null ||
+            _this$match$params === void 0
+          ? void 0
+          : _this$match$params.id,
+    });
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        list: (res === null || res === void 0 ? void 0 : res.epolicies) || [],
+      },
+    });
+  }
+
+  async getPeers(v, callback) {
+    var _ref,
+      _res$ibppeersForCreat,
+      _res$ibppeersForCreat2,
+      _res$ibppeersForCreat3;
     const { initiator, organizations } = v;
     const res =
       await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
-        members: [initiator, ...organizations],
+        members:
+          (_ref = [initiator, ...organizations]) === null || _ref === void 0
+            ? void 0
+            : _ref.filter((item) => item),
       });
     const allPeers = [];
     res === null || res === void 0
@@ -508,10 +665,13 @@ class NetworkDetail$$Page extends React.Component {
                 : _item$children.length) > 0
             );
           })) || [];
-    this.setState({
-      peers,
-      allPeers,
-    });
+    this.setState(
+      {
+        peers,
+        allPeers,
+      },
+      callback
+    );
   }
 
   handleChannelPaginationChange(c, s) {
@@ -678,14 +838,31 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   openAddChannelPeerModal(e, payload) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        record: payload.record,
+    var _payload$record, _payload$record$membe;
+    this.getPeers(
+      {
+        organizations:
+          (payload === null || payload === void 0
+            ? void 0
+            : (_payload$record = payload.record) === null ||
+              _payload$record === void 0
+            ? void 0
+            : (_payload$record$membe = _payload$record.members) === null ||
+              _payload$record$membe === void 0
+            ? void 0
+            : _payload$record$membe.map((item) => item.name)) || [],
       },
-      isOpenModal: true,
-      modalType: 'addchannelpeer',
-    });
+      () => {
+        this.setState({
+          channel: {
+            ...this.state.channel,
+            record: payload.record,
+          },
+          isOpenModal: true,
+          modalType: 'addchannelpeer',
+        });
+      }
+    );
   }
 
   openAddChannelSuccessModal() {
@@ -703,9 +880,11 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   openAddStrategyModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addstrategy',
+    this.getChannelsForCreateEpolicy(() => {
+      this.setState({
+        isOpenModal: true,
+        modalType: 'addstrategy',
+      });
     });
   }
 
@@ -785,6 +964,7 @@ class NetworkDetail$$Page extends React.Component {
       });
     };
     getOrganizations();
+    this.getEpolicies();
   }
 
   render() {
@@ -862,7 +1042,7 @@ class NetworkDetail$$Page extends React.Component {
               layout: 'horizontal',
               wrapperCol: 20,
             }}
-            ref={this._refsManager.linkRef('formily_ji1wx62rpa8')}
+            ref={this._refsManager.linkRef('formily_create_strategy')}
           >
             <FormilyInput
               __component_name="FormilyInput"
@@ -921,8 +1101,10 @@ class NetworkDetail$$Page extends React.Component {
               __component_name="FormilySelect"
               componentProps={{
                 'x-component-props': {
+                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                   allowClear: false,
                   disabled: false,
+                  enum: __$$eval(() => this.state.strategy.channels),
                   placeholder: this.i18n('i18n-59plmy1n') /* 请选择通道 */,
                 },
               }}
@@ -937,7 +1119,7 @@ class NetworkDetail$$Page extends React.Component {
               __component_name="FormilyFormItem"
               componentProps={{ 'x-component-props': {} }}
               fieldProps={{
-                name: 'FormilyFormItem',
+                name: 'content',
                 required: true,
                 title: this.i18n('i18n-tcgbsroi') /* 策略内容 */,
                 'x-component': 'FormilyFormItem',
@@ -963,7 +1145,7 @@ class NetworkDetail$$Page extends React.Component {
                     },
                     type: 'object',
                   },
-                  name: 'name',
+                  name: 'value',
                   properties: {
                     add: {
                       title: this.i18n('i18n-z29zhp7a') /* 新增一行“or 条件” */,
@@ -980,8 +1162,10 @@ class NetworkDetail$$Page extends React.Component {
                   __component_name="FormilySelect"
                   componentProps={{
                     'x-component-props': {
+                      _unsafe_MixedSetter_enum_select: 'StringSetter',
                       allowClear: false,
                       disabled: false,
+                      enum: '{{ $form?.values?.channel ? (JSON.parse($form?.values?.channel)?.members?.map(item => ({ label: item.name, value: item.name })) ||[]) : []}}',
                       mode: 'multiple',
                       placeholder:
                         this.i18n('i18n-92kkrrjc') /* 添加“and 条件” */,
@@ -989,7 +1173,7 @@ class NetworkDetail$$Page extends React.Component {
                   }}
                   fieldProps={{
                     _unsafe_MixedSetter_title_select: 'I18nSetter',
-                    name: 'Select',
+                    name: 'item',
                     title: {},
                     'x-validator': [],
                   }}
@@ -1701,8 +1885,49 @@ class NetworkDetail$$Page extends React.Component {
             <Col __component_name="Col" span={24}>
               <Transfer
                 __component_name="Transfer"
-                dataSource={[]}
+                __events={{
+                  eventDataList: [
+                    {
+                      name: 'onChange',
+                      relatedEventName: 'channelPeersChange',
+                      type: 'componentEvent',
+                    },
+                  ],
+                  eventList: [
+                    {
+                      disabled: true,
+                      name: 'onChange',
+                      template:
+                        "onChange(targetKeys,direction,moveKeys,${extParams}){\n// 选项在两栏之间转移时的回调函数\nconsole.log('onChange',targetKeys,direction,moveKeys);}",
+                    },
+                    {
+                      disabled: false,
+                      name: 'onScroll',
+                      template:
+                        "onScroll(direction,event,${extParams}){\n// 选项列表滚动时的回调函数\nconsole.log('onScroll',direction,event);}",
+                    },
+                    {
+                      disabled: false,
+                      name: 'onSearch',
+                      template:
+                        "onSearch(direction,value,${extParams}){\n// 搜索框内容时改变时的回调函数\nconsole.log('onSearch',direction,value);}",
+                    },
+                    {
+                      disabled: false,
+                      name: 'onSelectChange',
+                      template:
+                        "onSelectChange(sourceSelectedKeys,targetSelectedKeys,${extParams}){\n// 选中项发生改变时的回调函数\nconsole.log('onSelectChange',sourceSelectedKeys,targetSelectedKeys);}",
+                    },
+                  ],
+                }}
+                dataSource={__$$eval(() => this.state.peers)}
                 disabled={false}
+                onChange={function () {
+                  return this.channelPeersChange.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
                 oneWay={false}
                 render={function () {
                   const self = this;
@@ -4086,9 +4311,9 @@ class NetworkDetail$$Page extends React.Component {
                                     >
                                       {__$$eval(
                                         () =>
-                                          record?.peers?.map(
-                                            (item) => item.name
-                                          ) || '-'
+                                          record?.peers
+                                            ?.map((item) => item.name)
+                                            ?.join(', ') || '-'
                                       )}
                                     </Typography.Text>
                                   ))(
@@ -4102,8 +4327,8 @@ class NetworkDetail$$Page extends React.Component {
                                   this.i18n('i18n-4cpogden') /* 我的节点 */,
                               },
                               {
-                                dataIndex: 'creationTimestamp',
-                                key: 'creationTimestamp',
+                                dataIndex: 'hy',
+                                key: 'hy',
                                 title:
                                   this.i18n('i18n-4lrtaenb') /* 合约数量 */,
                               },
@@ -4135,7 +4360,7 @@ class NetworkDetail$$Page extends React.Component {
                                   ((__$$context) => (
                                     <Status
                                       __component_name="Status"
-                                      id="disabled"
+                                      id={__$$eval(() => record.status)}
                                       types={[
                                         {
                                           children:
@@ -4798,9 +5023,9 @@ class NetworkDetail$$Page extends React.Component {
                                 []
                               )
                                 ?.filter((item) => {
-                                  return this.state.channel.searchValue
+                                  return this.state.contract.searchValue
                                     ? item.name?.includes(
-                                        this.state.channel.searchValue
+                                        this.state.contract.searchValue
                                       )
                                     : true;
                                 })
@@ -4867,9 +5092,9 @@ class NetworkDetail$$Page extends React.Component {
                                     this.props.useGetNetwork?.data?.network
                                       ?.hy || []
                                   )?.filter((item) => {
-                                    return this.state.channel.searchValue
+                                    return this.state.contract.searchValue
                                       ? item.name?.includes(
-                                          this.state.channel.searchValue
+                                          this.state.contract.searchValue
                                         )
                                       : true;
                                   })).length
@@ -4968,7 +5193,7 @@ class NetworkDetail$$Page extends React.Component {
                                       {
                                         name: 'onChange',
                                         relatedEventName:
-                                          'handleContractSearchValueChange',
+                                          'handleStrategySearchValueChange',
                                         type: 'componentEvent',
                                       },
                                     ],
@@ -5024,7 +5249,7 @@ class NetworkDetail$$Page extends React.Component {
                                     ],
                                   }}
                                   onChange={function () {
-                                    return this.handleContractSearchValueChange.apply(
+                                    return this.handleStrategySearchValueChange.apply(
                                       this,
                                       Array.prototype.slice
                                         .call(arguments)
@@ -5105,8 +5330,8 @@ class NetworkDetail$$Page extends React.Component {
                                   this.i18n('i18n-87kp314f') /* 策略名称 */,
                               },
                               {
-                                dataIndex: 'version',
-                                key: 'version',
+                                dataIndex: 'channel',
+                                key: 'channel',
                                 title:
                                   this.i18n('i18n-gnw09zuy') /* 应用通道 */,
                               },
@@ -5118,8 +5343,8 @@ class NetworkDetail$$Page extends React.Component {
                                   this.i18n('i18n-qg8otk6r') /* 应用合约 */,
                               },
                               {
-                                dataIndex: 'node',
-                                key: 'node',
+                                dataIndex: 'description',
+                                key: 'description',
                                 title:
                                   this.i18n('i18n-w3qy6omh') /* 策略描述 */,
                               },
@@ -5131,14 +5356,11 @@ class NetworkDetail$$Page extends React.Component {
                               },
                             ]}
                             dataSource={__$$eval(() =>
-                              (
-                                this.props.useGetNetwork?.data?.network?.cl ||
-                                []
-                              )
+                              (this.state?.strategy?.list || [])
                                 ?.filter((item) => {
-                                  return this.state.channel.searchValue
+                                  return this.state.strategy.searchValue
                                     ? item.name?.includes(
-                                        this.state.channel.searchValue
+                                        this.state.strategy.searchValue
                                       )
                                     : true;
                                 })
@@ -5201,16 +5423,15 @@ class NetworkDetail$$Page extends React.Component {
                               size: 'default',
                               total: __$$eval(
                                 () =>
-                                  ((
-                                    this.props.useGetNetwork?.data?.network
-                                      ?.hy || []
-                                  )?.filter((item) => {
-                                    return this.state.channel.searchValue
-                                      ? item.name?.includes(
-                                          this.state.channel.searchValue
-                                        )
-                                      : true;
-                                  })).length
+                                  ((this.state?.strategy?.list || [])?.filter(
+                                    (item) => {
+                                      return this.state.strategy.searchValue
+                                        ? item.name?.includes(
+                                            this.state.strategy.searchValue
+                                          )
+                                        : true;
+                                    }
+                                  )).length
                               ),
                             }}
                             rowKey="name"
@@ -5906,8 +6127,18 @@ class NetworkDetail$$Page extends React.Component {
               __component_name="FormilySelect"
               componentProps={{
                 'x-component-props': {
+                  _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                   allowClear: false,
                   disabled: false,
+                  enum: __$$eval(
+                    () =>
+                      this.props.useGetNetwork?.data?.network?.organizations?.map(
+                        (item) => ({
+                          value: item.name,
+                          label: `${item.name}(${item.admin})`,
+                        })
+                      ) || []
+                  ),
                   placeholder: this.i18n('i18n-vg3668rl') /* 请选择组织 */,
                 },
               }}

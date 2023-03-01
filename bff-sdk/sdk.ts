@@ -32,6 +32,10 @@ export type Channel = {
   createdByMe?: Maybe<Scalars['Boolean']>;
   /** 合约数量 */
   creationTimestamp?: Maybe<Scalars['String']>;
+  /** 描述 */
+  description?: Maybe<Scalars['String']>;
+  /** 背书策略 */
+  epolicy?: Maybe<Array<Epolicy>>;
   /** 我参与的 */
   iamInvolved?: Maybe<Scalars['Boolean']>;
   /** 组织数量 */
@@ -60,6 +64,21 @@ export enum ChannelStatus {
   /** 失败 */
   Error = 'Error',
 }
+
+/** 背书策略 */
+export type Epolicy = {
+  __typename?: 'Epolicy';
+  /** 所在通道 */
+  channel: Scalars['String'];
+  /** 创建时间 */
+  creationTimestamp?: Maybe<Scalars['String']>;
+  /** 描述 */
+  description?: Maybe<Scalars['String']>;
+  /** name */
+  name: Scalars['ID'];
+  /** 策略内容 */
+  value: Scalars['String'];
+};
 
 /** 联盟 */
 export type Federation = {
@@ -153,6 +172,10 @@ export type Mutation = {
   channelCreate: Channel;
   /** 加入/去除Peer节点 */
   channelUpdate: Channel;
+  /** 创建策略 */
+  epolicyCreate: Epolicy;
+  /** 删除策略 */
+  epolicyDelete: K8sV1Status;
   /** 向联盟中添加组织（返回true：只表示这个操作触发成功，而不是添加组织成功） */
   federationAddOrganization: Scalars['Boolean'];
   /** 创建联盟 */
@@ -167,6 +190,8 @@ export type Mutation = {
   ibppeerCreate: Ibppeer;
   /** 创建网络 */
   networkCreate: Network;
+  /** 删除网络 */
+  networkDelete: K8sV1Status;
   /** 释放网络（返回true：只表示这个操作触发成功，而不是释放网络成功） */
   networkDissolve: Scalars['Boolean'];
   /** 新增组织 */
@@ -186,6 +211,14 @@ export type MutationChannelCreateArgs = {
 
 export type MutationChannelUpdateArgs = {
   channel: UpdateChannel;
+  name: Scalars['String'];
+};
+
+export type MutationEpolicyCreateArgs = {
+  epolicy: NewEpolicyInput;
+};
+
+export type MutationEpolicyDeleteArgs = {
   name: Scalars['String'];
 };
 
@@ -217,6 +250,10 @@ export type MutationIbppeerCreateArgs = {
 
 export type MutationNetworkCreateArgs = {
   network: NewNetworkInput;
+};
+
+export type MutationNetworkDeleteArgs = {
+  name: Scalars['String'];
 };
 
 export type MutationNetworkDissolveArgs = {
@@ -294,6 +331,17 @@ export type NewChannel = {
   peers: Array<ChannelPeer>;
   /** 准入门槛 */
   policy?: InputMaybe<Scalars['String']>;
+};
+
+export type NewEpolicyInput = {
+  /** 通道（当前用户组织参与的channel，使用接口：getChannelsForCreateEpolicy） */
+  channel?: InputMaybe<Scalars['String']>;
+  /** 策略描述 */
+  description?: InputMaybe<Scalars['String']>;
+  /** 策略名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*） */
+  name: Scalars['String'];
+  /** 策略内容：可选组织为已选通道内的成员，语法参考（https://hyperledger-fabric.readthedocs.io/en/latest/endorsement-policies.html#endorsement-policy-syntax） */
+  value?: InputMaybe<Scalars['String']>;
 };
 
 export type NewFederationInput = {
@@ -378,8 +426,6 @@ export type Organization = {
   name: Scalars['ID'];
   /** 所在网络 */
   networks?: Maybe<Array<Network>>;
-  /** 状态（加入联盟时处于哪个阶段） */
-  phase?: Maybe<Scalars['String']>;
   /** 原因 */
   reason?: Maybe<Scalars['String']>;
   /** 状态 */
@@ -453,6 +499,12 @@ export enum ProposalType {
 
 export type Query = {
   __typename?: 'Query';
+  /** 通道详情 */
+  channel: Channel;
+  /** 创建策略时，可选的通道 */
+  channelsForCreateEpolicy: Array<Channel>;
+  /** 策略列表 */
+  epolicies: Array<Epolicy>;
   /** 联盟详情 */
   federation: Federation;
   /** 联盟列表 */
@@ -473,6 +525,18 @@ export type Query = {
   proposal: Proposal;
   /** 提议列表 */
   proposals: Array<Proposal>;
+};
+
+export type QueryChannelArgs = {
+  name: Scalars['String'];
+};
+
+export type QueryChannelsForCreateEpolicyArgs = {
+  network: Scalars['String'];
+};
+
+export type QueryEpoliciesArgs = {
+  network?: InputMaybe<Scalars['String']>;
 };
 
 export type QueryFederationArgs = {
@@ -634,6 +698,32 @@ export enum VotePhase {
   Voted = 'Voted',
 }
 
+export type GetChannelQueryVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type GetChannelQuery = {
+  __typename?: 'Query';
+  channel: {
+    __typename?: 'Channel';
+    name: string;
+    description?: string | null;
+    creationTimestamp?: string | null;
+    epolicy?: Array<{
+      __typename?: 'Epolicy';
+      name: string;
+      description?: string | null;
+      creationTimestamp?: string | null;
+    }> | null;
+    members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
+    peers?: Array<{
+      __typename?: 'SpecPeer';
+      name?: string | null;
+      namespace?: string | null;
+    }> | null;
+  };
+};
+
 export type CreateChannelMutationVariables = Exact<{
   network: Scalars['String'];
   channel: NewChannel;
@@ -674,6 +764,63 @@ export type UpdateChannelMutation = {
       namespace?: string | null;
     }> | null;
   };
+};
+
+export type GetEpoliciesQueryVariables = Exact<{
+  network?: InputMaybe<Scalars['String']>;
+}>;
+
+export type GetEpoliciesQuery = {
+  __typename?: 'Query';
+  epolicies: Array<{
+    __typename?: 'Epolicy';
+    name: string;
+    description?: string | null;
+    channel: string;
+    value: string;
+  }>;
+};
+
+export type CreateEpolicyMutationVariables = Exact<{
+  epolicy: NewEpolicyInput;
+}>;
+
+export type CreateEpolicyMutation = {
+  __typename?: 'Mutation';
+  epolicyCreate: {
+    __typename?: 'Epolicy';
+    name: string;
+    value: string;
+    description?: string | null;
+    channel: string;
+  };
+};
+
+export type DeleteEpolicyMutationVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type DeleteEpolicyMutation = {
+  __typename?: 'Mutation';
+  epolicyDelete: {
+    __typename?: 'K8sV1Status';
+    status?: string | null;
+    code?: number | null;
+    message?: string | null;
+  };
+};
+
+export type GetChannelsForCreateEpolicyQueryVariables = Exact<{
+  network: Scalars['String'];
+}>;
+
+export type GetChannelsForCreateEpolicyQuery = {
+  __typename?: 'Query';
+  channelsForCreateEpolicy: Array<{
+    __typename?: 'Channel';
+    name: string;
+    members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
+  }>;
 };
 
 export type GetFederationsQueryVariables = Exact<{ [key: string]: never }>;
@@ -997,6 +1144,20 @@ export type DissolveNetworkMutation = {
   networkDissolve: boolean;
 };
 
+export type DeleteNetworkMutationVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type DeleteNetworkMutation = {
+  __typename?: 'Mutation';
+  networkDelete: {
+    __typename?: 'K8sV1Status';
+    code?: number | null;
+    status?: string | null;
+    message?: string | null;
+  };
+};
+
 export type GetOrganizationsQueryVariables = Exact<{
   admin?: InputMaybe<Scalars['String']>;
 }>;
@@ -1217,6 +1378,27 @@ export type UpdateVoteMutation = {
   };
 };
 
+export const GetChannelDocument = gql`
+  query getChannel($name: String!) {
+    channel(name: $name) {
+      name
+      description
+      creationTimestamp
+      epolicy {
+        name
+        description
+        creationTimestamp
+      }
+      members {
+        name
+      }
+      peers {
+        name
+        namespace
+      }
+    }
+  }
+`;
 export const CreateChannelDocument = gql`
   mutation createChannel($network: String!, $channel: NewChannel!) {
     channelCreate(network: $network, channel: $channel) {
@@ -1246,6 +1428,45 @@ export const UpdateChannelDocument = gql`
       }
       creationTimestamp
       status
+    }
+  }
+`;
+export const GetEpoliciesDocument = gql`
+  query getEpolicies($network: String) {
+    epolicies(network: $network) {
+      name
+      description
+      channel
+      value
+    }
+  }
+`;
+export const CreateEpolicyDocument = gql`
+  mutation createEpolicy($epolicy: NewEpolicyInput!) {
+    epolicyCreate(epolicy: $epolicy) {
+      name
+      value
+      description
+      channel
+    }
+  }
+`;
+export const DeleteEpolicyDocument = gql`
+  mutation deleteEpolicy($name: String!) {
+    epolicyDelete(name: $name) {
+      status
+      code
+      message
+    }
+  }
+`;
+export const GetChannelsForCreateEpolicyDocument = gql`
+  query getChannelsForCreateEpolicy($network: String!) {
+    channelsForCreateEpolicy(network: $network) {
+      name
+      members {
+        name
+      }
     }
   }
 `;
@@ -1493,6 +1714,15 @@ export const DissolveNetworkDocument = gql`
     networkDissolve(name: $name, federation: $federation, initiator: $initiator)
   }
 `;
+export const DeleteNetworkDocument = gql`
+  mutation deleteNetwork($name: String!) {
+    networkDelete(name: $name) {
+      code
+      status
+      message
+    }
+  }
+`;
 export const GetOrganizationsDocument = gql`
   query getOrganizations($admin: String) {
     organizations(admin: $admin) {
@@ -1674,6 +1904,20 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    getChannel(
+      variables: GetChannelQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetChannelQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetChannelQuery>(GetChannelDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getChannel',
+        'query'
+      );
+    },
     createChannel(
       variables: CreateChannelMutationVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -1700,6 +1944,63 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
           }),
         'updateChannel',
         'mutation'
+      );
+    },
+    getEpolicies(
+      variables?: GetEpoliciesQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetEpoliciesQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetEpoliciesQuery>(GetEpoliciesDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getEpolicies',
+        'query'
+      );
+    },
+    createEpolicy(
+      variables: CreateEpolicyMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<CreateEpolicyMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<CreateEpolicyMutation>(CreateEpolicyDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'createEpolicy',
+        'mutation'
+      );
+    },
+    deleteEpolicy(
+      variables: DeleteEpolicyMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<DeleteEpolicyMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<DeleteEpolicyMutation>(DeleteEpolicyDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'deleteEpolicy',
+        'mutation'
+      );
+    },
+    getChannelsForCreateEpolicy(
+      variables: GetChannelsForCreateEpolicyQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetChannelsForCreateEpolicyQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetChannelsForCreateEpolicyQuery>(
+            GetChannelsForCreateEpolicyDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getChannelsForCreateEpolicy',
+        'query'
       );
     },
     getFederations(
@@ -1886,6 +2187,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
         'mutation'
       );
     },
+    deleteNetwork(
+      variables: DeleteNetworkMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<DeleteNetworkMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<DeleteNetworkMutation>(DeleteNetworkDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'deleteNetwork',
+        'mutation'
+      );
+    },
     getOrganizations(
       variables?: GetOrganizationsQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -2032,6 +2347,36 @@ export function getSdkWithHooks(
   ];
   return {
     ...sdk,
+    useGetChannel(
+      variables: GetChannelQueryVariables,
+      config?: SWRConfigInterface<GetChannelQuery, ClientError>
+    ) {
+      return useSWR<GetChannelQuery, ClientError>(
+        genKey<GetChannelQueryVariables>('GetChannel', variables),
+        () => sdk.getChannel(variables),
+        config
+      );
+    },
+    useGetEpolicies(
+      variables?: GetEpoliciesQueryVariables,
+      config?: SWRConfigInterface<GetEpoliciesQuery, ClientError>
+    ) {
+      return useSWR<GetEpoliciesQuery, ClientError>(
+        genKey<GetEpoliciesQueryVariables>('GetEpolicies', variables),
+        () => sdk.getEpolicies(variables),
+        config
+      );
+    },
+    useGetChannelsForCreateEpolicy(
+      variables: GetChannelsForCreateEpolicyQueryVariables,
+      config?: SWRConfigInterface<GetChannelsForCreateEpolicyQuery, ClientError>
+    ) {
+      return useSWR<GetChannelsForCreateEpolicyQuery, ClientError>(
+        genKey<GetChannelsForCreateEpolicyQueryVariables>('GetChannelsForCreateEpolicy', variables),
+        () => sdk.getChannelsForCreateEpolicy(variables),
+        config
+      );
+    },
     useGetFederations(
       variables?: GetFederationsQueryVariables,
       config?: SWRConfigInterface<GetFederationsQuery, ClientError>
