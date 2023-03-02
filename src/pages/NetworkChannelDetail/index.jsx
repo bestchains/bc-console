@@ -106,19 +106,58 @@ class NetworkChannelDetail$$Page extends React.Component {
                         column={1}
                         items={[
                           {
-                            children: null,
+                            children: (
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                disabled={false}
+                                ellipsis={true}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                              >
+                                {__$$eval(
+                                  () =>
+                                    this.props.useGetChannel?.data?.channel
+                                      ?.name || '-'
+                                )}
+                              </Typography.Text>
+                            ),
                             key: '9qhq7vaoun',
                             label: this.i18n('i18n-9e87qfos') /* 名称 */,
                             span: 1,
                           },
                           {
-                            children: null,
+                            children: (
+                              <Typography.Text
+                                __component_name="Typography.Text"
+                                disabled={false}
+                                ellipsis={true}
+                                strong={false}
+                                style={{ fontSize: '' }}
+                              >
+                                {__$$eval(
+                                  () =>
+                                    this.props.useGetChannel?.data?.channel
+                                      ?.description || '-'
+                                )}
+                              </Typography.Text>
+                            ),
                             key: 'pvlb9npuf1',
                             label: this.i18n('i18n-8weq4mfy9lf') /* 描述 */,
                             span: 1,
                           },
                           {
-                            children: null,
+                            children: (
+                              <Typography.Time
+                                __component_name="Typography.Time"
+                                format=""
+                                relativeTime={false}
+                                time={__$$eval(
+                                  () =>
+                                    this.props.useGetChannel?.data?.channel
+                                      ?.creationTimestamp || '-'
+                                )}
+                              />
+                            ),
                             key: '3fvfujee7p7',
                             label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                             span: 1,
@@ -142,7 +181,11 @@ class NetworkChannelDetail$$Page extends React.Component {
                               strong={false}
                               style={{ fontSize: '' }}
                             >
-                              text
+                              {__$$eval(
+                                () =>
+                                  this.props.useGetChannel?.data?.channel
+                                    ?.name || '-'
+                              )}
                             </Typography.Text>
                           }
                         </Descriptions.Item>
@@ -159,7 +202,11 @@ class NetworkChannelDetail$$Page extends React.Component {
                               strong={false}
                               style={{ fontSize: '' }}
                             >
-                              text
+                              {__$$eval(
+                                () =>
+                                  this.props.useGetChannel?.data?.channel
+                                    ?.description || '-'
+                              )}
                             </Typography.Text>
                           }
                         </Descriptions.Item>
@@ -173,7 +220,11 @@ class NetworkChannelDetail$$Page extends React.Component {
                               __component_name="Typography.Time"
                               format=""
                               relativeTime={false}
-                              time=""
+                              time={__$$eval(
+                                () =>
+                                  this.props.useGetChannel?.data?.channel
+                                    ?.creationTimestamp || '-'
+                              )}
                             />
                           }
                         </Descriptions.Item>
@@ -221,6 +272,9 @@ class NetworkChannelDetail$$Page extends React.Component {
                           },
                         ]}
                         dataSource={__$$eval(() => [{}])}
+                        loading={__$$eval(
+                          () => this.props.useGetChannel?.loading
+                        )}
                         pagination={false}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
@@ -269,12 +323,19 @@ class NetworkChannelDetail$$Page extends React.Component {
                           },
                           {
                             _unsafe_MixedSetter_title_select: 'StringSetter',
-                            dataIndex: 'version',
-                            key: 'age',
+                            dataIndex: 'name',
+                            key: 'name',
                             title: 'mspid',
                           },
                         ]}
-                        dataSource={__$$eval(() => [{}])}
+                        dataSource={__$$eval(
+                          () =>
+                            this.props.useGetChannel?.data?.channel?.members ||
+                            []
+                        )}
+                        loading={__$$eval(
+                          () => this.props.useGetChannel?.loading
+                        )}
                         pagination={false}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
@@ -322,8 +383,8 @@ class NetworkChannelDetail$$Page extends React.Component {
                             title: this.i18n('i18n-9e87qfos') /* 名称 */,
                           },
                           {
-                            dataIndex: 'version',
-                            key: 'age',
+                            dataIndex: 'namespace',
+                            key: 'namespace',
                             title: this.i18n('i18n-2uy76ea1') /* 组织 */,
                           },
                           {
@@ -332,7 +393,13 @@ class NetworkChannelDetail$$Page extends React.Component {
                             title: this.i18n('i18n-db5zj61b') /* 错节点 */,
                           },
                         ]}
-                        dataSource={__$$eval(() => [{}])}
+                        dataSource={__$$eval(
+                          () =>
+                            this.props.useGetChannel?.data?.channel?.peers || []
+                        )}
+                        loading={__$$eval(
+                          () => this.props.useGetChannel?.loading
+                        )}
                         pagination={false}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
@@ -378,8 +445,8 @@ class NetworkChannelDetail$$Page extends React.Component {
                         title: this.i18n('i18n-87kp314f') /* 策略名称 */,
                       },
                       {
-                        dataIndex: 'version',
-                        key: 'age',
+                        dataIndex: 'description',
+                        key: 'description',
                         title: this.i18n('i18n-w3qy6omh') /* 策略描述 */,
                       },
                       {
@@ -389,12 +456,31 @@ class NetworkChannelDetail$$Page extends React.Component {
                         title: this.i18n('i18n-xnyhdqu3') /* 应用合约数 */,
                       },
                       {
-                        dataIndex: 'crea',
-                        key: 'crea',
+                        dataIndex: 'creationTimestamp',
+                        key: 'creationTimestamp',
+                        render: (text, record, index) =>
+                          ((__$$context) => (
+                            <Typography.Time
+                              __component_name="Typography.Time"
+                              format=""
+                              relativeTime={false}
+                              time={__$$eval(() => record?.creationTimestamp)}
+                            />
+                          ))(
+                            __$$createChildContext(__$$context, {
+                              text,
+                              record,
+                              index,
+                            })
+                          ),
                         title: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                       },
                     ]}
-                    dataSource={__$$eval(() => [{}])}
+                    dataSource={__$$eval(
+                      () =>
+                        this.props.useGetChannel?.data?.channel?.epolicy || []
+                    )}
+                    loading={__$$eval(() => this.props.useGetChannel?.loading)}
                     pagination={false}
                     rowKey="id"
                     scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
@@ -429,7 +515,14 @@ export default () => {
   };
   return (
     <DataProvider
-      sdkSwrFuncs={[]}
+      sdkSwrFuncs={[
+        {
+          func: 'useGetChannel',
+          params: {
+            name: self.match?.params?.channelId,
+          },
+        },
+      ]}
       render={(dataProps) => (
         <NetworkChannelDetail$$Page
           {...dataProps}

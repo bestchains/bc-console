@@ -74,6 +74,8 @@ export type Epolicy = {
   creationTimestamp?: Maybe<Scalars['String']>;
   /** 描述 */
   description?: Maybe<Scalars['String']>;
+  /** 更新时间 */
+  lastHeartbeatTime?: Maybe<Scalars['String']>;
   /** name */
   name: Scalars['ID'];
   /** 策略内容 */
@@ -187,7 +189,7 @@ export type Mutation = {
   /** 从联盟中驱逐一个组织（返回true：只表示这个操作触发成功，而不是驱逐组织成功） */
   federationRemoveOrganization: Scalars['Boolean'];
   /** 创建IBPPeer节点 */
-  ibppeerCreate: Ibppeer;
+  ibppeerCreate: Array<Ibppeer>;
   /** 创建网络 */
   networkCreate: Network;
   /** 删除网络 */
@@ -245,6 +247,7 @@ export type MutationFederationRemoveOrganizationArgs = {
 };
 
 export type MutationIbppeerCreateArgs = {
+  count?: InputMaybe<Scalars['Float']>;
   organization: Scalars['String'];
 };
 
@@ -658,6 +661,8 @@ export type User = {
   email: Scalars['String'];
   /** 是否为组织管理员（组织列表中） */
   isOrganizationAdmin?: Maybe<Scalars['Boolean']>;
+  /** 加入组织时间（组织列表中） */
+  joinedAt?: Maybe<Scalars['String']>;
   /** 用户名 */
   name: Scalars['ID'];
   /** 密码 */
@@ -778,6 +783,8 @@ export type GetEpoliciesQuery = {
     description?: string | null;
     channel: string;
     value: string;
+    creationTimestamp?: string | null;
+    lastHeartbeatTime?: string | null;
   }>;
 };
 
@@ -993,12 +1000,13 @@ export type GetIbppeersQuery = {
 };
 
 export type CreateIbppeerMutationVariables = Exact<{
-  organization: Scalars['String'];
+  org: Scalars['String'];
+  count?: InputMaybe<Scalars['Float']>;
 }>;
 
 export type CreateIbppeerMutation = {
   __typename?: 'Mutation';
-  ibppeerCreate: {
+  ibppeerCreate: Array<{
     __typename?: 'Ibppeer';
     name: string;
     creationTimestamp: string;
@@ -1008,7 +1016,7 @@ export type CreateIbppeerMutation = {
       cpu: string;
       memory: string;
     } | null;
-  };
+  }>;
 };
 
 export type GetNetworksQueryVariables = Exact<{ [key: string]: never }>;
@@ -1202,18 +1210,9 @@ export type GetOrganizationQuery = {
       __typename?: 'User';
       name: string;
       isOrganizationAdmin?: boolean | null;
+      joinedAt?: string | null;
     }> | null;
-    ibppeers?: Array<{
-      __typename?: 'Ibppeer';
-      name: string;
-      creationTimestamp: string;
-      status?: IbppeerStatus | null;
-      limits?: {
-        __typename?: 'SpecResource';
-        cpu: string;
-        memory: string;
-      } | null;
-    }> | null;
+    ibppeers?: Array<{ __typename?: 'Ibppeer'; name: string }> | null;
   };
 };
 
@@ -1438,6 +1437,8 @@ export const GetEpoliciesDocument = gql`
       description
       channel
       value
+      creationTimestamp
+      lastHeartbeatTime
     }
   }
 `;
@@ -1597,8 +1598,8 @@ export const GetIbppeersDocument = gql`
   }
 `;
 export const CreateIbppeerDocument = gql`
-  mutation createIbppeer($organization: String!) {
-    ibppeerCreate(organization: $organization) {
+  mutation createIbppeer($org: String!, $count: Float) {
+    ibppeerCreate(organization: $org, count: $count) {
       name
       creationTimestamp
       status
@@ -1760,15 +1761,10 @@ export const GetOrganizationDocument = gql`
       users {
         name
         isOrganizationAdmin
+        joinedAt
       }
       ibppeers {
         name
-        creationTimestamp
-        status
-        limits {
-          cpu
-          memory
-        }
       }
     }
   }
