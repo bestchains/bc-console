@@ -409,7 +409,7 @@ class NetworkDetail$$Page extends React.Component {
                   _valueitem$item === void 0
                   ? void 0
                   : (_valueitem$item$map = _valueitem$item.map((item, i) => {
-                      item = `'${item}'`;
+                      item = `'${item}.member'`;
                       if (i === 0) {
                         return 'AND(' + item;
                       }
@@ -5349,8 +5349,25 @@ class NetworkDetail$$Page extends React.Component {
                                   this.i18n('i18n-w3qy6omh') /* 策略描述 */,
                               },
                               {
-                                dataIndex: 'channels',
-                                key: 'channels',
+                                dataIndex: 'lastHeartbeatTime',
+                                key: 'lastHeartbeatTime',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Time
+                                      __component_name="Typography.Time"
+                                      format=""
+                                      relativeTime={false}
+                                      time={__$$eval(
+                                        () => record?.lastHeartbeatTime
+                                      )}
+                                    />
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
                                 title:
                                   this.i18n('i18n-watjije0jk') /* 更新时间 */,
                               },
