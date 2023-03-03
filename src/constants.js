@@ -1,7 +1,5 @@
-const __$$constants = {};
-
-export default __$$constants;
-
 export const IS_PROD = process.env.NODE_ENV === 'production';
-export const isQiankun = window.__POWERED_BY_QIANKUN__;
-export const basename = IS_PROD || isQiankun ? '/bc/' : '/';
+export const IS_QIAN_KUN = window.__POWERED_BY_QIANKUN__;
+export const basename = IS_PROD || IS_QIAN_KUN ? '/bc' : '/';
+
+export default { IS_PROD, IS_QIAN_KUN, basename };

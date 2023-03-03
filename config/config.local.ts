@@ -15,12 +15,12 @@ import { defineConfig } from '@umijs/max';
 export default defineConfig({
   proxy: {
     '/bff': {
-      target: 'https://bc.172.22.96.209.nip.io',
+      target: 'https://portal.172.22.96.209.nip.io/bc-apis',
       changeOrigin: true,
       secure: false,
     },
     '/token': {
-      target: 'https://bc.172.22.96.209.nip.io',
+      target: 'https://portal.172.22.96.209.nip.io',
       changeOrigin: true,
       secure: false,
     },

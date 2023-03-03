@@ -17,7 +17,7 @@ import logo from '@/assets/img/logo-title-white.png';
 import theme from '../config/theme';
 import { initUnifiedLinkHistory } from '@tenx-ui/utils/es/UnifiedLink';
 import utils from './utils';
-import { basename, IS_PROD, isQiankun } from './constants';
+import { basename, IS_PROD, IS_QIAN_KUN } from './constants';
 import { getLocale, setLocale } from './i18n';
 import { Tooltip } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
@@ -78,7 +78,7 @@ export const layout: RunTimeLayoutConfig = () => {
     }
   );
 
-  const notProdOrQiankun = !IS_PROD && !isQiankun;
+  const notProdOrQiankun = !IS_PROD && !IS_QIAN_KUN;
 
   return {
     title: false,

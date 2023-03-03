@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Outlet, useLocation, history } from '@umijs/max';
 import utils from '../utils';
-import { IS_PROD, isQiankun } from '../constants';
+import { IS_PROD, IS_QIAN_KUN } from '../constants';
 import { getLocale } from '../i18n';
 import Request from '@tenx-ui/utils/es/request';
 import queryString from '@tenx-ui/utils/es/queryString';
@@ -39,7 +39,7 @@ const Layout: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!IS_PROD || !isQiankun) {
+    if (!IS_PROD || !IS_QIAN_KUN) {
       if (query.code) {
         getToken(query.code);
         return;

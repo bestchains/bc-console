@@ -31,10 +31,13 @@
   },
   "husky": { "hooks": { "pre-commit": "npm run lint-staged" } },
   "lint-staged": {
-    "**/*.less": "stylelint --allow-empty-input --syntax less",
-    "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:es",
-    "**/*.{js,jsx,less,md,json}": ["prettier --write"],
-    "**/*.ts?(x)": ["prettier --parser=typescript --write"]
+    "**/*.js?(x)": ["eslint --fix", "prettier --write"],
+    "**/*.ts?(x)": ["eslint --fix", "prettier --parser=typescript --write"],
+    "**/*.{less}": [
+      "stylelint --allow-empty-input --syntax less",
+      "prettier --write"
+    ],
+    "**/*.{md,json}": ["prettier --write"]
   },
   "dependencies": {
     "@alilc/lowcode-datasource-engine": "latest",
