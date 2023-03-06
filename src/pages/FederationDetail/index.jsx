@@ -1204,7 +1204,7 @@ class FederationDetail$$Page extends React.Component {
                     render: (text, record, index) =>
                       ((__$$context) => (
                         <Status
-                          id="disabled"
+                          id={__$$eval(() => record.status)}
                           types={[
                             {
                               children: this.i18n('i18n-zrowlr7zwx') /* 正常 */,

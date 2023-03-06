@@ -56,15 +56,15 @@ class OrganizationDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      current: 1,
+      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
-      filter: 'ALL',
-      searchValue: undefined,
-      searchKey: 'name',
-      size: 10,
-      current: 1,
-      record: {},
       peers: [],
+      record: {},
+      searchKey: 'name',
+      searchValue: undefined,
+      size: 10,
     };
   }
 
@@ -77,101 +77,6 @@ class OrganizationDetail$$Page extends React.Component {
   };
 
   componentWillUnmount() {}
-
-  async getIbppeers() {
-    var _this$match, _this$match$params;
-    const res = await this.props.appHelper.utils.bff.getIbppeers({
-      organization:
-        (_this$match = this.match) === null || _this$match === void 0
-          ? void 0
-          : (_this$match$params = _this$match.params) === null ||
-            _this$match$params === void 0
-          ? void 0
-          : _this$match$params.id,
-    });
-    this.setState({
-      peers: (res === null || res === void 0 ? void 0 : res.ibppeers) || [],
-    });
-  }
-
-  openCreateModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'create',
-    });
-  }
-
-  openCreateNodeModal() {
-    this.setState(
-      {
-        isOpenModal: true,
-        modalType: 'createnode',
-      },
-      () => {
-        setTimeout(() => {
-          var _this$props$useGetOrg,
-            _this$props$useGetOrg2,
-            _this$$,
-            _this$$$formRef,
-            _this$$$formRef$curre,
-            _this$state$peers;
-          const organization =
-            ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
-            _this$props$useGetOrg === void 0
-              ? void 0
-              : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) ===
-                  null || _this$props$useGetOrg2 === void 0
-              ? void 0
-              : _this$props$useGetOrg2.organization) || {};
-          const form =
-            (_this$$ = this.$('formily_create_node')) === null ||
-            _this$$ === void 0
-              ? void 0
-              : (_this$$$formRef = _this$$.formRef) === null ||
-                _this$$$formRef === void 0
-              ? void 0
-              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-                _this$$$formRef$curre === void 0
-              ? void 0
-              : _this$$$formRef$curre.form;
-          form.setValues({
-            organization: organization.name,
-            nodes:
-              ((_this$state$peers = this.state.peers) === null ||
-              _this$state$peers === void 0
-                ? void 0
-                : _this$state$peers.length) || 0,
-            count: 1,
-            storage: 50,
-            time: '30',
-          });
-        }, 0);
-      }
-    );
-  }
-
-  openCreateSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'createsuccess',
-    });
-  }
-
-  openTransferModal(e, payload) {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'transfer',
-      record: payload === null || payload === void 0 ? void 0 : payload.record,
-    });
-  }
-
-  openDeleteModal(e, payload) {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'delete',
-      record: payload === null || payload === void 0 ? void 0 : payload.record,
-    });
-  }
 
   closeModal() {
     this.setState({
@@ -244,7 +149,7 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
-  confirmTransferModal(e, payload) {
+  confirmCreateNodelModal(e, payload) {
     var _this$props$useGetOrg,
       _this$props$useGetOrg2,
       _this$$,
@@ -259,7 +164,7 @@ class OrganizationDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetOrg2.organization) || {};
     const form =
-      (_this$$ = this.$('formily_transfer')) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_create_node')) === null || _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -270,19 +175,19 @@ class OrganizationDetail$$Page extends React.Component {
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
       try {
-        await this.props.appHelper.utils.bff.updateOrganization({
-          name: organization.name,
-          organization: v,
+        const res = await this.props.appHelper.utils.bff.createIbppeer({
+          org: organization.name,
+          count: v.count,
         });
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n('i18n-hjonznxjara'),
+          message: this.i18n('i18n-x26twb9oy0l'),
         });
-        this.props.useGetOrganization.mutate();
+        this.getIbppeers();
       } catch (error) {
         var _error$response;
         this.utils.notification.warnings({
-          message: this.i18n('i18n-zzu9mo73zo'),
+          message: this.i18n('i18n-43getajmxf3'),
           errors:
             error === null || error === void 0
               ? void 0
@@ -349,7 +254,7 @@ class OrganizationDetail$$Page extends React.Component {
     }
   }
 
-  confirmCreateNodelModal(e, payload) {
+  confirmTransferModal(e, payload) {
     var _this$props$useGetOrg,
       _this$props$useGetOrg2,
       _this$$,
@@ -364,7 +269,7 @@ class OrganizationDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetOrg2.organization) || {};
     const form =
-      (_this$$ = this.$('formily_create_node')) === null || _this$$ === void 0
+      (_this$$ = this.$('formily_transfer')) === null || _this$$ === void 0
         ? void 0
         : (_this$$$formRef = _this$$.formRef) === null ||
           _this$$$formRef === void 0
@@ -375,19 +280,19 @@ class OrganizationDetail$$Page extends React.Component {
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
       try {
-        const res = await this.props.appHelper.utils.bff.createIbppeer({
-          org: organization.name,
-          count: v.count,
+        await this.props.appHelper.utils.bff.updateOrganization({
+          name: organization.name,
+          organization: v,
         });
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n('i18n-x26twb9oy0l'),
+          message: this.i18n('i18n-hjonznxjara'),
         });
-        this.getIbppeers();
+        this.props.useGetOrganization.mutate();
       } catch (error) {
         var _error$response;
         this.utils.notification.warnings({
-          message: this.i18n('i18n-43getajmxf3'),
+          message: this.i18n('i18n-zzu9mo73zo'),
           errors:
             error === null || error === void 0
               ? void 0
@@ -400,6 +305,22 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  async getIbppeers() {
+    var _this$match, _this$match$params;
+    const res = await this.props.appHelper.utils.bff.getIbppeers({
+      organization:
+        (_this$match = this.match) === null || _this$match === void 0
+          ? void 0
+          : (_this$match$params = _this$match.params) === null ||
+            _this$match$params === void 0
+          ? void 0
+          : _this$match$params.id,
+    });
+    this.setState({
+      peers: (res === null || res === void 0 ? void 0 : res.ibppeers) || [],
+    });
+  }
+
   handleFilterChange(e) {
     this.setState({
       filter: e.target.value,
@@ -407,44 +328,9 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      current: 1,
-    });
-  }
-
-  handlePaginationChange(c, s) {
-    this.setState({
-      size: s,
-      current: c,
-    });
-  }
-
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
-      'i18n-v7xu122b9o'
-    )}`;
-  }
-
   handleNodeFilterChange(e) {
     this.setState({
       filter: e.target.value,
-      current: 1,
-    });
-  }
-
-  handleNodeSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
       current: 1,
     });
   }
@@ -456,6 +342,13 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  handleNodeSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
   handleNodeTableChange(pagination, filters, sorter, extra) {
     this.setState({
       pagination,
@@ -464,7 +357,114 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
+  }
+
   nodePaginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
+  }
+
+  openCreateModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'create',
+    });
+  }
+
+  openCreateNodeModal() {
+    this.setState(
+      {
+        isOpenModal: true,
+        modalType: 'createnode',
+      },
+      () => {
+        setTimeout(() => {
+          var _this$props$useGetOrg,
+            _this$props$useGetOrg2,
+            _this$$,
+            _this$$$formRef,
+            _this$$$formRef$curre,
+            _this$state$peers;
+          const organization =
+            ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
+            _this$props$useGetOrg === void 0
+              ? void 0
+              : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) ===
+                  null || _this$props$useGetOrg2 === void 0
+              ? void 0
+              : _this$props$useGetOrg2.organization) || {};
+          const form =
+            (_this$$ = this.$('formily_create_node')) === null ||
+            _this$$ === void 0
+              ? void 0
+              : (_this$$$formRef = _this$$.formRef) === null ||
+                _this$$$formRef === void 0
+              ? void 0
+              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+                _this$$$formRef$curre === void 0
+              ? void 0
+              : _this$$$formRef$curre.form;
+          form.setValues({
+            organization: organization.name,
+            nodes:
+              ((_this$state$peers = this.state.peers) === null ||
+              _this$state$peers === void 0
+                ? void 0
+                : _this$state$peers.length) || 0,
+            count: 1,
+            storage: 50,
+            time: '30',
+          });
+        }, 0);
+      }
+    );
+  }
+
+  openCreateSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'createsuccess',
+    });
+  }
+
+  openDeleteModal(e, payload) {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+      record: payload === null || payload === void 0 ? void 0 : payload.record,
+    });
+  }
+
+  openTransferModal(e, payload) {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'transfer',
+      record: payload === null || payload === void 0 ? void 0 : payload.record,
+    });
+  }
+
+  paginationShowTotal(total, range) {
     return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
       'i18n-v7xu122b9o'
     )}`;
@@ -592,8 +592,9 @@ class OrganizationDetail$$Page extends React.Component {
                         relativeTime={false}
                         time={__$$eval(
                           () =>
-                            this.props.useGetOrganization?.data?.organization
-                              ?.joinAt
+                            this.props.useGetOrganization?.data?.organization?.users?.find(
+                              (item) => item.isOrganizationAdmin
+                            )?.joinedAt
                         )}
                       />
                     ),
@@ -685,8 +686,8 @@ class OrganizationDetail$$Page extends React.Component {
                   {
                     children: __$$eval(
                       () =>
-                        this.props.useGetOrganization?.data?.organization?.nodes
-                          ?.length || '-'
+                        this.props.useGetOrganization?.data?.organization
+                          ?.ibppeers?.length || '-'
                     ),
                     key: 'ayb0txehyzf',
                     label: this.i18n('i18n-kh6e0jr0i7b') /* 节点数量 */,
@@ -895,8 +896,8 @@ class OrganizationDetail$$Page extends React.Component {
                 >
                   {__$$eval(
                     () =>
-                      this.props.useGetOrganization?.data?.organization?.nodes
-                        ?.length || '-'
+                      this.props.useGetOrganization?.data?.organization
+                        ?.ibppeers?.length || '-'
                   )}
                 </Descriptions.Item>
               </Descriptions>
@@ -2595,36 +2596,36 @@ class OrganizationDetail$$Page extends React.Component {
                   __component_name="FormilyInput"
                   componentProps={{
                     'x-component-props': {
-                      placeholder: '请输入',
-                      addonAfter: 'G',
                       _unsafe_MixedSetter_addonAfter_select: 'StringSetter',
+                      addonAfter: 'G',
+                      placeholder: '请输入',
                     },
                   }}
                   fieldProps={{
+                    _unsafe_MixedSetter_default_select: 'StringSetter',
+                    default: '50',
                     name: 'storage',
                     title: this.i18n('i18n-cbhoi5g6') /* 节点存储 */,
                     'x-pattern': 'disabled',
                     'x-validator': [],
-                    default: '50',
-                    _unsafe_MixedSetter_default_select: 'StringSetter',
                   }}
                 />
                 <FormilyInput
                   __component_name="FormilyInput"
                   componentProps={{
                     'x-component-props': {
-                      placeholder: '请输入',
-                      addonAfter: this.i18n('i18n-rzd7hbhq') /* 天 */,
                       _unsafe_MixedSetter_addonAfter_select: 'I18nSetter',
+                      addonAfter: this.i18n('i18n-rzd7hbhq') /* 天 */,
+                      placeholder: '请输入',
                     },
                   }}
                   fieldProps={{
+                    _unsafe_MixedSetter_default_select: 'StringSetter',
+                    default: '30',
                     name: 'time',
                     title: this.i18n('i18n-ugehpppw') /* 购买时长 */,
                     'x-pattern': 'disabled',
                     'x-validator': [],
-                    default: '30',
-                    _unsafe_MixedSetter_default_select: 'StringSetter',
                   }}
                 />
               </FormilyForm>
