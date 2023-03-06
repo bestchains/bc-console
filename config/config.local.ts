@@ -19,10 +19,5 @@ export default defineConfig({
       changeOrigin: true,
       secure: false,
     },
-    '/token': {
-      target: 'https://portal.172.22.96.209.nip.io',
-      changeOrigin: true,
-      secure: false,
-    },
   },
 });

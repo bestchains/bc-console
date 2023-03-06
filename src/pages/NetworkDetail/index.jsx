@@ -191,15 +191,14 @@ class NetworkDetail$$Page extends React.Component {
         ? void 0
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
-      this.getPeers(v, () => {
-        this.setState({
-          channel: {
-            ...this.state.channel,
-            addData: v,
-            step: 1,
-          },
-        });
+      this.setState({
+        channel: {
+          ...this.state.channel,
+          addData: v,
+          step: 1,
+        },
       });
+      this.getPeers(v, () => {});
     });
   }
 
@@ -551,7 +550,13 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   async getChannelsForCreateEpolicy(callback) {
-    var _this$match, _this$match$params, _res$channelsForCreat;
+    var _this$match,
+      _this$match$params,
+      _res$channelsForCreat,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre,
+      _res$channelsForCreat2;
     const res =
       await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
         network:
@@ -580,6 +585,29 @@ class NetworkDetail$$Page extends React.Component {
       },
       callback
     );
+    const form =
+      (_this$$ = this.$('formily_create_strategy')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.setFieldState('channel', {
+      dataSource:
+        (res === null || res === void 0
+          ? void 0
+          : (_res$channelsForCreat2 = res.channelsForCreateEpolicy) === null ||
+            _res$channelsForCreat2 === void 0
+          ? void 0
+          : _res$channelsForCreat2.map((item) => ({
+              value: JSON.stringify(item),
+              label: item.name,
+            }))) || [],
+    });
   }
 
   async getEpolicies() {
@@ -601,7 +629,7 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  async getPeers(v, callback) {
+  async getPeers(v, callback, usedPeers) {
     var _ref,
       _res$ibppeersForCreat,
       _res$ibppeersForCreat2,
@@ -639,7 +667,7 @@ class NetworkDetail$$Page extends React.Component {
           _res$ibppeersForCreat2 === void 0
         ? void 0
         : (_res$ibppeersForCreat3 = _res$ibppeersForCreat2.map((item) => {
-            var _item$ibppeers2;
+            var _item$ibppeers2, _item$ibppeers2$filte, _item$ibppeers2$filte2;
             return {
               key: item.name,
               title: item.name,
@@ -647,10 +675,30 @@ class NetworkDetail$$Page extends React.Component {
                 (_item$ibppeers2 = item.ibppeers) === null ||
                 _item$ibppeers2 === void 0
                   ? void 0
-                  : _item$ibppeers2.map((peer) => ({
-                      key: item.name + peer.name,
-                      title: peer.name,
-                    })),
+                  : (_item$ibppeers2$filte = _item$ibppeers2.filter(
+                      (item) => item.status === 'Deployed'
+                    )) === null || _item$ibppeers2$filte === void 0
+                  ? void 0
+                  : (_item$ibppeers2$filte2 = _item$ibppeers2$filte.map(
+                      (peer) => ({
+                        key: item.name + peer.name,
+                        title: peer.name,
+                      })
+                    )) === null || _item$ibppeers2$filte2 === void 0
+                  ? void 0
+                  : _item$ibppeers2$filte2.filter((peer) => {
+                      return usedPeers !== null &&
+                        usedPeers !== void 0 &&
+                        usedPeers.length
+                        ? usedPeers.every(
+                            (used) =>
+                              !(
+                                used.name === peer.title &&
+                                used.namespace === item.name
+                              )
+                          )
+                        : true;
+                    }),
             };
           })) === null || _res$ibppeersForCreat3 === void 0
         ? void 0
@@ -839,6 +887,15 @@ class NetworkDetail$$Page extends React.Component {
 
   openAddChannelPeerModal(e, payload) {
     var _payload$record, _payload$record$membe;
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'addchannelpeer',
+      peers: [],
+    });
     this.getPeers(
       {
         organizations:
@@ -852,16 +909,8 @@ class NetworkDetail$$Page extends React.Component {
             ? void 0
             : _payload$record$membe.map((item) => item.name)) || [],
       },
-      () => {
-        this.setState({
-          channel: {
-            ...this.state.channel,
-            record: payload.record,
-          },
-          isOpenModal: true,
-          modalType: 'addchannelpeer',
-        });
-      }
+      () => {},
+      payload.record.peers || []
     );
   }
 
@@ -880,12 +929,11 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   openAddStrategyModal() {
-    this.getChannelsForCreateEpolicy(() => {
-      this.setState({
-        isOpenModal: true,
-        modalType: 'addstrategy',
-      });
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addstrategy',
     });
+    this.getChannelsForCreateEpolicy(() => {});
   }
 
   openDeleteChannelModal(e, payload) {
@@ -2687,7 +2735,7 @@ class NetworkDetail$$Page extends React.Component {
                                             {__$$eval(
                                               () =>
                                                 this.props.useGetNetwork?.data?.network?.channels?.filter(
-                                                  (item) => item.iamInvolved
+                                                  (item) => item.createdByMe
                                                 )?.length || '0'
                                             )}
                                           </Typography.Text>
@@ -3135,7 +3183,7 @@ class NetworkDetail$$Page extends React.Component {
                                 hoverable={false}
                                 loading={false}
                                 size="default"
-                                style={{ height: '280px' }}
+                                style={{ height: '300px' }}
                                 type="default"
                               >
                                 <Row wrap={true}>
@@ -3468,7 +3516,7 @@ class NetworkDetail$$Page extends React.Component {
                                 hoverable={false}
                                 loading={false}
                                 size="default"
-                                style={{ height: '280px' }}
+                                style={{ height: '300px' }}
                                 type="default"
                               >
                                 <Row wrap={true}>
@@ -3937,7 +3985,12 @@ class NetworkDetail$$Page extends React.Component {
                                     __component_name="Button"
                                     block={false}
                                     danger={false}
-                                    disabled={false}
+                                    disabled={__$$eval(() =>
+                                      record?.admin ===
+                                      __$$context.props.authData?.user?.name
+                                        ? undefined
+                                        : true
+                                    )}
                                     ghost={false}
                                     href={__$$eval(
                                       () => `/organization/${record.name}`
