@@ -134,16 +134,35 @@ class Organization$$Page extends React.Component {
         message: this.i18n('i18n-4lcfgutb'),
       });
     } catch (error) {
-      var _error$response;
+      var _error$response, _error$response$error, _error$response2;
+      if (
+        error !== null &&
+        error !== void 0 &&
+        (_error$response = error.response) !== null &&
+        _error$response !== void 0 &&
+        (_error$response$error = _error$response.errors) !== null &&
+        _error$response$error !== void 0 &&
+        _error$response$error.some(
+          (item) =>
+            (item === null || item === void 0 ? void 0 : item.message) ===
+            'the organization is initiator of one federation'
+        )
+      ) {
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-e7ei7djt'),
+          description: this.i18n('i18n-33ei2z58'),
+        });
+        return;
+      }
       this.utils.notification.warnings({
         message: this.i18n('i18n-e7ei7djt'),
         errors:
           error === null || error === void 0
             ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
+            : (_error$response2 = error.response) === null ||
+              _error$response2 === void 0
             ? void 0
-            : _error$response.errors,
+            : _error$response2.errors,
       });
     }
   }
@@ -223,6 +242,27 @@ class Organization$$Page extends React.Component {
     return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
       'i18n-v7xu122b9o'
     )}`;
+  }
+
+  validatorName(value) {
+    var _this$props,
+      _this$props$useGetOrg,
+      _this$props$useGetOrg2,
+      _this$props$useGetOrg3;
+    if (
+      (_this$props = this.props) !== null &&
+      _this$props !== void 0 &&
+      (_this$props$useGetOrg = _this$props.useGetOrganizations) !== null &&
+      _this$props$useGetOrg !== void 0 &&
+      (_this$props$useGetOrg2 = _this$props$useGetOrg.data) !== null &&
+      _this$props$useGetOrg2 !== void 0 &&
+      (_this$props$useGetOrg3 = _this$props$useGetOrg2.organizations) !==
+        null &&
+      _this$props$useGetOrg3 !== void 0 &&
+      _this$props$useGetOrg3.some((item) => item.name === value)
+    ) {
+      return this.i18n('i18n-4y6fvhua');
+    }
   }
 
   componentDidMount() {}
@@ -325,9 +365,21 @@ class Organization$$Page extends React.Component {
                       this.i18n(
                         'i18n-iiub6ybv6ms'
                       ) /* 组织名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-zA-Z0-9_]{3,10}$',
+                    pattern: '^[a-z0-9_]{3,10}$',
                     required: true,
                     whitespace: true,
+                  },
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validatorName.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
                   },
                 ],
               }}
@@ -1043,7 +1095,12 @@ class Organization$$Page extends React.Component {
                             }}
                             block={false}
                             danger={false}
-                            disabled={null}
+                            disabled={__$$eval(() =>
+                              record?.admin ===
+                              __$$context.props.authData?.user?.name
+                                ? undefined
+                                : true
+                            )}
                             ghost={false}
                             href={null}
                             icon=""

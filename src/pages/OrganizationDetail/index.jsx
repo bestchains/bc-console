@@ -2029,7 +2029,7 @@ class OrganizationDetail$$Page extends React.Component {
                       this.i18n(
                         'i18n-ch5wgxkhdhs'
                       ) /* 用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-zA-Z0-9_]{3,10}$',
+                    pattern: '^[a-z0-9_]{3,10}$',
                     required: true,
                     whitespace: true,
                   },
@@ -2149,7 +2149,7 @@ class OrganizationDetail$$Page extends React.Component {
                       this.i18n(
                         'i18n-ch5wgxkhdhs'
                       ) /* 用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-zA-Z0-9_]{3,10}$',
+                    pattern: '^[a-z0-9_]{3,10}$',
                     required: true,
                     whitespace: true,
                   },
