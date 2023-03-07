@@ -151,6 +151,26 @@ class NetworkCreate$$Page extends React.Component {
     });
   }
 
+  validatorName(value) {
+    var _this$props,
+      _this$props$useGetNet,
+      _this$props$useGetNet2,
+      _this$props$useGetNet3;
+    if (
+      (_this$props = this.props) !== null &&
+      _this$props !== void 0 &&
+      (_this$props$useGetNet = _this$props.useGetNetworks) !== null &&
+      _this$props$useGetNet !== void 0 &&
+      (_this$props$useGetNet2 = _this$props$useGetNet.data) !== null &&
+      _this$props$useGetNet2 !== void 0 &&
+      (_this$props$useGetNet3 = _this$props$useGetNet2.networks) !== null &&
+      _this$props$useGetNet3 !== void 0 &&
+      _this$props$useGetNet3.some((item) => item.name === value)
+    ) {
+      return this.i18n('i18n-4y6fvhua');
+    }
+  }
+
   componentDidMount() {}
 
   render() {
@@ -243,8 +263,20 @@ class NetworkCreate$$Page extends React.Component {
                               this.i18n(
                                 'i18n-4v5vky0x'
                               ) /* 网络名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
-                            pattern: '^[a-zA-Z0-9_]{3,20}$',
+                            pattern: '^[a-z0-9_]{3,20}$',
                             type: 'disabled',
+                          },
+                          {
+                            children: '未知',
+                            icon: 'tenx-ui-icon:Circle',
+                            id: 'disabled',
+                            type: 'disabled',
+                            validator: function () {
+                              return this.validatorName.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([])
+                              );
+                            }.bind(this),
                           },
                         ],
                       }}
@@ -653,7 +685,12 @@ export default () => {
   };
   return (
     <DataProvider
-      sdkSwrFuncs={[]}
+      sdkSwrFuncs={[
+        {
+          func: 'useGetNetworks',
+          params: undefined,
+        },
+      ]}
       render={(dataProps) => (
         <NetworkCreate$$Page {...dataProps} self={self} appHelper={appHelper} />
       )}

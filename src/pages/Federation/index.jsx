@@ -102,14 +102,25 @@ class Federation$$Page extends React.Component {
         createLoading: true,
       });
       try {
+        var _v$organizations;
         await this.props.appHelper.utils.bff.createFederation({
           federation: v,
         });
-        this.openCreateSuccessModal();
-        // this.closeModal()
-        // this.utils.notification.success({
-        //   message: this.i18n('i18n-d4bbvp00v5t'),
-        // })
+        if (
+          (v === null || v === void 0
+            ? void 0
+            : (_v$organizations = v.organizations) === null ||
+              _v$organizations === void 0
+            ? void 0
+            : _v$organizations.length) > 0
+        ) {
+          this.openCreateSuccessModal();
+        } else {
+          this.closeModal();
+          this.utils.notification.success({
+            message: this.i18n('i18n-d4bbvp00v5t'),
+          });
+        }
         this.props.useGetFederations.mutate();
         this.setState({
           createLoading: false,
@@ -277,6 +288,26 @@ class Federation$$Page extends React.Component {
     )}`;
   }
 
+  validatorName(value) {
+    var _this$props,
+      _this$props$useGetFed,
+      _this$props$useGetFed2,
+      _this$props$useGetFed3;
+    if (
+      (_this$props = this.props) !== null &&
+      _this$props !== void 0 &&
+      (_this$props$useGetFed = _this$props.useGetFederations) !== null &&
+      _this$props$useGetFed !== void 0 &&
+      (_this$props$useGetFed2 = _this$props$useGetFed.data) !== null &&
+      _this$props$useGetFed2 !== void 0 &&
+      (_this$props$useGetFed3 = _this$props$useGetFed2.federations) !== null &&
+      _this$props$useGetFed3 !== void 0 &&
+      _this$props$useGetFed3.some((item) => item.name === value)
+    ) {
+      return this.i18n('i18n-4y6fvhua');
+    }
+  }
+
   componentDidMount() {
     const getOrganizations = async () => {
       var _res$organizations;
@@ -403,7 +434,19 @@ class Federation$$Page extends React.Component {
                         'i18n-neccml35hvq'
                       ) /* 大小写字母, 数字, 中划线组成，开头和结尾只能是字母或数字 */,
                     pattern:
-                      '^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?)*$',
+                      '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
+                  },
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validatorName.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
                   },
                 ],
               }}

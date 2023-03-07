@@ -1112,7 +1112,7 @@ class NetworkDetail$$Page extends React.Component {
                       this.i18n(
                         'i18n-1icnfyd1'
                       ) /* 策略名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-zA-Z0-9_]{3,10}$',
+                    pattern: '^[a-z0-9_]{3,10}$',
                     type: 'disabled',
                   },
                 ],
@@ -5784,7 +5784,7 @@ class NetworkDetail$$Page extends React.Component {
                             this.i18n(
                               'i18n-0u5pwt0jtl4'
                             ) /* 通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成 */,
-                          pattern: '^[a-zA-Z0-9_]{3,10}$',
+                          pattern: '^[a-z0-9_]{3,10}$',
                           required: true,
                           whitespace: true,
                         },
@@ -6330,7 +6330,7 @@ class NetworkDetail$$Page extends React.Component {
                       this.i18n(
                         'i18n-1h2618xx'
                       ) /* 合约名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-zA-Z0-9_]{3,10}$',
+                    pattern: '^[a-z0-9_]{3,10}$',
                     type: 'disabled',
                   },
                 ],
