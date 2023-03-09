@@ -489,8 +489,13 @@ class FederationDetail$$Page extends React.Component {
                               >
                                 {__$$eval(
                                   () =>
-                                    this.props.useGetFederation?.data
-                                      ?.federation?.initiator?.admin || '-'
+                                    `${
+                                      this.props.useGetFederation?.data
+                                        ?.federation?.initiator?.name || '-'
+                                    }(${
+                                      this.props.useGetFederation?.data
+                                        ?.federation?.initiator?.admin || '-'
+                                    })`
                                 )}
                               </Typography.Text>
                             }
@@ -1098,7 +1103,12 @@ class FederationDetail$$Page extends React.Component {
                           strong={false}
                           style={{ fontSize: '' }}
                         >
-                          {__$$eval(() => record?.initiator?.admin || '-')}
+                          {__$$eval(
+                            () =>
+                              `${record?.initiator?.name || '-'}(${
+                                record?.initiator?.admin || '-'
+                              })`
+                          )}
                         </Typography.Text>
                       ))(
                         __$$createChildContext(__$$context, {
