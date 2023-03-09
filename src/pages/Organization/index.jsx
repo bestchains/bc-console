@@ -890,7 +890,12 @@ class Organization$$Page extends React.Component {
                           shape="default"
                           type="link"
                         >
-                          {__$$eval(() => record.name)}
+                          {__$$eval(
+                            () =>
+                              `${record.displayName || '-'}(${
+                                record.name || '-'
+                              })`
+                          )}
                         </Button>
                       ))(
                         __$$createChildContext(__$$context, {

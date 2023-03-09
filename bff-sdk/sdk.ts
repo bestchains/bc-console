@@ -24,6 +24,21 @@ export type Scalars = {
   Float: number;
   JSON: any;
   JSONObject: any;
+  Upload: any;
+};
+
+export type Chaincodebuild = {
+  __typename?: 'Chaincodebuild';
+  /** 创建时间 */
+  creationTimestamp?: Maybe<Scalars['String']>;
+  /** 名称 */
+  displayName: Scalars['String'];
+  /** metadata.name */
+  name: Scalars['ID'];
+  /** 状态（Created时，才能部署升级） */
+  status?: Maybe<CrdStatusType>;
+  /** 版本 */
+  version?: Maybe<Scalars['String']>;
 };
 
 export type Channel = {
@@ -45,7 +60,7 @@ export type Channel = {
   /** 我的节点 */
   peers?: Maybe<Array<SpecPeer>>;
   /** 状态 */
-  status?: Maybe<ChannelStatus>;
+  status?: Maybe<CrdStatusType>;
 };
 
 export type ChannelPeer = {
@@ -55,14 +70,38 @@ export type ChannelPeer = {
   namespace: Scalars['String'];
 };
 
-/** 「通道」状态 */
-export enum ChannelStatus {
-  /** Deployed */
+/** IBPCR 状态 */
+export enum CrdStatusType {
+  /** ChannelArchived */
+  ChannelArchived = 'ChannelArchived',
+  /** ChannelCreated */
+  ChannelCreated = 'ChannelCreated',
+  /** 正常 */
+  Created = 'Created',
+  /** Deployed is the status when the component's deployment is done successfully */
   Deployed = 'Deployed',
-  /** Deploying */
+  /** Deploying is the status when component is being deployed */
   Deploying = 'Deploying',
-  /** 失败 */
+  /** 异常 */
   Error = 'Error',
+  /** 已激活 */
+  FederationActivated = 'FederationActivated',
+  /** 已解散 */
+  FederationDissolved = 'FederationDissolved',
+  /** 组建失败 */
+  FederationFailed = 'FederationFailed',
+  /** 组建中 */
+  FederationPending = 'FederationPending',
+  /** Initializing is the status when a component is initializing */
+  Initializing = 'Initializing',
+  /** 正常 */
+  NetworkCreated = 'NetworkCreated',
+  /** 已解散 */
+  NetworkDissolved = 'NetworkDissolved',
+  /** Precreated is the status of the orderers when they are waiting for config block */
+  Precreated = 'Precreated',
+  /** Warning is the status when a component is running, but will fail in future */
+  Warning = 'Warning',
 }
 
 /** 背书策略 */
@@ -102,22 +141,8 @@ export type Federation = {
   /** 提议策略 */
   policy?: Maybe<ProposalPolicy>;
   /** 状态 */
-  status?: Maybe<FederationStatus>;
+  status?: Maybe<CrdStatusType>;
 };
-
-/** 「联盟」状态 */
-export enum FederationStatus {
-  /** 失败 */
-  Error = 'Error',
-  /** 已激活 */
-  FederationActivated = 'FederationActivated',
-  /** 已解散 */
-  FederationDissolved = 'FederationDissolved',
-  /** 组建失败 */
-  FederationFailed = 'FederationFailed',
-  /** 组建中 */
-  FederationPending = 'FederationPending',
-}
 
 export type Ibppeer = {
   __typename?: 'Ibppeer';
@@ -134,18 +159,8 @@ export type Ibppeer = {
   /** 加入的网络 */
   networks?: Maybe<Array<Scalars['String']>>;
   /** 运行状态 */
-  status?: Maybe<IbppeerStatus>;
+  status?: Maybe<CrdStatusType>;
 };
-
-/** 「Peer节点」状态 */
-export enum IbppeerStatus {
-  /** Deployed */
-  Deployed = 'Deployed',
-  /** Deploying */
-  Deploying = 'Deploying',
-  /** 失败 */
-  Error = 'Error',
-}
 
 /** 操作状态 */
 export type K8sV1Status = {
@@ -170,6 +185,14 @@ export type K8sV1StatusDetails = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** 部署合约（返回true，只表示这个操作触发成功，而不是部署合约成功） */
+  chaincodeDeploy: Scalars['Boolean'];
+  /** 创建合约 */
+  chaincodebuildCreate: Chaincodebuild;
+  /** 删除合约 */
+  chaincodebuildDelete: Array<K8sV1Status>;
+  /** 升级合约 */
+  chaincodebuildUpgrade: Chaincodebuild;
   /** 创建通道 */
   channelCreate: Channel;
   /** 加入/去除Peer节点 */
@@ -204,6 +227,23 @@ export type Mutation = {
   organizationUpdate: Organization;
   /** 更新投票 */
   voteUpdate: Vote;
+};
+
+export type MutationChaincodeDeployArgs = {
+  chaincode: NewChaincode;
+};
+
+export type MutationChaincodebuildCreateArgs = {
+  chaincodebuild: NewChaincodebuild;
+};
+
+export type MutationChaincodebuildDeleteArgs = {
+  displayName: Scalars['String'];
+  network: Scalars['String'];
+};
+
+export type MutationChaincodebuildUpgradeArgs = {
+  chaincodebuild: UpgradeChaincodebuild;
 };
 
 export type MutationChannelCreateArgs = {
@@ -314,11 +354,39 @@ export type Network = {
   /** 网络中的所有节点 */
   peers?: Maybe<Array<Ibppeer>>;
   /** 状态 */
-  status?: Maybe<StatusType>;
+  status?: Maybe<CrdStatusType>;
   /** 节点存储 */
   storage?: Maybe<Scalars['String']>;
   /** 节点版本 */
   version?: Maybe<OrderVersion>;
+};
+
+export type NewChaincode = {
+  /** 通道 */
+  channel: Scalars['String'];
+  /** 背书策略 */
+  epolicy: Scalars['String'];
+  /** 安装节点（暂不支持） */
+  ibppeer?: InputMaybe<Scalars['String']>;
+  /** 合约name */
+  name: Scalars['String'];
+  /** 合约版本号 */
+  version: Scalars['String'];
+};
+
+export type NewChaincodebuild = {
+  /** 描述 */
+  description?: InputMaybe<Scalars['String']>;
+  /** 合约名称（规则：^[a-z][a-z0-9]{7,63}$） */
+  displayName: Scalars['String'];
+  /** 合约文件 */
+  file?: InputMaybe<Scalars['Upload']>;
+  /** 选择语言 */
+  language?: InputMaybe<Scalars['String']>;
+  /** 此合约构建所在网络 */
+  network: Scalars['String'];
+  /** 合约版本号 */
+  version: Scalars['String'];
 };
 
 export type NewChannel = {
@@ -432,7 +500,7 @@ export type Organization = {
   /** 原因 */
   reason?: Maybe<Scalars['String']>;
   /** 状态 */
-  status?: Maybe<StatusType>;
+  status?: Maybe<CrdStatusType>;
   /** 成员 */
   users?: Maybe<Array<User>>;
 };
@@ -490,18 +558,28 @@ export enum ProposalStatus {
 export enum ProposalType {
   /** 联盟添加组织时创建的提议 */
   AddMemberProposal = 'AddMemberProposal',
+  /** ArchiveChannelProposal */
+  ArchiveChannelProposal = 'ArchiveChannelProposal',
   /** 创建联盟时创建的提议 */
   CreateFederationProposal = 'CreateFederationProposal',
   /** 联盟驱逐组织时创建的提议 */
   DeleteMemberProposal = 'DeleteMemberProposal',
+  /** 创建合约时创建的提议 */
+  DeployChaincodeProposal = 'DeployChaincodeProposal',
   /** 解散联盟的时候创建的提议 */
   DissolveFederationProposal = 'DissolveFederationProposal',
   /** 释放网络时创建的提议 */
   DissolveNetworkProposal = 'DissolveNetworkProposal',
+  /** UnarchiveChannelProposal */
+  UnarchiveChannelProposal = 'UnarchiveChannelProposal',
+  /** 更新合约时创建的提议 */
+  UpgradeChaincodeProposal = 'UpgradeChaincodeProposal',
 }
 
 export type Query = {
   __typename?: 'Query';
+  /** 合约列表 */
+  chaincodebuilds: Array<Chaincodebuild>;
   /** 通道详情 */
   channel: Channel;
   /** 创建策略时，可选的通道 */
@@ -528,6 +606,10 @@ export type Query = {
   proposal: Proposal;
   /** 提议列表 */
   proposals: Array<Proposal>;
+};
+
+export type QueryChaincodebuildsArgs = {
+  network: Scalars['String'];
 };
 
 export type QueryChannelArgs = {
@@ -599,36 +681,6 @@ export type SpecResource = {
   memory: Scalars['String'];
 };
 
-/** IBPCR 状态 */
-export enum StatusType {
-  /** 正常 */
-  Created = 'Created',
-  /** Deployed is the status when the component's deployment is done successfully */
-  Deployed = 'Deployed',
-  /** Deploying is the status when component is being deployed */
-  Deploying = 'Deploying',
-  /** 异常 */
-  Error = 'Error',
-  /** FederationActivated means `Proposal-Vote` passed */
-  FederationActivated = 'FederationActivated',
-  /** FederationDissolved means `Federation` no longer active */
-  FederationDissolved = 'FederationDissolved',
-  /** FederationFailed means `Proposal-Vote` failed */
-  FederationFailed = 'FederationFailed',
-  /** FederationPending means `Proposal-Vote` not passed yet */
-  FederationPending = 'FederationPending',
-  /** Initializing is the status when a component is initializing */
-  Initializing = 'Initializing',
-  /** 正常 */
-  NetworkCreated = 'NetworkCreated',
-  /** 已解散 */
-  NetworkDissolved = 'NetworkDissolved',
-  /** Precreated is the status of the orderers when they are waiting for config block */
-  Precreated = 'Precreated',
-  /** Warning is the status when a component is running, but will fail in future */
-  Warning = 'Warning',
-}
-
 export type UpdateChannel = {
   /** 操作类型 */
   operate: Operator;
@@ -648,6 +700,19 @@ export type UpdateVote = {
   decision: Scalars['Boolean'];
   /** 备注 */
   description?: InputMaybe<Scalars['String']>;
+};
+
+export type UpgradeChaincodebuild = {
+  /** 合约名称 */
+  displayName: Scalars['String'];
+  /** 合约文件 */
+  file?: InputMaybe<Scalars['Upload']>;
+  /** 选择语言 */
+  language?: InputMaybe<Scalars['String']>;
+  /** 此合约构建所在网络 */
+  network: Scalars['String'];
+  /** 升级后版本号 */
+  newVersion: Scalars['String'];
 };
 
 /** 用户 */
@@ -703,6 +768,87 @@ export enum VotePhase {
   Voted = 'Voted',
 }
 
+export type DeployChaincodeMutationVariables = Exact<{
+  chaincode: NewChaincode;
+}>;
+
+export type DeployChaincodeMutation = {
+  __typename?: 'Mutation';
+  chaincodeDeploy: boolean;
+};
+
+export type CreateChaincodebuildMutationVariables = Exact<{
+  displayName: Scalars['String'];
+  description?: InputMaybe<Scalars['String']>;
+  language?: InputMaybe<Scalars['String']>;
+  network: Scalars['String'];
+  version: Scalars['String'];
+  file: Scalars['Upload'];
+}>;
+
+export type CreateChaincodebuildMutation = {
+  __typename?: 'Mutation';
+  chaincodebuildCreate: {
+    __typename?: 'Chaincodebuild';
+    name: string;
+    displayName: string;
+    creationTimestamp?: string | null;
+    version?: string | null;
+    status?: CrdStatusType | null;
+  };
+};
+
+export type GetChaincodebuildsQueryVariables = Exact<{
+  network: Scalars['String'];
+}>;
+
+export type GetChaincodebuildsQuery = {
+  __typename?: 'Query';
+  chaincodebuilds: Array<{
+    __typename?: 'Chaincodebuild';
+    name: string;
+    displayName: string;
+    creationTimestamp?: string | null;
+    version?: string | null;
+    status?: CrdStatusType | null;
+  }>;
+};
+
+export type DeleteChaincodebuildMutationVariables = Exact<{
+  displayName: Scalars['String'];
+  network: Scalars['String'];
+}>;
+
+export type DeleteChaincodebuildMutation = {
+  __typename?: 'Mutation';
+  chaincodebuildDelete: Array<{
+    __typename?: 'K8sV1Status';
+    code?: number | null;
+    status?: string | null;
+    reason?: string | null;
+  }>;
+};
+
+export type UpgradeChaincodebuildMutationVariables = Exact<{
+  displayName: Scalars['String'];
+  file: Scalars['Upload'];
+  language?: InputMaybe<Scalars['String']>;
+  network: Scalars['String'];
+  newVersion: Scalars['String'];
+}>;
+
+export type UpgradeChaincodebuildMutation = {
+  __typename?: 'Mutation';
+  chaincodebuildUpgrade: {
+    __typename?: 'Chaincodebuild';
+    name: string;
+    displayName: string;
+    creationTimestamp?: string | null;
+    version?: string | null;
+    status?: CrdStatusType | null;
+  };
+};
+
 export type GetChannelQueryVariables = Exact<{
   name: Scalars['String'];
 }>;
@@ -740,7 +886,7 @@ export type CreateChannelMutation = {
     __typename?: 'Channel';
     name: string;
     creationTimestamp?: string | null;
-    status?: ChannelStatus | null;
+    status?: CrdStatusType | null;
     members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
     peers?: Array<{
       __typename?: 'SpecPeer';
@@ -761,7 +907,7 @@ export type UpdateChannelMutation = {
     __typename?: 'Channel';
     name: string;
     creationTimestamp?: string | null;
-    status?: ChannelStatus | null;
+    status?: CrdStatusType | null;
     members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
     peers?: Array<{
       __typename?: 'SpecPeer';
@@ -840,7 +986,7 @@ export type GetFederationsQuery = {
     creationTimestamp: string;
     description?: string | null;
     policy?: ProposalPolicy | null;
-    status?: FederationStatus | null;
+    status?: CrdStatusType | null;
     joinedAt?: string | null;
     initiator?: {
       __typename?: 'Organization';
@@ -869,7 +1015,7 @@ export type GetFederationQuery = {
     creationTimestamp: string;
     description?: string | null;
     policy?: ProposalPolicy | null;
-    status?: FederationStatus | null;
+    status?: CrdStatusType | null;
     joinedAt?: string | null;
     initiator?: {
       __typename?: 'Organization';
@@ -890,7 +1036,7 @@ export type GetFederationQuery = {
       federation?: string | null;
       clusterSize?: number | null;
       ordererType?: string | null;
-      status?: StatusType | null;
+      status?: CrdStatusType | null;
       organizations?: Array<{
         __typename?: 'Organization';
         name: string;
@@ -918,7 +1064,7 @@ export type CreateFederationMutation = {
     creationTimestamp: string;
     description?: string | null;
     policy?: ProposalPolicy | null;
-    status?: FederationStatus | null;
+    status?: CrdStatusType | null;
     joinedAt?: string | null;
     initiator?: {
       __typename?: 'Organization';
@@ -988,7 +1134,7 @@ export type GetIbppeersQuery = {
     __typename?: 'Ibppeer';
     name: string;
     creationTimestamp: string;
-    status?: IbppeerStatus | null;
+    status?: CrdStatusType | null;
     channels?: Array<string> | null;
     networks?: Array<string> | null;
     limits?: {
@@ -1010,7 +1156,7 @@ export type CreateIbppeerMutation = {
     __typename?: 'Ibppeer';
     name: string;
     creationTimestamp: string;
-    status?: IbppeerStatus | null;
+    status?: CrdStatusType | null;
     limits?: {
       __typename?: 'SpecResource';
       cpu: string;
@@ -1032,7 +1178,7 @@ export type GetNetworksQuery = {
     federation?: string | null;
     clusterSize?: number | null;
     ordererType?: string | null;
-    status?: StatusType | null;
+    status?: CrdStatusType | null;
     organizations?: Array<{
       __typename?: 'Organization';
       name: string;
@@ -1075,7 +1221,7 @@ export type GetNetworkQuery = {
     ordererType?: string | null;
     version?: OrderVersion | null;
     storage?: string | null;
-    status?: StatusType | null;
+    status?: CrdStatusType | null;
     limits?: {
       __typename?: 'SpecResource';
       cpu: string;
@@ -1088,7 +1234,7 @@ export type GetNetworkQuery = {
       admin?: string | null;
       creationTimestamp: string;
       lastHeartbeatTime?: string | null;
-      status?: StatusType | null;
+      status?: CrdStatusType | null;
       reason?: string | null;
       ibppeers?: Array<{ __typename?: 'Ibppeer'; name: string }> | null;
     }> | null;
@@ -1106,7 +1252,7 @@ export type GetNetworkQuery = {
       __typename?: 'Channel';
       name: string;
       creationTimestamp?: string | null;
-      status?: ChannelStatus | null;
+      status?: CrdStatusType | null;
       createdByMe?: boolean | null;
       iamInvolved?: boolean | null;
       members?: Array<{
@@ -1137,7 +1283,7 @@ export type CreateNetworkMutation = {
     federation?: string | null;
     clusterSize?: number | null;
     ordererType?: string | null;
-    status?: StatusType | null;
+    status?: CrdStatusType | null;
   };
 };
 
@@ -1180,7 +1326,7 @@ export type GetOrganizationsQuery = {
     creationTimestamp: string;
     lastHeartbeatTime?: string | null;
     admin?: string | null;
-    status?: StatusType | null;
+    status?: CrdStatusType | null;
     reason?: string | null;
     federations?: Array<string> | null;
     networks?: Array<{ __typename?: 'Network'; name: string }> | null;
@@ -1201,7 +1347,7 @@ export type GetOrganizationQuery = {
     creationTimestamp: string;
     lastHeartbeatTime?: string | null;
     admin?: string | null;
-    status?: StatusType | null;
+    status?: CrdStatusType | null;
     reason?: string | null;
     federations?: Array<string> | null;
     channels?: Array<string> | null;
@@ -1230,7 +1376,7 @@ export type CreateOrganizationMutation = {
     creationTimestamp: string;
     lastHeartbeatTime?: string | null;
     admin?: string | null;
-    status?: StatusType | null;
+    status?: CrdStatusType | null;
     reason?: string | null;
   };
 };
@@ -1250,7 +1396,7 @@ export type UpdateOrganizationMutation = {
     creationTimestamp: string;
     lastHeartbeatTime?: string | null;
     admin?: string | null;
-    status?: StatusType | null;
+    status?: CrdStatusType | null;
     reason?: string | null;
   };
 };
@@ -1282,7 +1428,7 @@ export type GetIbppeersForCreateChannelQuery = {
     ibppeers?: Array<{
       __typename?: 'Ibppeer';
       name: string;
-      status?: IbppeerStatus | null;
+      status?: CrdStatusType | null;
     }> | null;
   }>;
 };
@@ -1377,6 +1523,83 @@ export type UpdateVoteMutation = {
   };
 };
 
+export const DeployChaincodeDocument = gql`
+  mutation deployChaincode($chaincode: NewChaincode!) {
+    chaincodeDeploy(chaincode: $chaincode)
+  }
+`;
+export const CreateChaincodebuildDocument = gql`
+  mutation createChaincodebuild(
+    $displayName: String!
+    $description: String
+    $language: String
+    $network: String!
+    $version: String!
+    $file: Upload!
+  ) {
+    chaincodebuildCreate(
+      chaincodebuild: {
+        displayName: $displayName
+        description: $description
+        language: $language
+        network: $network
+        version: $version
+        file: $file
+      }
+    ) {
+      name
+      displayName
+      creationTimestamp
+      version
+      status
+    }
+  }
+`;
+export const GetChaincodebuildsDocument = gql`
+  query getChaincodebuilds($network: String!) {
+    chaincodebuilds(network: $network) {
+      name
+      displayName
+      creationTimestamp
+      version
+      status
+    }
+  }
+`;
+export const DeleteChaincodebuildDocument = gql`
+  mutation deleteChaincodebuild($displayName: String!, $network: String!) {
+    chaincodebuildDelete(displayName: $displayName, network: $network) {
+      code
+      status
+      reason
+    }
+  }
+`;
+export const UpgradeChaincodebuildDocument = gql`
+  mutation upgradeChaincodebuild(
+    $displayName: String!
+    $file: Upload!
+    $language: String
+    $network: String!
+    $newVersion: String!
+  ) {
+    chaincodebuildUpgrade(
+      chaincodebuild: {
+        displayName: $displayName
+        file: $file
+        language: $language
+        network: $network
+        newVersion: $newVersion
+      }
+    ) {
+      name
+      displayName
+      creationTimestamp
+      version
+      status
+    }
+  }
+`;
 export const GetChannelDocument = gql`
   query getChannel($name: String!) {
     channel(name: $name) {
@@ -1900,6 +2123,76 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    deployChaincode(
+      variables: DeployChaincodeMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<DeployChaincodeMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<DeployChaincodeMutation>(DeployChaincodeDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'deployChaincode',
+        'mutation'
+      );
+    },
+    createChaincodebuild(
+      variables: CreateChaincodebuildMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<CreateChaincodebuildMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<CreateChaincodebuildMutation>(CreateChaincodebuildDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'createChaincodebuild',
+        'mutation'
+      );
+    },
+    getChaincodebuilds(
+      variables: GetChaincodebuildsQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetChaincodebuildsQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetChaincodebuildsQuery>(GetChaincodebuildsDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getChaincodebuilds',
+        'query'
+      );
+    },
+    deleteChaincodebuild(
+      variables: DeleteChaincodebuildMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<DeleteChaincodebuildMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<DeleteChaincodebuildMutation>(DeleteChaincodebuildDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'deleteChaincodebuild',
+        'mutation'
+      );
+    },
+    upgradeChaincodebuild(
+      variables: UpgradeChaincodebuildMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<UpgradeChaincodebuildMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<UpgradeChaincodebuildMutation>(UpgradeChaincodebuildDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'upgradeChaincodebuild',
+        'mutation'
+      );
+    },
     getChannel(
       variables: GetChannelQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -2343,6 +2636,16 @@ export function getSdkWithHooks(
   ];
   return {
     ...sdk,
+    useGetChaincodebuilds(
+      variables: GetChaincodebuildsQueryVariables,
+      config?: SWRConfigInterface<GetChaincodebuildsQuery, ClientError>
+    ) {
+      return useSWR<GetChaincodebuildsQuery, ClientError>(
+        genKey<GetChaincodebuildsQueryVariables>('GetChaincodebuilds', variables),
+        () => sdk.getChaincodebuilds(variables),
+        config
+      );
+    },
     useGetChannel(
       variables: GetChannelQueryVariables,
       config?: SWRConfigInterface<GetChannelQuery, ClientError>

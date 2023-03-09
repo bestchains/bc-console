@@ -333,31 +333,66 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   confirmAddContractModal(e, payload) {
-    // this.openAddChannelOrganizationSuccessModal()
-    console.log(this.state.contract, 'ccccccccccccccccccccc');
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openAddChannelSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
+    var _this$props$useGetNet,
+      _this$props$useGetNet2,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    const form =
+      (_this$$ = this.$('formily_create_contract')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      try {
+        var _this$match, _this$match$params, _v$file;
+        const res = await this.props.appHelper.utils.bff.createChaincodebuild({
+          ...v,
+          network:
+            (_this$match = this.match) === null || _this$match === void 0
+              ? void 0
+              : (_this$match$params = _this$match.params) === null ||
+                _this$match$params === void 0
+              ? void 0
+              : _this$match$params.id,
+          file:
+            (_v$file = v.file) === null || _v$file === void 0
+              ? void 0
+              : _v$file.fileList,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-5eg2znpg'),
+        });
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-rw4x2dt7'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
   }
 
   confirmAddStrategyModal(e, payload) {
@@ -472,81 +507,149 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   async confirmDeleteContractModal(e, payload) {
-    console.log(this.state.contract, 'cccccccccccc');
-    // const federation = this.props.useGetFederation?.data?.federation || {}
-    // try {
-    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
-    //     name: federation?.name,
-    //     organization: this.state.channelRecord?.name,
-    //     initiator: federation?.initiator?.name
-    //   })
-    //   this.closeModal()
-    //   this.utils.notification.success({
-    //     message: this.i18n('i18n-yy3f9rxigm'),
-    //   })
-    //   this.props.useGetFederation.mutate()
-    // } catch (error) {
-    //   this.utils.notification.warnings({
-    //     message: this.i18n('i18n-p5gea1q7fem'),
-    //     errors: error?.response?.errors
-    //   })
-    // }
+    try {
+      var _this$match,
+        _this$match$params,
+        _this$state$contract,
+        _this$state$contract$;
+      await this.props.appHelper.utils.bff.deleteChaincodebuild({
+        network:
+          (_this$match = this.match) === null || _this$match === void 0
+            ? void 0
+            : (_this$match$params = _this$match.params) === null ||
+              _this$match$params === void 0
+            ? void 0
+            : _this$match$params.id,
+        displayName:
+          (_this$state$contract = this.state.contract) === null ||
+          _this$state$contract === void 0
+            ? void 0
+            : (_this$state$contract$ = _this$state$contract.record) === null ||
+              _this$state$contract$ === void 0
+            ? void 0
+            : _this$state$contract$.displayName,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-5m5bdexs'),
+      });
+      this.props.useGetChaincodebuilds.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-esbyfrwe'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
   }
 
   confirmDeploymentContractModal(e, payload) {
-    this.openDeploymentContractSuccessModal();
-    console.log(this.state.contract, 'ccccccccccccccccccccc');
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openDeploymentContractSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_contract_deploy')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      const chaincode = {
+        channel: v.channel,
+        epolicy: v.epolicy,
+        name: v.name,
+        version: v.version,
+        // edit
+        // ibppeer: v.ibppeer
+      };
+
+      console.log(v, chaincode);
+      try {
+        const res = await this.props.appHelper.utils.bff.deployChaincode({
+          chaincode,
+        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-l8fybssesij'),
+        // })
+        this.openDeploymentContractSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-ekujezos'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
   }
 
   confirmUpgradeContractModal(e, payload) {
-    // this.openAddChannelOrganizationSuccessModal()
-    console.log(this.state.contract, 'ccccccccccccccccccccc');
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.addOrganizationToFederation({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openAddChannelSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_contract_upgrade')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      const { versoin, ...params } = v;
+      try {
+        var _this$match, _this$match$params, _v$file;
+        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
+          ...params,
+          network:
+            (_this$match = this.match) === null || _this$match === void 0
+              ? void 0
+              : (_this$match$params = _this$match.params) === null ||
+                _this$match$params === void 0
+              ? void 0
+              : _this$match$params.id,
+          file:
+            (_v$file = v.file) === null || _v$file === void 0
+              ? void 0
+              : _v$file.fileList,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-a4rcftyd'),
+        });
+        this.openAddChannelSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-7fxj402s'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
   }
 
   async getChannelsForCreateEpolicy(callback) {
@@ -960,14 +1063,55 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   openDeploymentContractModal(e, payload) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        record: payload.record,
+    this.setState(
+      {
+        contract: {
+          ...this.state.contract,
+          record: payload.record,
+        },
+        isOpenModal: true,
+        modalType: 'deploymentcontract',
       },
-      isOpenModal: true,
-      modalType: 'deploymentcontract',
-    });
+      () => {
+        setTimeout(() => {
+          var _this$$,
+            _this$$$formRef,
+            _this$$$formRef$curre,
+            _payload$record,
+            _payload$record2,
+            _payload$record3;
+          const form =
+            (_this$$ = this.$('formily_contract_deploy')) === null ||
+            _this$$ === void 0
+              ? void 0
+              : (_this$$$formRef = _this$$.formRef) === null ||
+                _this$$$formRef === void 0
+              ? void 0
+              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+                _this$$$formRef$curre === void 0
+              ? void 0
+              : _this$$$formRef$curre.form;
+          form.setValues({
+            displayName:
+              (_payload$record = payload.record) === null ||
+              _payload$record === void 0
+                ? void 0
+                : _payload$record.displayName,
+            // edit
+            version:
+              (_payload$record2 = payload.record) === null ||
+              _payload$record2 === void 0
+                ? void 0
+                : _payload$record2.version,
+            name:
+              (_payload$record3 = payload.record) === null ||
+              _payload$record3 === void 0
+                ? void 0
+                : _payload$record3.name,
+          });
+        }, 0);
+      }
+    );
   }
 
   openDeploymentContractSuccessModal() {
@@ -978,14 +1122,49 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   openUpgradeContractModal(e, payload) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        record: payload.record,
+    this.setState(
+      {
+        contract: {
+          ...this.state.contract,
+          record: payload.record,
+        },
+        isOpenModal: true,
+        modalType: 'upgradecontract',
       },
-      isOpenModal: true,
-      modalType: 'upgradecontract',
-    });
+      () => {
+        setTimeout(() => {
+          var _this$$,
+            _this$$$formRef,
+            _this$$$formRef$curre,
+            _payload$record,
+            _payload$record2;
+          const form =
+            (_this$$ = this.$('formily_contract_upgrade')) === null ||
+            _this$$ === void 0
+              ? void 0
+              : (_this$$$formRef = _this$$.formRef) === null ||
+                _this$$$formRef === void 0
+              ? void 0
+              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+                _this$$$formRef$curre === void 0
+              ? void 0
+              : _this$$$formRef$curre.form;
+          form.setValues({
+            displayName:
+              (_payload$record = payload.record) === null ||
+              _payload$record === void 0
+                ? void 0
+                : _payload$record.displayName,
+            // edit
+            version:
+              (_payload$record2 = payload.record) === null ||
+              _payload$record2 === void 0
+                ? void 0
+                : _payload$record2.version,
+          });
+        }, 0);
+      }
+    );
   }
 
   paginationShowTotal(total, range) {
@@ -1313,7 +1492,7 @@ class NetworkDetail$$Page extends React.Component {
               fieldProps={{
                 _unsafe_MixedSetter_default_select: 'VariableSetter',
                 default: __$$eval(() => this.state.contract?.record?.name),
-                name: 'name',
+                name: 'displayName',
                 required: true,
                 title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
                 'x-pattern': 'disabled',
@@ -1331,7 +1510,7 @@ class NetworkDetail$$Page extends React.Component {
                 },
               }}
               fieldProps={{
-                name: 'name1',
+                name: 'version',
                 required: true,
                 title: this.i18n('i18n-a20yo7fz') /* 当前版本号 */,
                 'x-pattern': 'disabled',
@@ -1349,7 +1528,7 @@ class NetworkDetail$$Page extends React.Component {
                 },
               }}
               fieldProps={{
-                name: 'version_update',
+                name: 'newVersion',
                 required: true,
                 title: this.i18n('i18n-1qxjy0jv') /* 升级后版本号 */,
                 'x-validator': [],
@@ -1357,8 +1536,9 @@ class NetworkDetail$$Page extends React.Component {
             />
             <FormilyUpload
               __component_name="FormilyUpload"
+              componentProps={{ 'x-component-props': { directory: true } }}
               fieldProps={{
-                name: 'Upload',
+                name: 'file',
                 required: true,
                 title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
                 'x-component': 'FormilyUpload',
@@ -1395,6 +1575,8 @@ class NetworkDetail$$Page extends React.Component {
                 },
               }}
               fieldProps={{
+                _unsafe_MixedSetter_default_select: 'StringSetter',
+                default: 'Go',
                 enum: [
                   {
                     _unsafe_MixedSetter_label_select: 'StringSetter',
@@ -1424,7 +1606,7 @@ class NetworkDetail$$Page extends React.Component {
                     value: 'Node',
                   },
                 ],
-                name: 'Select',
+                name: 'language',
                 title: this.i18n('i18n-7usiozsk') /* 选择语言 */,
                 'x-validator': [],
               }}
@@ -1513,7 +1695,9 @@ class NetworkDetail$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.contract?.record?.name || '-')}
+                  {__$$eval(
+                    () => this.state.contract?.record?.displayName || '-'
+                  )}
                 </Typography.Text>
                 <Typography.Text
                   __component_name="Typography.Text"
@@ -1762,7 +1946,7 @@ class NetworkDetail$$Page extends React.Component {
                   layout: 'horizontal',
                   wrapperCol: 20,
                 }}
-                ref={this._refsManager.linkRef('formily_4sd81nnptby')}
+                ref={this._refsManager.linkRef('formily_contract_deploy')}
               >
                 <FormilyInput
                   __component_name="FormilyInput"
@@ -1773,7 +1957,7 @@ class NetworkDetail$$Page extends React.Component {
                     },
                   }}
                   fieldProps={{
-                    name: 'name',
+                    name: 'displayName',
                     title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
                     'x-pattern': 'disabled',
                     'x-validator': [],
@@ -1783,15 +1967,25 @@ class NetworkDetail$$Page extends React.Component {
                   __component_name="FormilySelect"
                   componentProps={{
                     'x-component-props': {
+                      _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                       allowClear: false,
                       disabled: false,
+                      enum: __$$eval(() =>
+                        this.props.useGetNetwork?.data?.network?.peers
+                          ?.filter((item) => item.createdByMe)
+                          ?.map((item) => ({
+                            value: item.name,
+                            label: item.name,
+                          }))
+                      ),
+                      mode: 'multiple',
                       notFoundContent: {},
                       placeholder:
                         this.i18n('i18n-o4a5p44k') /* 选择自己的节点，可多选 */,
                     },
                   }}
                   fieldProps={{
-                    name: 'peer',
+                    name: 'ibppeer',
                     required: true,
                     title: this.i18n('i18n-wlv4nr0d') /* 安装节点 */,
                     'x-validator': [],
@@ -1801,9 +1995,18 @@ class NetworkDetail$$Page extends React.Component {
                   __component_name="FormilySelect"
                   componentProps={{
                     'x-component-props': {
+                      _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                       allowClear: false,
                       disabled: false,
-                      mode: 'multiple',
+                      enum: __$$eval(() =>
+                        this.props.useGetNetwork?.data?.network?.channels?.map(
+                          (item) => ({
+                            value: item.name,
+                            label: item.name,
+                          })
+                        )
+                      ),
+                      mode: 'single',
                       notFoundContent: {},
                       placeholder: this.i18n('i18n-59plmy1n') /* 请选择通道 */,
                     },
@@ -1819,15 +2022,22 @@ class NetworkDetail$$Page extends React.Component {
                   __component_name="FormilySelect"
                   componentProps={{
                     'x-component-props': {
+                      _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
                       allowClear: false,
                       disabled: false,
+                      enum: __$$eval(() =>
+                        this.state.strategy?.list?.map((item) => ({
+                          value: item.name,
+                          label: item.name,
+                        }))
+                      ),
                       notFoundContent: {},
                       placeholder:
                         this.i18n('i18n-e0gcsyat') /* 请选择背书策略 */,
                     },
                   }}
                   fieldProps={{
-                    name: 'cl',
+                    name: 'epolicy',
                     title: this.i18n('i18n-wh9bw5j9') /* 背书策略 */,
                     'x-validator': [],
                   }}
@@ -4867,8 +5077,8 @@ class NetworkDetail$$Page extends React.Component {
                             }}
                             columns={[
                               {
-                                dataIndex: 'name',
-                                key: 'name',
+                                dataIndex: 'displayName',
+                                key: 'displayName',
                                 render: (text, record, index) =>
                                   ((__$$context) => (
                                     <Button
@@ -4884,7 +5094,7 @@ class NetworkDetail$$Page extends React.Component {
                                       shape="default"
                                       type="link"
                                     >
-                                      {__$$eval(() => record.name)}
+                                      {__$$eval(() => record.displayName)}
                                     </Button>
                                   ))(
                                     __$$createChildContext(__$$context, {
@@ -5072,12 +5282,12 @@ class NetworkDetail$$Page extends React.Component {
                             ]}
                             dataSource={__$$eval(() =>
                               (
-                                this.props.useGetNetwork?.data?.network?.hy ||
-                                []
+                                this.props.useGetChaincodebuilds?.data
+                                  ?.chaincodebuilds || []
                               )
                                 ?.filter((item) => {
                                   return this.state.contract.searchValue
-                                    ? item.name?.includes(
+                                    ? item.displayName?.includes(
                                         this.state.contract.searchValue
                                       )
                                     : true;
@@ -5141,16 +5351,31 @@ class NetworkDetail$$Page extends React.Component {
                               size: 'default',
                               total: __$$eval(
                                 () =>
-                                  ((
-                                    this.props.useGetNetwork?.data?.network
-                                      ?.hy || []
-                                  )?.filter((item) => {
-                                    return this.state.contract.searchValue
-                                      ? item.name?.includes(
-                                          this.state.contract.searchValue
-                                        )
-                                      : true;
-                                  })).length
+                                  (
+                                    this.props.useGetChaincodebuilds?.data
+                                      ?.chaincodebuilds || []
+                                  )
+                                    ?.filter((item) => {
+                                      return this.state.contract.searchValue
+                                        ? item.displayName?.includes(
+                                            this.state.contract.searchValue
+                                          )
+                                        : true;
+                                    })
+                                    ?.sort((a, b) => {
+                                      if (
+                                        this.state.sorter?.order !== 'ascend'
+                                      ) {
+                                        return (
+                                          new Date(b.joinedAt).getTime() -
+                                          new Date(a.joinedAt).getTime()
+                                        );
+                                      }
+                                      return (
+                                        new Date(a.joinedAt).getTime() -
+                                        new Date(b.joinedAt).getTime()
+                                      );
+                                    }).length
                               ),
                             }}
                             rowKey="name"
@@ -5784,7 +6009,7 @@ class NetworkDetail$$Page extends React.Component {
                             this.i18n(
                               'i18n-0u5pwt0jtl4'
                             ) /* 通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成 */,
-                          pattern: '^[a-z0-9_]{3,10}$',
+                          pattern: '^[a-z0-9_]{3,50}$',
                           required: true,
                           whitespace: true,
                         },
@@ -5858,7 +6083,7 @@ class NetworkDetail$$Page extends React.Component {
                         </Typography.Text>
                       ),
                       name: 'organizations',
-                      required: true,
+                      required: false,
                       title: this.i18n('i18n-cprrxhrkty') /* 配置成员 */,
                       'x-validator': [],
                     }}
@@ -6318,7 +6543,7 @@ class NetworkDetail$$Page extends React.Component {
                 },
               }}
               fieldProps={{
-                name: 'name',
+                name: 'displayName',
                 required: true,
                 title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
                 'x-validator': [
@@ -6362,6 +6587,7 @@ class NetworkDetail$$Page extends React.Component {
                 'x-component': 'FormilyUpload',
                 'x-validator': [],
               }}
+              componentProps={{ 'x-component-props': { multiple: true } }}
             >
               <Button
                 __component_name="Button"
@@ -6389,11 +6615,33 @@ class NetworkDetail$$Page extends React.Component {
                 'x-component-props': {
                   allowClear: false,
                   disabled: false,
+                  enum: [
+                    {
+                      _unsafe_MixedSetter_label_select: 'StringSetter',
+                      disabled: false,
+                      label: 'Go',
+                      value: 'Go',
+                    },
+                    {
+                      _unsafe_MixedSetter_label_select: 'StringSetter',
+                      disabled: false,
+                      label: 'Java',
+                      value: 'Java',
+                    },
+                    {
+                      _unsafe_MixedSetter_label_select: 'StringSetter',
+                      disabled: false,
+                      label: 'Node',
+                      value: 'Node',
+                    },
+                  ],
                   notFoundContent: {},
                   placeholder: this.i18n('i18n-928f3hdn') /* 请选择语言 */,
                 },
               }}
               fieldProps={{
+                _unsafe_MixedSetter_default_select: 'StringSetter',
+                default: 'Go',
                 name: 'language',
                 title: this.i18n('i18n-7usiozsk') /* 选择语言 */,
                 'x-validator': [],
@@ -6452,6 +6700,12 @@ export default () => {
           func: 'useGetNetwork',
           params: {
             name: self.match?.params?.id,
+          },
+        },
+        {
+          func: 'useGetChaincodebuilds',
+          params: {
+            network: self.match?.params?.id,
           },
         },
       ]}

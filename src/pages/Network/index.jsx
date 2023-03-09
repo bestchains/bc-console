@@ -565,7 +565,12 @@ class Network$$Page extends React.Component {
                               }}
                               block={false}
                               danger={false}
-                              disabled={false}
+                              disabled={__$$eval(() =>
+                                item?.initiator?.admin ===
+                                __$$context.props.authData?.user?.name
+                                  ? undefined
+                                  : 'disabled'
+                              )}
                               ghost={false}
                               onClick={function () {
                                 return this.onMenuClick.apply(
@@ -972,7 +977,7 @@ class Network$$Page extends React.Component {
                                   __component_name="Typography.Time"
                                   format=""
                                   relativeTime={false}
-                                  time="2023-01-30"
+                                  time={__$$eval(() => item?.expiredTime)}
                                 />
                               </Col>
                               <Col __component_name="Col" span={24}>
@@ -980,7 +985,7 @@ class Network$$Page extends React.Component {
                                   __component_name="Typography.Time"
                                   format=""
                                   relativeTime={true}
-                                  time="2023-01-30"
+                                  time={__$$eval(() => item?.expiredTime)}
                                 />
                                 <Typography.Text
                                   __component_name="Typography.Text"
