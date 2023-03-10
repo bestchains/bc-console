@@ -29,6 +29,7 @@ import {
   Status,
   Table,
   Input,
+  Dropdown,
   Steps,
 } from '@tenx-ui/materials';
 
@@ -63,25 +64,6 @@ class NetworkDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      allPeers: [],
-      channel: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-        step: 0,
-      },
-      channelPeers: [],
-      contract: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-      },
       isOpenModal: false,
       modalType: 'addchannel',
       organization: {
@@ -92,8 +74,23 @@ class NetworkDetail$$Page extends React.Component {
         current: 1,
         record: {},
       },
-      organizations: [],
-      peers: [],
+      channel: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+        step: 0,
+      },
+      contract: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+      },
       strategy: {
         filter: 'ALL',
         searchValue: undefined,
@@ -104,6 +101,10 @@ class NetworkDetail$$Page extends React.Component {
         list: [],
         channels: [],
       },
+      organizations: [],
+      peers: [],
+      channelPeers: [],
+      allPeers: [],
     };
   }
 
@@ -116,541 +117,6 @@ class NetworkDetail$$Page extends React.Component {
   };
 
   componentWillUnmount() {}
-
-  async channelAddModalConfirm(e, payload) {
-    var _this$props$useGetNet, _this$props$useGetNet2;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    try {
-      var _this$state, _this$state$channel, _this$state$channelPe;
-      const res = await this.props.appHelper.utils.bff.createChannel({
-        network: network === null || network === void 0 ? void 0 : network.name,
-        channel: {
-          ...(((_this$state = this.state) === null || _this$state === void 0
-            ? void 0
-            : (_this$state$channel = _this$state.channel) === null ||
-              _this$state$channel === void 0
-            ? void 0
-            : _this$state$channel.addData) || {}),
-          peers:
-            (_this$state$channelPe = this.state.channelPeers) === null ||
-            _this$state$channelPe === void 0
-              ? void 0
-              : _this$state$channelPe.map((key) => {
-                  var _this$state$allPeers;
-                  const item =
-                    (_this$state$allPeers = this.state.allPeers) === null ||
-                    _this$state$allPeers === void 0
-                      ? void 0
-                      : _this$state$allPeers.find((item) => item.key === key);
-                  return {
-                    name: item.name,
-                    namespace: item.namespace,
-                  };
-                }),
-        },
-      });
-      // this.closeModal()
-      // this.utils.notification.success({
-      //   message: this.i18n('i18n-l8fybssesij'),
-      // })
-      this.openAddChannelSuccessModal();
-      this.props.useGetNetwork.mutate();
-    } catch (error) {
-      var _error$response;
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-85kkwp67i5u'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
-      });
-    }
-  }
-
-  channelAddModalNext() {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_create_channel')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      this.setState({
-        channel: {
-          ...this.state.channel,
-          addData: v,
-          step: 1,
-        },
-      });
-      this.getPeers(v, () => {});
-    });
-  }
-
-  channelAddModalPre() {
-    this.setState(
-      {
-        channel: {
-          ...this.state.channel,
-          step: 0,
-        },
-      },
-      () => {
-        var _this$$, _this$$$formRef, _this$$$formRef$curre;
-        const form =
-          (_this$$ = this.$('formily_create_channel')) === null ||
-          _this$$ === void 0
-            ? void 0
-            : (_this$$$formRef = _this$$.formRef) === null ||
-              _this$$$formRef === void 0
-            ? void 0
-            : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-              _this$$$formRef$curre === void 0
-            ? void 0
-            : _this$$$formRef$curre.form;
-        form.setValues(this.state.channel.addData);
-      }
-    );
-  }
-
-  channelAddOrganizationModalConfirm(e, payload) {
-    this.openAddChannelOrganizationSuccessModal();
-    console.log(this.state.channel, 'ccccccccccccccccccccc');
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.updateChannel({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openAddChannelSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
-  }
-
-  async channelAddPeerModalConfirm(e, payload) {
-    var _this$props$useGetNet, _this$props$useGetNet2;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    try {
-      var _this$state$channel, _this$state$channel$r, _this$state$channelPe;
-      const res = await this.props.appHelper.utils.bff.updateChannel({
-        name:
-          (_this$state$channel = this.state.channel) === null ||
-          _this$state$channel === void 0
-            ? void 0
-            : (_this$state$channel$r = _this$state$channel.record) === null ||
-              _this$state$channel$r === void 0
-            ? void 0
-            : _this$state$channel$r.name,
-        channel: {
-          operate: 'add',
-          // remove
-          peers:
-            (_this$state$channelPe = this.state.channelPeers) === null ||
-            _this$state$channelPe === void 0
-              ? void 0
-              : _this$state$channelPe.map((key) => {
-                  var _this$state$allPeers;
-                  const item =
-                    (_this$state$allPeers = this.state.allPeers) === null ||
-                    _this$state$allPeers === void 0
-                      ? void 0
-                      : _this$state$allPeers.find((item) => item.key === key);
-                  return {
-                    name: item.name,
-                    namespace: item.namespace,
-                  };
-                }),
-        },
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-knuex06q'),
-      });
-      // this.openAddChannelSuccessModal()
-      this.props.useGetNetwork.mutate();
-    } catch (error) {
-      var _error$response;
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-sunw6qwy'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
-      });
-    }
-  }
-
-  channelPeersChange(channelPeers) {
-    this.setState({
-      channelPeers,
-    });
-  }
-
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-      channelPeers: [],
-    });
-  }
-
-  confirmAddContractModal(e, payload) {
-    var _this$props$useGetNet,
-      _this$props$useGetNet2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    const form =
-      (_this$$ = this.$('formily_create_contract')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      try {
-        var _this$match, _this$match$params, _v$file;
-        const res = await this.props.appHelper.utils.bff.createChaincodebuild({
-          ...v,
-          network:
-            (_this$match = this.match) === null || _this$match === void 0
-              ? void 0
-              : (_this$match$params = _this$match.params) === null ||
-                _this$match$params === void 0
-              ? void 0
-              : _this$match$params.id,
-          file:
-            (_v$file = v.file) === null || _v$file === void 0
-              ? void 0
-              : _v$file.fileList,
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-5eg2znpg'),
-        });
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-rw4x2dt7'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
-  }
-
-  confirmAddStrategyModal(e, payload) {
-    var _this$props$useGetNet,
-      _this$props$useGetNet2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    const form =
-      (_this$$ = this.$('formily_create_strategy')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      var _JSON$parse, _v$content, _v$content$value, _v$content$value$map;
-      const epolicy = {
-        channel:
-          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
-          _JSON$parse === void 0
-            ? void 0
-            : _JSON$parse.name,
-        description: v.description,
-        name: v.name,
-        value:
-          'OR(' +
-          ((_v$content = v.content) === null || _v$content === void 0
-            ? void 0
-            : (_v$content$value = _v$content.value) === null ||
-              _v$content$value === void 0
-            ? void 0
-            : (_v$content$value$map = _v$content$value.map((valueitem) => {
-                var _valueitem$item, _valueitem$item$map;
-                return (_valueitem$item = valueitem.item) === null ||
-                  _valueitem$item === void 0
-                  ? void 0
-                  : (_valueitem$item$map = _valueitem$item.map((item, i) => {
-                      item = `'${item}.member'`;
-                      if (i === 0) {
-                        return 'AND(' + item;
-                      }
-                      if (i === valueitem.item.length - 1) {
-                        return item + ')';
-                      }
-                      return item;
-                    })) === null || _valueitem$item$map === void 0
-                  ? void 0
-                  : _valueitem$item$map.join(',');
-              })) === null || _v$content$value$map === void 0
-            ? void 0
-            : _v$content$value$map.join(',')) +
-          ')',
-      };
-      try {
-        const res = await this.props.appHelper.utils.bff.createEpolicy({
-          epolicy,
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-636u5idg'),
-        });
-        this.props.useGetNetwork.mutate();
-        this.getEpolicies();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-sivjo10j'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
-  }
-
-  async confirmDeleteChannelModal(e, payload) {
-    // const federation = this.props.useGetFederation?.data?.federation || {}
-    // try {
-    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
-    //     name: federation?.name,
-    //     organization: this.state.channelRecord?.name,
-    //     initiator: federation?.initiator?.name
-    //   })
-    //   this.closeModal()
-    //   this.utils.notification.success({
-    //     message: this.i18n('i18n-yy3f9rxigm'),
-    //   })
-    //   this.props.useGetFederation.mutate()
-    // } catch (error) {
-    //   this.utils.notification.warnings({
-    //     message: this.i18n('i18n-p5gea1q7fem'),
-    //     errors: error?.response?.errors
-    //   })
-    // }
-  }
-
-  async confirmDeleteContractModal(e, payload) {
-    try {
-      var _this$match,
-        _this$match$params,
-        _this$state$contract,
-        _this$state$contract$;
-      await this.props.appHelper.utils.bff.deleteChaincodebuild({
-        network:
-          (_this$match = this.match) === null || _this$match === void 0
-            ? void 0
-            : (_this$match$params = _this$match.params) === null ||
-              _this$match$params === void 0
-            ? void 0
-            : _this$match$params.id,
-        displayName:
-          (_this$state$contract = this.state.contract) === null ||
-          _this$state$contract === void 0
-            ? void 0
-            : (_this$state$contract$ = _this$state$contract.record) === null ||
-              _this$state$contract$ === void 0
-            ? void 0
-            : _this$state$contract$.displayName,
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-5m5bdexs'),
-      });
-      this.props.useGetChaincodebuilds.mutate();
-    } catch (error) {
-      var _error$response;
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-esbyfrwe'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
-      });
-    }
-  }
-
-  confirmDeploymentContractModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_contract_deploy')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      const chaincode = {
-        channel: v.channel,
-        epolicy: v.epolicy,
-        name: v.name,
-        version: v.version,
-        // edit
-        // ibppeer: v.ibppeer
-      };
-
-      console.log(v, chaincode);
-      try {
-        const res = await this.props.appHelper.utils.bff.deployChaincode({
-          chaincode,
-        });
-        // this.closeModal()
-        // this.utils.notification.success({
-        //   message: this.i18n('i18n-l8fybssesij'),
-        // })
-        this.openDeploymentContractSuccessModal();
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-ekujezos'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
-  }
-
-  confirmUpgradeContractModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_contract_upgrade')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      const { versoin, ...params } = v;
-      try {
-        var _this$match, _this$match$params, _v$file;
-        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
-          ...params,
-          network:
-            (_this$match = this.match) === null || _this$match === void 0
-              ? void 0
-              : (_this$match$params = _this$match.params) === null ||
-                _this$match$params === void 0
-              ? void 0
-              : _this$match$params.id,
-          file:
-            (_v$file = v.file) === null || _v$file === void 0
-              ? void 0
-              : _v$file.fileList,
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-a4rcftyd'),
-        });
-        this.openAddChannelSuccessModal();
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-7fxj402s'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
-  }
 
   async getChannelsForCreateEpolicy(callback) {
     var _this$match,
@@ -825,63 +291,153 @@ class NetworkDetail$$Page extends React.Component {
     );
   }
 
-  handleChannelPaginationChange(c, s) {
+  formatContract() {
+    var _ref,
+      _ref$filter,
+      _this$props$useGetCha,
+      _this$props$useGetCha2,
+      _Object$keys;
+    const list =
+      (_ref =
+        ((_this$props$useGetCha = this.props.useGetChaincodebuilds) === null ||
+        _this$props$useGetCha === void 0
+          ? void 0
+          : (_this$props$useGetCha2 = _this$props$useGetCha.data) === null ||
+            _this$props$useGetCha2 === void 0
+          ? void 0
+          : _this$props$useGetCha2.chaincodebuilds) || []) === null ||
+      _ref === void 0
+        ? void 0
+        : (_ref$filter = _ref.filter((item) => {
+            var _item$displayName;
+            return this.state.contract.searchValue
+              ? (_item$displayName = item.displayName) === null ||
+                _item$displayName === void 0
+                ? void 0
+                : _item$displayName.includes(this.state.contract.searchValue)
+              : true;
+          })) === null || _ref$filter === void 0
+        ? void 0
+        : _ref$filter.sort((a, b) => {
+            var _this$state$sorter;
+            if (
+              ((_this$state$sorter = this.state.sorter) === null ||
+              _this$state$sorter === void 0
+                ? void 0
+                : _this$state$sorter.order) !== 'ascend'
+            ) {
+              return (
+                new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime()
+              );
+            }
+            return (
+              new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime()
+            );
+          });
+    const result = {};
+    const initVersions = {};
+    list.forEach((item) => {
+      if (!result[item.displayName]) {
+        result[item.displayName] = {};
+      }
+      if (!result[item.displayName][item.name]) {
+        result[item.displayName][item.name] = item;
+      }
+    });
+    const formatList =
+      (_Object$keys = Object.keys(result)) === null || _Object$keys === void 0
+        ? void 0
+        : _Object$keys.map((displayName) => {
+            var _versions$, _Object$values;
+            const versions = Object.values(result[displayName]);
+            initVersions[displayName] =
+              versions === null || versions === void 0
+                ? void 0
+                : (_versions$ = versions[0]) === null || _versions$ === void 0
+                ? void 0
+                : _versions$.name;
+            const record =
+              (versions === null || versions === void 0
+                ? void 0
+                : versions.find((item) => {
+                    var _this$state$initVersi;
+                    return (
+                      item.name ===
+                      ((_this$state$initVersi = this.state.initVersions) ===
+                        null || _this$state$initVersi === void 0
+                        ? void 0
+                        : _this$state$initVersi[displayName])
+                    );
+                  })) ||
+              (versions === null || versions === void 0 ? void 0 : versions[0]);
+            return {
+              displayName,
+              ...record,
+              versions:
+                (_Object$values = Object.values(result[displayName])) ===
+                  null || _Object$values === void 0
+                  ? void 0
+                  : _Object$values.map((item) => ({
+                      ...item,
+                      label: item.version,
+                      key: item.name,
+                    })),
+            };
+          });
+    if (!this.state.initVersions) {
+      this.setState({
+        initVersions,
+      });
+    }
+    return formatList;
+  }
+
+  getContractVersion(record) {
+    var _this$state$initVersi, _record$versions, _record$versions$find;
+    const name =
+      (_this$state$initVersi = this.state.initVersions) === null ||
+      _this$state$initVersi === void 0
+        ? void 0
+        : _this$state$initVersi[
+            record === null || record === void 0 ? void 0 : record.displayName
+          ];
+    return record === null || record === void 0
+      ? void 0
+      : (_record$versions = record.versions) === null ||
+        _record$versions === void 0
+      ? void 0
+      : (_record$versions$find = _record$versions.find(
+          (item) => item.name === name
+        )) === null || _record$versions$find === void 0
+      ? void 0
+      : _record$versions$find.version;
+  }
+
+  getContractVersions(record) {
+    return (
+      (record === null || record === void 0 ? void 0 : record.versions) || []
+    );
+  }
+
+  changeContractVersion(e, payload) {
+    var _payload$record;
     this.setState({
-      channel: {
-        ...this.state.channel,
-        size: s,
-        current: c,
+      initVersions: {
+        ...this.state.initVersions,
+        [payload === null || payload === void 0
+          ? void 0
+          : (_payload$record = payload.record) === null ||
+            _payload$record === void 0
+          ? void 0
+          : _payload$record.displayName]: e.key,
       },
     });
   }
 
-  handleChannelSearchValueChange(e) {
+  closeModal() {
     this.setState({
-      channel: {
-        ...this.state.channel,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleChannelTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  handleContractPaginationChange(c, s) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleContractSearchValueChange(e) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleContractTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        pagination,
-        filters,
-        sorter,
-      },
+      isOpenModal: false,
+      channelPeers: [],
     });
   }
 
@@ -889,6 +445,33 @@ class NetworkDetail$$Page extends React.Component {
     this.setState({
       filter: e.target.value,
     });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+    });
+  }
+
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
+  }
+
+  paginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
   }
 
   handleOrganizationPaginationChange(c, s) {
@@ -912,42 +495,29 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  handlePaginationChange(c, s) {
+  handleChannelSearchValueChange(e) {
     this.setState({
-      size: s,
-      current: c,
+      channel: {
+        ...this.state.channel,
+        searchValue: e.target.value,
+      },
     });
   }
 
-  handleSearchValueChange(e) {
+  handleChannelPaginationChange(c, s) {
     this.setState({
-      searchValue: e.target.value,
-    });
-  }
-
-  handleStrategyPaginationChange(c, s) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
+      channel: {
+        ...this.state.channel,
         size: s,
         current: c,
       },
     });
   }
 
-  handleStrategySearchValueChange(e) {
+  handleChannelTableChange(pagination, filters, sorter, extra) {
     this.setState({
-      strategy: {
-        ...this.state.strategy,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleStrategyTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
+      channel: {
+        ...this.state.channel,
         pagination,
         filters,
         sorter,
@@ -955,18 +525,17 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
   openAddChannelModal() {
     this.setState({
       isOpenModal: true,
       modalType: 'addchannel',
+    });
+  }
+
+  openAddChannelSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelsuccess',
     });
   }
 
@@ -1017,26 +586,211 @@ class NetworkDetail$$Page extends React.Component {
     );
   }
 
-  openAddChannelSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannelsuccess',
+  channelAddModalNext() {
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_create_channel')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      this.setState({
+        channel: {
+          ...this.state.channel,
+          addData: v,
+          step: 1,
+        },
+      });
+      this.getPeers(v, () => {});
     });
   }
 
-  openAddContractModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addcontract',
-    });
+  channelAddModalPre() {
+    this.setState(
+      {
+        channel: {
+          ...this.state.channel,
+          step: 0,
+        },
+      },
+      () => {
+        var _this$$, _this$$$formRef, _this$$$formRef$curre;
+        const form =
+          (_this$$ = this.$('formily_create_channel')) === null ||
+          _this$$ === void 0
+            ? void 0
+            : (_this$$$formRef = _this$$.formRef) === null ||
+              _this$$$formRef === void 0
+            ? void 0
+            : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+              _this$$$formRef$curre === void 0
+            ? void 0
+            : _this$$$formRef$curre.form;
+        form.setValues(this.state.channel.addData);
+      }
+    );
   }
 
-  openAddStrategyModal() {
+  async channelAddModalConfirm(e, payload) {
+    var _this$props$useGetNet, _this$props$useGetNet2;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    try {
+      var _this$state, _this$state$channel, _this$state$channelPe;
+      const res = await this.props.appHelper.utils.bff.createChannel({
+        network: network === null || network === void 0 ? void 0 : network.name,
+        channel: {
+          ...(((_this$state = this.state) === null || _this$state === void 0
+            ? void 0
+            : (_this$state$channel = _this$state.channel) === null ||
+              _this$state$channel === void 0
+            ? void 0
+            : _this$state$channel.addData) || {}),
+          peers:
+            (_this$state$channelPe = this.state.channelPeers) === null ||
+            _this$state$channelPe === void 0
+              ? void 0
+              : _this$state$channelPe.map((key) => {
+                  var _this$state$allPeers;
+                  const item =
+                    (_this$state$allPeers = this.state.allPeers) === null ||
+                    _this$state$allPeers === void 0
+                      ? void 0
+                      : _this$state$allPeers.find((item) => item.key === key);
+                  return {
+                    name: item.name,
+                    namespace: item.namespace,
+                  };
+                }),
+        },
+      });
+      // this.closeModal()
+      // this.utils.notification.success({
+      //   message: this.i18n('i18n-l8fybssesij'),
+      // })
+      this.openAddChannelSuccessModal();
+      this.props.useGetNetwork.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-85kkwp67i5u'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  channelAddOrganizationModalConfirm(e, payload) {
+    this.openAddChannelOrganizationSuccessModal();
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.updateChannel({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openAddChannelSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
+  async channelAddPeerModalConfirm(e, payload) {
+    var _this$props$useGetNet, _this$props$useGetNet2;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    try {
+      var _this$state$channel, _this$state$channel$r, _this$state$channelPe;
+      const res = await this.props.appHelper.utils.bff.updateChannel({
+        name:
+          (_this$state$channel = this.state.channel) === null ||
+          _this$state$channel === void 0
+            ? void 0
+            : (_this$state$channel$r = _this$state$channel.record) === null ||
+              _this$state$channel$r === void 0
+            ? void 0
+            : _this$state$channel$r.name,
+        channel: {
+          operate: 'add',
+          // remove
+          peers:
+            (_this$state$channelPe = this.state.channelPeers) === null ||
+            _this$state$channelPe === void 0
+              ? void 0
+              : _this$state$channelPe.map((key) => {
+                  var _this$state$allPeers;
+                  const item =
+                    (_this$state$allPeers = this.state.allPeers) === null ||
+                    _this$state$allPeers === void 0
+                      ? void 0
+                      : _this$state$allPeers.find((item) => item.key === key);
+                  return {
+                    name: item.name,
+                    namespace: item.namespace,
+                  };
+                }),
+        },
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-knuex06q'),
+      });
+      // this.openAddChannelSuccessModal()
+      this.props.useGetNetwork.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-sunw6qwy'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  channelPeersChange(channelPeers) {
     this.setState({
-      isOpenModal: true,
-      modalType: 'addstrategy',
+      channelPeers,
     });
-    this.getChannelsForCreateEpolicy(() => {});
   }
 
   openDeleteChannelModal(e, payload) {
@@ -1051,14 +805,61 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  openDeleteContractModal(e, payload) {
+  async confirmDeleteChannelModal(e, payload) {
+    // const federation = this.props.useGetFederation?.data?.federation || {}
+    // try {
+    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
+    //     name: federation?.name,
+    //     organization: this.state.channelRecord?.name,
+    //     initiator: federation?.initiator?.name
+    //   })
+    //   this.closeModal()
+    //   this.utils.notification.success({
+    //     message: this.i18n('i18n-yy3f9rxigm'),
+    //   })
+    //   this.props.useGetFederation.mutate()
+    // } catch (error) {
+    //   this.utils.notification.warnings({
+    //     message: this.i18n('i18n-p5gea1q7fem'),
+    //     errors: error?.response?.errors
+    //   })
+    // }
+  }
+
+  handleContractSearchValueChange(e) {
     this.setState({
       contract: {
         ...this.state.contract,
-        record: payload.record,
+        searchValue: e.target.value,
       },
+    });
+  }
+
+  handleContractPaginationChange(c, s) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleContractTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  openAddContractModal() {
+    this.setState({
       isOpenModal: true,
-      modalType: 'deletecontract',
+      modalType: 'addcontract',
     });
   }
 
@@ -1167,10 +968,356 @@ class NetworkDetail$$Page extends React.Component {
     );
   }
 
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
-      'i18n-v7xu122b9o'
-    )}`;
+  openDeleteContractModal(e, payload) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletecontract',
+    });
+  }
+
+  confirmAddContractModal(e, payload) {
+    var _this$props$useGetNet,
+      _this$props$useGetNet2,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    const form =
+      (_this$$ = this.$('formily_create_contract')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      console.log(v, 'vvvvvvvv');
+      try {
+        var _this$match, _this$match$params, _v$files;
+        const res = await this.props.appHelper.utils.bff.createChaincodebuild({
+          ...v,
+          network:
+            (_this$match = this.match) === null || _this$match === void 0
+              ? void 0
+              : (_this$match$params = _this$match.params) === null ||
+                _this$match$params === void 0
+              ? void 0
+              : _this$match$params.id,
+          files:
+            (_v$files = v.files) === null || _v$files === void 0
+              ? void 0
+              : _v$files.fileList,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-5eg2znpg'),
+        });
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-rw4x2dt7'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  confirmUpgradeContractModal(e, payload) {
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_contract_upgrade')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      const { versoin, ...params } = v;
+      try {
+        var _this$match, _this$match$params, _v$files;
+        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
+          ...params,
+          network:
+            (_this$match = this.match) === null || _this$match === void 0
+              ? void 0
+              : (_this$match$params = _this$match.params) === null ||
+                _this$match$params === void 0
+              ? void 0
+              : _this$match$params.id,
+          files:
+            (_v$files = v.files) === null || _v$files === void 0
+              ? void 0
+              : _v$files.fileList,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-a4rcftyd'),
+        });
+        this.openAddChannelSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-7fxj402s'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  confirmDeploymentContractModal(e, payload) {
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_contract_deploy')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      const chaincode = {
+        channel: v.channel,
+        epolicy: v.epolicy,
+        name: v.name,
+        version: v.version,
+        // edit
+        // ibppeer: v.ibppeer
+      };
+
+      try {
+        const res = await this.props.appHelper.utils.bff.deployChaincode({
+          chaincode,
+        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-l8fybssesij'),
+        // })
+        this.openDeploymentContractSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-ekujezos'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  async confirmDeleteContractModal(e, payload) {
+    try {
+      var _this$match,
+        _this$match$params,
+        _this$state$contract,
+        _this$state$contract$;
+      await this.props.appHelper.utils.bff.deleteChaincodebuild({
+        network:
+          (_this$match = this.match) === null || _this$match === void 0
+            ? void 0
+            : (_this$match$params = _this$match.params) === null ||
+              _this$match$params === void 0
+            ? void 0
+            : _this$match$params.id,
+        displayName:
+          (_this$state$contract = this.state.contract) === null ||
+          _this$state$contract === void 0
+            ? void 0
+            : (_this$state$contract$ = _this$state$contract.record) === null ||
+              _this$state$contract$ === void 0
+            ? void 0
+            : _this$state$contract$.displayName,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-5m5bdexs'),
+      });
+      this.props.useGetChaincodebuilds.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-esbyfrwe'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  handleStrategySearchValueChange(e) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleStrategyPaginationChange(c, s) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleStrategyTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  openAddStrategyModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addstrategy',
+    });
+    this.getChannelsForCreateEpolicy(() => {});
+  }
+
+  confirmAddStrategyModal(e, payload) {
+    var _this$props$useGetNet,
+      _this$props$useGetNet2,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    const form =
+      (_this$$ = this.$('formily_create_strategy')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      var _JSON$parse, _v$content, _v$content$value, _v$content$value$map;
+      const epolicy = {
+        channel:
+          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
+          _JSON$parse === void 0
+            ? void 0
+            : _JSON$parse.name,
+        description: v.description,
+        name: v.name,
+        value:
+          'OR(' +
+          ((_v$content = v.content) === null || _v$content === void 0
+            ? void 0
+            : (_v$content$value = _v$content.value) === null ||
+              _v$content$value === void 0
+            ? void 0
+            : (_v$content$value$map = _v$content$value.map((valueitem) => {
+                var _valueitem$item, _valueitem$item$map;
+                return (_valueitem$item = valueitem.item) === null ||
+                  _valueitem$item === void 0
+                  ? void 0
+                  : (_valueitem$item$map = _valueitem$item.map((item, i) => {
+                      item = `'${item}.member'`;
+                      if (i === 0) {
+                        return 'AND(' + item;
+                      }
+                      if (i === valueitem.item.length - 1) {
+                        return item + ')';
+                      }
+                      return item;
+                    })) === null || _valueitem$item$map === void 0
+                  ? void 0
+                  : _valueitem$item$map.join(',');
+              })) === null || _v$content$value$map === void 0
+            ? void 0
+            : _v$content$value$map.join(',')) +
+          ')',
+      };
+      try {
+        const res = await this.props.appHelper.utils.bff.createEpolicy({
+          epolicy,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-636u5idg'),
+        });
+        this.props.useGetNetwork.mutate();
+        this.getEpolicies();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-sivjo10j'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  beforeUpload() {
+    return false;
   }
 
   componentDidMount() {
@@ -1536,9 +1683,19 @@ class NetworkDetail$$Page extends React.Component {
             />
             <FormilyUpload
               __component_name="FormilyUpload"
-              componentProps={{ 'x-component-props': { directory: true } }}
+              componentProps={{
+                'x-component-props': {
+                  directory: true,
+                  beforeUpload: function () {
+                    return this.beforeUpload.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                },
+              }}
               fieldProps={{
-                name: 'file',
+                name: 'files',
                 required: true,
                 title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
                 'x-component': 'FormilyUpload',
@@ -5109,32 +5266,196 @@ class NetworkDetail$$Page extends React.Component {
                               {
                                 dataIndex: 'version',
                                 key: 'version',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Dropdown
+                                      __component_name="Dropdown"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            name: 'menu.onClick',
+                                            paramStr:
+                                              '{\n \trecord: this.record\n}',
+                                            relatedEventName:
+                                              'changeContractVersion',
+                                            type: 'componentEvent',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            disabled: true,
+                                            name: 'menu.onClick',
+                                            template:
+                                              "onDropDownClick({ item, key, keyPath, domEvent }, ${extParams}){\n// onClick\t点击 MenuItem 调用此函数 \nconsole.log('onDropDownClick', item, key, keyPath, domEvent);}",
+                                          },
+                                        ],
+                                      }}
+                                      destroyPopupOnHide={true}
+                                      disabled={false}
+                                      menu={{
+                                        items: __$$eval(() =>
+                                          __$$context.getContractVersions(
+                                            record
+                                          )
+                                        ),
+                                        onClick: function () {
+                                          return this.changeContractVersion.apply(
+                                            this,
+                                            Array.prototype.slice
+                                              .call(arguments)
+                                              .concat([
+                                                {
+                                                  record: record,
+                                                },
+                                              ])
+                                          );
+                                        }.bind(__$$context),
+                                      }}
+                                      placement="bottomLeft"
+                                      trigger={['hover']}
+                                    >
+                                      <Button
+                                        __component_name="Button"
+                                        block={false}
+                                        danger={false}
+                                        disabled={false}
+                                        ghost={false}
+                                        shape="default"
+                                        type="link"
+                                      >
+                                        {[
+                                          <Typography.Text
+                                            __component_name="Typography.Text"
+                                            disabled={false}
+                                            strong={false}
+                                            style={{
+                                              color: 'inherit',
+                                              fontSize: '',
+                                            }}
+                                          >
+                                            {__$$eval(() =>
+                                              __$$context.getContractVersion(
+                                                record
+                                              )
+                                            )}
+                                          </Typography.Text>,
+                                          <Icon
+                                            __component_name="Icon"
+                                            size={12}
+                                            style={{
+                                              marginLeft: 4,
+                                              verticalAlign: 'middle',
+                                            }}
+                                            type="DownOutlined"
+                                          />,
+                                        ]}
+                                      </Button>
+                                    </Dropdown>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
                                 title: this.i18n('i18n-hbf63hki898') /* 版本 */,
                               },
                               {
                                 dataIndex: 'source',
                                 key: 'source',
-                                render: '',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {__$$eval(() => record?.initiator || '-')}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
                                 title:
                                   this.i18n('i18n-1vlhlgh9') /* 合约来源 */,
                               },
                               {
                                 dataIndex: 'node',
                                 key: 'node',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {__$$eval(
+                                        () => record?.ibppeers?.length || '0'
+                                      )}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
                                 title:
                                   this.i18n('i18n-jhpf4qg9') /* 部署节点 */,
                               },
                               {
                                 dataIndex: 'channels',
                                 key: 'channels',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {__$$eval(() => record?.length || '0')}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
                                 title:
                                   this.i18n('i18n-dmz1d3cr') /* 部署通道数 */,
                               },
                               {
                                 dataIndex: 'creationTimestamp',
                                 key: 'creationTimestamp',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Time
+                                      __component_name="Typography.Time"
+                                      format=""
+                                      relativeTime={false}
+                                      time={__$$eval(
+                                        () => record.creationTimestamp
+                                      )}
+                                    />
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
                                 title:
-                                  this.i18n('i18n-4lrtaenb') /* 合约数量 */,
+                                  this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
                               },
                               {
                                 dataIndex: 'op',
@@ -5280,31 +5601,7 @@ class NetworkDetail$$Page extends React.Component {
                                 title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
                               },
                             ]}
-                            dataSource={__$$eval(() =>
-                              (
-                                this.props.useGetChaincodebuilds?.data
-                                  ?.chaincodebuilds || []
-                              )
-                                ?.filter((item) => {
-                                  return this.state.contract.searchValue
-                                    ? item.displayName?.includes(
-                                        this.state.contract.searchValue
-                                      )
-                                    : true;
-                                })
-                                ?.sort((a, b) => {
-                                  if (this.state.sorter?.order !== 'ascend') {
-                                    return (
-                                      new Date(b.joinedAt).getTime() -
-                                      new Date(a.joinedAt).getTime()
-                                    );
-                                  }
-                                  return (
-                                    new Date(a.joinedAt).getTime() -
-                                    new Date(b.joinedAt).getTime()
-                                  );
-                                })
-                            )}
+                            dataSource={__$$eval(() => this.formatContract())}
                             loading={__$$eval(
                               () => this.props.useGetNetwork?.loading
                             )}
@@ -5350,32 +5647,7 @@ class NetworkDetail$$Page extends React.Component {
                               simple: false,
                               size: 'default',
                               total: __$$eval(
-                                () =>
-                                  (
-                                    this.props.useGetChaincodebuilds?.data
-                                      ?.chaincodebuilds || []
-                                  )
-                                    ?.filter((item) => {
-                                      return this.state.contract.searchValue
-                                        ? item.displayName?.includes(
-                                            this.state.contract.searchValue
-                                          )
-                                        : true;
-                                    })
-                                    ?.sort((a, b) => {
-                                      if (
-                                        this.state.sorter?.order !== 'ascend'
-                                      ) {
-                                        return (
-                                          new Date(b.joinedAt).getTime() -
-                                          new Date(a.joinedAt).getTime()
-                                        );
-                                      }
-                                      return (
-                                        new Date(a.joinedAt).getTime() -
-                                        new Date(b.joinedAt).getTime()
-                                      );
-                                    }).length
+                                () => this.formatContract()?.length || 0
                               ),
                             }}
                             rowKey="name"
@@ -6580,14 +6852,25 @@ class NetworkDetail$$Page extends React.Component {
             />
             <FormilyUpload
               __component_name="FormilyUpload"
+              componentProps={{
+                'x-component-props': {
+                  directory: true,
+                  multiple: false,
+                  beforeUpload: function () {
+                    return this.beforeUpload.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                },
+              }}
               fieldProps={{
-                name: 'file',
+                name: 'files',
                 required: true,
                 title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
                 'x-component': 'FormilyUpload',
                 'x-validator': [],
               }}
-              componentProps={{ 'x-component-props': { multiple: true } }}
             >
               <Button
                 __component_name="Button"
