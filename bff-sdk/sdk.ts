@@ -29,12 +29,22 @@ export type Scalars = {
 
 export type Chaincodebuild = {
   __typename?: 'Chaincodebuild';
+  /** 通道 */
+  channels?: Maybe<Array<Channel>>;
   /** 创建时间 */
   creationTimestamp?: Maybe<Scalars['String']>;
   /** 名称 */
   displayName: Scalars['String'];
+  /** 节点 */
+  ibppeers?: Maybe<Array<SpecPeer>>;
+  /** 发起者（组织） */
+  initiator?: Maybe<Scalars['String']>;
   /** metadata.name */
   name: Scalars['ID'];
+  /** 所在网络 */
+  network?: Maybe<Scalars['String']>;
+  /** 组织 */
+  organizations?: Maybe<Array<Organization>>;
   /** 状态（Created时，才能部署升级） */
   status?: Maybe<CrdStatusType>;
   /** 版本 */
@@ -381,6 +391,8 @@ export type NewChaincodebuild = {
   displayName: Scalars['String'];
   /** 合约文件 */
   file?: InputMaybe<Scalars['Upload']>;
+  /** 合约文件夹 */
+  files?: InputMaybe<Array<Scalars['Upload']>>;
   /** 选择语言 */
   language?: InputMaybe<Scalars['String']>;
   /** 此合约构建所在网络 */
@@ -578,6 +590,8 @@ export enum ProposalType {
 
 export type Query = {
   __typename?: 'Query';
+  /** 合约详情 */
+  chaincodebuild: Chaincodebuild;
   /** 合约列表 */
   chaincodebuilds: Array<Chaincodebuild>;
   /** 通道详情 */
@@ -606,6 +620,10 @@ export type Query = {
   proposal: Proposal;
   /** 提议列表 */
   proposals: Array<Proposal>;
+};
+
+export type QueryChaincodebuildArgs = {
+  name: Scalars['String'];
 };
 
 export type QueryChaincodebuildsArgs = {
@@ -707,6 +725,8 @@ export type UpgradeChaincodebuild = {
   displayName: Scalars['String'];
   /** 合约文件 */
   file?: InputMaybe<Scalars['Upload']>;
+  /** 合约文件夹 */
+  files?: InputMaybe<Array<Scalars['Upload']>>;
   /** 选择语言 */
   language?: InputMaybe<Scalars['String']>;
   /** 此合约构建所在网络 */
@@ -783,7 +803,8 @@ export type CreateChaincodebuildMutationVariables = Exact<{
   language?: InputMaybe<Scalars['String']>;
   network: Scalars['String'];
   version: Scalars['String'];
-  file: Scalars['Upload'];
+  file?: InputMaybe<Scalars['Upload']>;
+  files?: InputMaybe<Array<Scalars['Upload']> | Scalars['Upload']>;
 }>;
 
 export type CreateChaincodebuildMutation = {
@@ -811,7 +832,44 @@ export type GetChaincodebuildsQuery = {
     creationTimestamp?: string | null;
     version?: string | null;
     status?: CrdStatusType | null;
+    network?: string | null;
+    initiator?: string | null;
+    ibppeers?: Array<{ __typename?: 'SpecPeer'; name?: string | null }> | null;
+    channels?: Array<{ __typename?: 'Channel'; name: string }> | null;
   }>;
+};
+
+export type GetChaincodebuildQueryVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type GetChaincodebuildQuery = {
+  __typename?: 'Query';
+  chaincodebuild: {
+    __typename?: 'Chaincodebuild';
+    name: string;
+    displayName: string;
+    creationTimestamp?: string | null;
+    version?: string | null;
+    status?: CrdStatusType | null;
+    network?: string | null;
+    initiator?: string | null;
+    organizations?: Array<{ __typename?: 'Organization'; name: string }> | null;
+    ibppeers?: Array<{
+      __typename?: 'SpecPeer';
+      name?: string | null;
+      namespace?: string | null;
+    }> | null;
+    channels?: Array<{
+      __typename?: 'Channel';
+      name: string;
+      epolicy?: Array<{
+        __typename?: 'Epolicy';
+        name: string;
+        value: string;
+      }> | null;
+    }> | null;
+  };
 };
 
 export type DeleteChaincodebuildMutationVariables = Exact<{
@@ -831,7 +889,8 @@ export type DeleteChaincodebuildMutation = {
 
 export type UpgradeChaincodebuildMutationVariables = Exact<{
   displayName: Scalars['String'];
-  file: Scalars['Upload'];
+  file?: InputMaybe<Scalars['Upload']>;
+  files?: InputMaybe<Array<Scalars['Upload']> | Scalars['Upload']>;
   language?: InputMaybe<Scalars['String']>;
   network: Scalars['String'];
   newVersion: Scalars['String'];
@@ -1535,7 +1594,8 @@ export const CreateChaincodebuildDocument = gql`
     $language: String
     $network: String!
     $version: String!
-    $file: Upload!
+    $file: Upload
+    $files: [Upload!]
   ) {
     chaincodebuildCreate(
       chaincodebuild: {
@@ -1545,6 +1605,7 @@ export const CreateChaincodebuildDocument = gql`
         network: $network
         version: $version
         file: $file
+        files: $files
       }
     ) {
       name
@@ -1563,6 +1624,41 @@ export const GetChaincodebuildsDocument = gql`
       creationTimestamp
       version
       status
+      network
+      initiator
+      ibppeers {
+        name
+      }
+      channels {
+        name
+      }
+    }
+  }
+`;
+export const GetChaincodebuildDocument = gql`
+  query getChaincodebuild($name: String!) {
+    chaincodebuild(name: $name) {
+      name
+      displayName
+      creationTimestamp
+      version
+      status
+      network
+      initiator
+      organizations {
+        name
+      }
+      ibppeers {
+        name
+        namespace
+      }
+      channels {
+        name
+        epolicy {
+          name
+          value
+        }
+      }
     }
   }
 `;
@@ -1578,7 +1674,8 @@ export const DeleteChaincodebuildDocument = gql`
 export const UpgradeChaincodebuildDocument = gql`
   mutation upgradeChaincodebuild(
     $displayName: String!
-    $file: Upload!
+    $file: Upload
+    $files: [Upload!]
     $language: String
     $network: String!
     $newVersion: String!
@@ -1587,6 +1684,7 @@ export const UpgradeChaincodebuildDocument = gql`
       chaincodebuild: {
         displayName: $displayName
         file: $file
+        files: $files
         language: $language
         network: $network
         newVersion: $newVersion
@@ -2165,6 +2263,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
         'query'
       );
     },
+    getChaincodebuild(
+      variables: GetChaincodebuildQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetChaincodebuildQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetChaincodebuildQuery>(GetChaincodebuildDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getChaincodebuild',
+        'query'
+      );
+    },
     deleteChaincodebuild(
       variables: DeleteChaincodebuildMutationVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -2643,6 +2755,16 @@ export function getSdkWithHooks(
       return useSWR<GetChaincodebuildsQuery, ClientError>(
         genKey<GetChaincodebuildsQueryVariables>('GetChaincodebuilds', variables),
         () => sdk.getChaincodebuilds(variables),
+        config
+      );
+    },
+    useGetChaincodebuild(
+      variables: GetChaincodebuildQueryVariables,
+      config?: SWRConfigInterface<GetChaincodebuildQuery, ClientError>
+    ) {
+      return useSWR<GetChaincodebuildQuery, ClientError>(
+        genKey<GetChaincodebuildQueryVariables>('GetChaincodebuild', variables),
+        () => sdk.getChaincodebuild(variables),
         config
       );
     },

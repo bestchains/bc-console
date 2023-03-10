@@ -192,7 +192,7 @@ class NetworkContractDetail$$Page extends React.Component {
                                 target="_blank"
                                 to="https://alibaba.com"
                               >
-                                链接
+                                {this.i18n('i18n-r1gt8gfi') /* 下载 */}
                               </UnifiedLink>
                             ),
                             key: 'd5nxvp29i',
@@ -218,7 +218,11 @@ class NetworkContractDetail$$Page extends React.Component {
                               strong={false}
                               style={{ fontSize: '' }}
                             >
-                              text
+                              {__$$eval(
+                                () =>
+                                  this.props.useGetChaincodebuild?.data
+                                    ?.chaincodebuild?.name
+                              )}
                             </Typography.Text>
                           }
                         </Descriptions.Item>
@@ -235,7 +239,11 @@ class NetworkContractDetail$$Page extends React.Component {
                               strong={false}
                               style={{ fontSize: '' }}
                             >
-                              text
+                              {__$$eval(
+                                () =>
+                                  this.props.useGetChaincodebuild?.data
+                                    ?.chaincodebuild?.version
+                              )}
                             </Typography.Text>
                           }
                         </Descriptions.Item>
@@ -249,7 +257,11 @@ class NetworkContractDetail$$Page extends React.Component {
                               __component_name="Typography.Time"
                               format=""
                               relativeTime={false}
-                              time=""
+                              time={__$$eval(
+                                () =>
+                                  this.props.useGetChaincodebuild?.data
+                                    ?.chaincodebuild?.creationTimestamp
+                              )}
                             />
                           }
                         </Descriptions.Item>
@@ -284,7 +296,11 @@ class NetworkContractDetail$$Page extends React.Component {
                               strong={false}
                               style={{ fontSize: '' }}
                             >
-                              text
+                              {__$$eval(
+                                () =>
+                                  this.props.useGetChaincodebuild?.data
+                                    ?.chaincodebuild?.initiator
+                              )}
                             </Typography.Text>
                           }
                         </Descriptions.Item>
@@ -396,7 +412,7 @@ class NetworkContractDetail$$Page extends React.Component {
                           },
                           {
                             _unsafe_MixedSetter_title_select: 'StringSetter',
-                            dataIndex: 'version',
+                            dataIndex: 'name',
                             key: 'age',
                             title: 'mspid',
                           },
@@ -426,7 +442,11 @@ class NetworkContractDetail$$Page extends React.Component {
                             title: this.i18n('i18n-bik6xl952y6') /* 状态 */,
                           },
                         ]}
-                        dataSource={__$$eval(() => [{}])}
+                        dataSource={__$$eval(
+                          () =>
+                            this.props.useGetChaincodebuild?.data
+                              ?.chaincodebuild?.organizations || []
+                        )}
                         pagination={false}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
@@ -470,12 +490,39 @@ class NetworkContractDetail$$Page extends React.Component {
                             title: this.i18n('i18n-4wgfgnn6') /* 通道 */,
                           },
                           {
-                            dataIndex: 'version',
-                            key: 'age',
+                            dataIndex: 'epolicy',
+                            key: 'epolicy',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      record?.epolicy
+                                        ?.map((item) => item?.name)
+                                        ?.join(',') || '-'
+                                  )}
+                                </Typography.Text>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-wh9bw5j9') /* 背书策略 */,
                           },
                         ]}
-                        dataSource={__$$eval(() => [{}])}
+                        dataSource={__$$eval(
+                          () =>
+                            this.props.useGetChaincodebuild?.data
+                              ?.chaincodebuild?.channels || []
+                        )}
                         pagination={false}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
@@ -512,7 +559,14 @@ export default () => {
   };
   return (
     <DataProvider
-      sdkSwrFuncs={[]}
+      sdkSwrFuncs={[
+        {
+          func: 'useGetChaincodebuild',
+          params: {
+            name: self.match?.params?.contractId,
+          },
+        },
+      ]}
       render={(dataProps) => (
         <NetworkContractDetail$$Page
           {...dataProps}
