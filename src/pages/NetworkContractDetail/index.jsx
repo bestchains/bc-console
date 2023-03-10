@@ -83,7 +83,9 @@ class NetworkContractDetail$$Page extends React.Component {
                   actions={[]}
                   bordered={false}
                   hoverable={false}
-                  loading={false}
+                  loading={__$$eval(
+                    () => this.props.useGetChaincodebuild?.loading
+                  )}
                   size="default"
                   style={{ height: '300px' }}
                   type="default"
@@ -116,7 +118,11 @@ class NetworkContractDetail$$Page extends React.Component {
                                 strong={false}
                                 style={{ fontSize: '' }}
                               >
-                                text
+                                {__$$eval(
+                                  () =>
+                                    this.props.useGetChaincodebuild?.data
+                                      ?.chaincodebuild?.name
+                                )}
                               </Typography.Text>
                             ),
                             key: '9qhq7vaoun',
@@ -132,7 +138,11 @@ class NetworkContractDetail$$Page extends React.Component {
                                 strong={false}
                                 style={{ fontSize: '' }}
                               >
-                                text
+                                {__$$eval(
+                                  () =>
+                                    this.props.useGetChaincodebuild?.data
+                                      ?.chaincodebuild?.version
+                                )}
                               </Typography.Text>
                             ),
                             key: 'pvlb9npuf1',
@@ -145,7 +155,11 @@ class NetworkContractDetail$$Page extends React.Component {
                                 __component_name="Typography.Time"
                                 format=""
                                 relativeTime={false}
-                                time=""
+                                time={__$$eval(
+                                  () =>
+                                    this.props.useGetChaincodebuild?.data
+                                      ?.chaincodebuild?.creationTimestamp
+                                )}
                               />
                             ),
                             key: '3fvfujee7p7',
@@ -178,7 +192,11 @@ class NetworkContractDetail$$Page extends React.Component {
                                 strong={false}
                                 style={{ fontSize: '' }}
                               >
-                                text
+                                {__$$eval(
+                                  () =>
+                                    this.props.useGetChaincodebuild?.data
+                                      ?.chaincodebuild?.initiator
+                                )}
                               </Typography.Text>
                             ),
                             key: 'zvaiq32eosn',
@@ -364,6 +382,9 @@ class NetworkContractDetail$$Page extends React.Component {
                           { title: this.i18n('i18n-6uzygunv') /* 合约日志 */ },
                         ]}
                         dataSource={__$$eval(() => [{}])}
+                        loading={__$$eval(
+                          () => this.props.useGetChaincodebuild?.loading
+                        )}
                         pagination={false}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
@@ -447,6 +468,9 @@ class NetworkContractDetail$$Page extends React.Component {
                             this.props.useGetChaincodebuild?.data
                               ?.chaincodebuild?.organizations || []
                         )}
+                        loading={__$$eval(
+                          () => this.props.useGetChaincodebuild?.loading
+                        )}
                         pagination={false}
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
@@ -522,6 +546,9 @@ class NetworkContractDetail$$Page extends React.Component {
                           () =>
                             this.props.useGetChaincodebuild?.data
                               ?.chaincodebuild?.channels || []
+                        )}
+                        loading={__$$eval(
+                          () => this.props.useGetChaincodebuild?.loading
                         )}
                         pagination={false}
                         rowKey="id"

@@ -81,7 +81,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                   actions={[]}
                   bordered={false}
                   hoverable={false}
-                  loading={false}
+                  loading={__$$eval(() => this.props.useGetChannel?.loading)}
                   size="default"
                   style={{ height: '250px' }}
                   type="default"
