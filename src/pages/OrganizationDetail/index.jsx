@@ -181,13 +181,13 @@ class OrganizationDetail$$Page extends React.Component {
         });
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n('i18n-x26twb9oy0l'),
+          message: this.i18n('i18n-knuex06q'),
         });
         this.getIbppeers();
       } catch (error) {
         var _error$response;
         this.utils.notification.warnings({
-          message: this.i18n('i18n-43getajmxf3'),
+          message: this.i18n('i18n-sunw6qwy'),
           errors:
             error === null || error === void 0
               ? void 0
