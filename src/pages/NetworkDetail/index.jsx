@@ -64,25 +64,6 @@ class NetworkDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      allPeers: [],
-      channel: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-        step: 0,
-      },
-      channelPeers: [],
-      contract: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-      },
       isOpenModal: false,
       modalType: 'addchannel',
       organization: {
@@ -93,8 +74,23 @@ class NetworkDetail$$Page extends React.Component {
         current: 1,
         record: {},
       },
-      organizations: [],
-      peers: [],
+      channel: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+        step: 0,
+      },
+      contract: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+      },
       strategy: {
         filter: 'ALL',
         searchValue: undefined,
@@ -105,6 +101,10 @@ class NetworkDetail$$Page extends React.Component {
         list: [],
         channels: [],
       },
+      organizations: [],
+      peers: [],
+      channelPeers: [],
+      allPeers: [],
     };
   }
 
@@ -118,319 +118,42 @@ class NetworkDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  beforeUpload() {
-    return false;
-  }
-
-  changeContractVersion(e, payload) {
-    var _payload$record;
-    this.setState({
-      initVersions: {
-        ...this.state.initVersions,
-        [payload === null || payload === void 0
-          ? void 0
-          : (_payload$record = payload.record) === null ||
-            _payload$record === void 0
-          ? void 0
-          : _payload$record.displayName]: e.key,
-      },
-    });
-  }
-
-  async channelAddModalConfirm(e, payload) {
-    var _this$props$useGetNet, _this$props$useGetNet2;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    try {
-      var _this$state, _this$state$channel, _this$state$channelPe;
-      const res = await this.props.appHelper.utils.bff.createChannel({
-        network: network === null || network === void 0 ? void 0 : network.name,
-        channel: {
-          ...(((_this$state = this.state) === null || _this$state === void 0
+  async getChannelsForCreateEpolicy(callback) {
+    var _this$match,
+      _this$match$params,
+      _res$channelsForCreat,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre,
+      _res$channelsForCreat2;
+    const res =
+      await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
+        network:
+          (_this$match = this.match) === null || _this$match === void 0
             ? void 0
-            : (_this$state$channel = _this$state.channel) === null ||
-              _this$state$channel === void 0
+            : (_this$match$params = _this$match.params) === null ||
+              _this$match$params === void 0
             ? void 0
-            : _this$state$channel.addData) || {}),
-          peers:
-            (_this$state$channelPe = this.state.channelPeers) === null ||
-            _this$state$channelPe === void 0
-              ? void 0
-              : _this$state$channelPe.map((key) => {
-                  var _this$state$allPeers;
-                  const item =
-                    (_this$state$allPeers = this.state.allPeers) === null ||
-                    _this$state$allPeers === void 0
-                      ? void 0
-                      : _this$state$allPeers.find((item) => item.key === key);
-                  return {
-                    name: item.name,
-                    namespace: item.namespace,
-                  };
-                }),
-        },
+            : _this$match$params.id,
       });
-      // this.closeModal()
-      // this.utils.notification.success({
-      //   message: this.i18n('i18n-l8fybssesij'),
-      // })
-      this.openAddChannelSuccessModal();
-      this.props.useGetNetwork.mutate();
-    } catch (error) {
-      var _error$response;
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-85kkwp67i5u'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
-      });
-    }
-  }
-
-  channelAddModalNext() {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_create_channel')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      this.setState({
-        channel: {
-          ...this.state.channel,
-          addData: v,
-          step: 1,
-        },
-      });
-      this.getPeers(v, () => {});
-    });
-  }
-
-  channelAddModalPre() {
     this.setState(
       {
-        channel: {
-          ...this.state.channel,
-          step: 0,
+        strategy: {
+          ...this.state.strategy,
+          channels:
+            (res === null || res === void 0
+              ? void 0
+              : (_res$channelsForCreat = res.channelsForCreateEpolicy) ===
+                  null || _res$channelsForCreat === void 0
+              ? void 0
+              : _res$channelsForCreat.map((item) => ({
+                  value: JSON.stringify(item),
+                  label: item.name,
+                }))) || [],
         },
       },
-      () => {
-        var _this$$, _this$$$formRef, _this$$$formRef$curre;
-        const form =
-          (_this$$ = this.$('formily_create_channel')) === null ||
-          _this$$ === void 0
-            ? void 0
-            : (_this$$$formRef = _this$$.formRef) === null ||
-              _this$$$formRef === void 0
-            ? void 0
-            : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-              _this$$$formRef$curre === void 0
-            ? void 0
-            : _this$$$formRef$curre.form;
-        form.setValues(this.state.channel.addData);
-      }
+      callback
     );
-  }
-
-  channelAddOrganizationModalConfirm(e, payload) {
-    this.openAddChannelOrganizationSuccessModal();
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.updateChannel({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openAddChannelSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
-  }
-
-  async channelAddPeerModalConfirm(e, payload) {
-    var _this$props$useGetNet, _this$props$useGetNet2;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    try {
-      var _this$state$channel, _this$state$channel$r, _this$state$channelPe;
-      const res = await this.props.appHelper.utils.bff.updateChannel({
-        name:
-          (_this$state$channel = this.state.channel) === null ||
-          _this$state$channel === void 0
-            ? void 0
-            : (_this$state$channel$r = _this$state$channel.record) === null ||
-              _this$state$channel$r === void 0
-            ? void 0
-            : _this$state$channel$r.name,
-        channel: {
-          operate: 'add',
-          // remove
-          peers:
-            (_this$state$channelPe = this.state.channelPeers) === null ||
-            _this$state$channelPe === void 0
-              ? void 0
-              : _this$state$channelPe.map((key) => {
-                  var _this$state$allPeers;
-                  const item =
-                    (_this$state$allPeers = this.state.allPeers) === null ||
-                    _this$state$allPeers === void 0
-                      ? void 0
-                      : _this$state$allPeers.find((item) => item.key === key);
-                  return {
-                    name: item.name,
-                    namespace: item.namespace,
-                  };
-                }),
-        },
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-knuex06q'),
-      });
-      // this.openAddChannelSuccessModal()
-      this.props.useGetNetwork.mutate();
-    } catch (error) {
-      var _error$response;
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-sunw6qwy'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
-      });
-    }
-  }
-
-  channelPeersChange(channelPeers) {
-    this.setState({
-      channelPeers,
-    });
-  }
-
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-      channelPeers: [],
-    });
-  }
-
-  confirmAddContractModal(e, payload) {
-    var _this$props$useGetNet,
-      _this$props$useGetNet2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    const form =
-      (_this$$ = this.$('formily_create_contract')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      try {
-        var _this$match, _this$match$params, _v$files, _v$files$fileList;
-        const res = await this.props.appHelper.utils.bff.createChaincodebuild({
-          ...v,
-          network:
-            (_this$match = this.match) === null || _this$match === void 0
-              ? void 0
-              : (_this$match$params = _this$match.params) === null ||
-                _this$match$params === void 0
-              ? void 0
-              : _this$match$params.id,
-          files:
-            (_v$files = v.files) === null || _v$files === void 0
-              ? void 0
-              : (_v$files$fileList = _v$files.fileList) === null ||
-                _v$files$fileList === void 0
-              ? void 0
-              : _v$files$fileList.map((item) => item.originFileObj),
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-5eg2znpg'),
-        });
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-rw4x2dt7'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
-  }
-
-  confirmAddStrategyModal(e, payload) {
-    var _this$props$useGetNet,
-      _this$props$useGetNet2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
     const form =
       (_this$$ = this.$('formily_create_strategy')) === null ||
       _this$$ === void 0
@@ -442,238 +165,130 @@ class NetworkDetail$$Page extends React.Component {
           _this$$$formRef$curre === void 0
         ? void 0
         : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      var _JSON$parse, _v$content, _v$content$value, _v$content$value$map;
-      const epolicy = {
-        channel:
-          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
-          _JSON$parse === void 0
+    form.setFieldState('channel', {
+      dataSource:
+        (res === null || res === void 0
+          ? void 0
+          : (_res$channelsForCreat2 = res.channelsForCreateEpolicy) === null ||
+            _res$channelsForCreat2 === void 0
+          ? void 0
+          : _res$channelsForCreat2.map((item) => ({
+              value: JSON.stringify(item),
+              label: item.name,
+            }))) || [],
+    });
+  }
+
+  async getEpolicies() {
+    var _this$match, _this$match$params;
+    const res = await this.props.appHelper.utils.bff.getEpolicies({
+      network:
+        (_this$match = this.match) === null || _this$match === void 0
+          ? void 0
+          : (_this$match$params = _this$match.params) === null ||
+            _this$match$params === void 0
+          ? void 0
+          : _this$match$params.id,
+    });
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        list: (res === null || res === void 0 ? void 0 : res.epolicies) || [],
+      },
+    });
+  }
+
+  async getPeers(v, callback, usedPeers) {
+    var _ref,
+      _res$ibppeersForCreat,
+      _res$ibppeersForCreat2,
+      _res$ibppeersForCreat3;
+    const { initiator, organizations } = v;
+    const res =
+      await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
+        members:
+          (_ref = [initiator, ...organizations]) === null || _ref === void 0
             ? void 0
-            : _JSON$parse.name,
-        description: v.description,
-        name: v.name,
-        value:
-          'OR(' +
-          ((_v$content = v.content) === null || _v$content === void 0
+            : _ref.filter((item) => item),
+      });
+    const allPeers = [];
+    res === null || res === void 0
+      ? void 0
+      : (_res$ibppeersForCreat = res.ibppeersForCreateChannel) === null ||
+        _res$ibppeersForCreat === void 0
+      ? void 0
+      : _res$ibppeersForCreat.forEach((item) => {
+          var _item$ibppeers;
+          (_item$ibppeers = item.ibppeers) === null || _item$ibppeers === void 0
             ? void 0
-            : (_v$content$value = _v$content.value) === null ||
-              _v$content$value === void 0
-            ? void 0
-            : (_v$content$value$map = _v$content$value.map((valueitem) => {
-                var _valueitem$item, _valueitem$item$map;
-                return (_valueitem$item = valueitem.item) === null ||
-                  _valueitem$item === void 0
+            : _item$ibppeers.forEach((peer) => {
+                allPeers.push({
+                  name: peer.name,
+                  namespace: item.name,
+                  key: item.name + peer.name,
+                });
+              });
+        });
+    const peers =
+      (res === null || res === void 0
+        ? void 0
+        : (_res$ibppeersForCreat2 = res.ibppeersForCreateChannel) === null ||
+          _res$ibppeersForCreat2 === void 0
+        ? void 0
+        : (_res$ibppeersForCreat3 = _res$ibppeersForCreat2.map((item) => {
+            var _item$ibppeers2, _item$ibppeers2$filte, _item$ibppeers2$filte2;
+            return {
+              key: item.name,
+              title: item.name,
+              children:
+                (_item$ibppeers2 = item.ibppeers) === null ||
+                _item$ibppeers2 === void 0
                   ? void 0
-                  : (_valueitem$item$map = _valueitem$item.map((item, i) => {
-                      item = `'${item}.member'`;
-                      if (i === 0) {
-                        return 'AND(' + item;
-                      }
-                      if (i === valueitem.item.length - 1) {
-                        return item + ')';
-                      }
-                      return item;
-                    })) === null || _valueitem$item$map === void 0
+                  : (_item$ibppeers2$filte = _item$ibppeers2.filter(
+                      (item) => item.status === 'Deployed'
+                    )) === null || _item$ibppeers2$filte === void 0
                   ? void 0
-                  : _valueitem$item$map.join(',');
-              })) === null || _v$content$value$map === void 0
-            ? void 0
-            : _v$content$value$map.join(',')) +
-          ')',
-      };
-      try {
-        const res = await this.props.appHelper.utils.bff.createEpolicy({
-          epolicy,
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-636u5idg'),
-        });
-        this.props.useGetNetwork.mutate();
-        this.getEpolicies();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-sivjo10j'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
-  }
-
-  async confirmDeleteChannelModal(e, payload) {
-    // const federation = this.props.useGetFederation?.data?.federation || {}
-    // try {
-    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
-    //     name: federation?.name,
-    //     organization: this.state.channelRecord?.name,
-    //     initiator: federation?.initiator?.name
-    //   })
-    //   this.closeModal()
-    //   this.utils.notification.success({
-    //     message: this.i18n('i18n-yy3f9rxigm'),
-    //   })
-    //   this.props.useGetFederation.mutate()
-    // } catch (error) {
-    //   this.utils.notification.warnings({
-    //     message: this.i18n('i18n-p5gea1q7fem'),
-    //     errors: error?.response?.errors
-    //   })
-    // }
-  }
-
-  async confirmDeleteContractModal(e, payload) {
-    try {
-      var _this$match,
-        _this$match$params,
-        _this$state$contract,
-        _this$state$contract$;
-      await this.props.appHelper.utils.bff.deleteChaincodebuild({
-        network:
-          (_this$match = this.match) === null || _this$match === void 0
-            ? void 0
-            : (_this$match$params = _this$match.params) === null ||
-              _this$match$params === void 0
-            ? void 0
-            : _this$match$params.id,
-        displayName:
-          (_this$state$contract = this.state.contract) === null ||
-          _this$state$contract === void 0
-            ? void 0
-            : (_this$state$contract$ = _this$state$contract.record) === null ||
-              _this$state$contract$ === void 0
-            ? void 0
-            : _this$state$contract$.displayName,
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-5m5bdexs'),
-      });
-      this.props.useGetChaincodebuilds.mutate();
-    } catch (error) {
-      var _error$response;
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-esbyfrwe'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
-      });
-    }
-  }
-
-  confirmDeploymentContractModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_contract_deploy')) === null ||
-      _this$$ === void 0
+                  : (_item$ibppeers2$filte2 = _item$ibppeers2$filte.map(
+                      (peer) => ({
+                        key: item.name + peer.name,
+                        title: peer.name,
+                      })
+                    )) === null || _item$ibppeers2$filte2 === void 0
+                  ? void 0
+                  : _item$ibppeers2$filte2.filter((peer) => {
+                      return usedPeers !== null &&
+                        usedPeers !== void 0 &&
+                        usedPeers.length
+                        ? usedPeers.every(
+                            (used) =>
+                              !(
+                                used.name === peer.title &&
+                                used.namespace === item.name
+                              )
+                          )
+                        : true;
+                    }),
+            };
+          })) === null || _res$ibppeersForCreat3 === void 0
         ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      const chaincode = {
-        channel: v.channel,
-        epolicy: v.epolicy,
-        name: v.name,
-        version: v.version,
-        // edit
-        // ibppeer: v.ibppeer
-      };
-
-      try {
-        const res = await this.props.appHelper.utils.bff.deployChaincode({
-          chaincode,
-        });
-        // this.closeModal()
-        // this.utils.notification.success({
-        //   message: this.i18n('i18n-l8fybssesij'),
-        // })
-        this.openDeploymentContractSuccessModal();
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-ekujezos'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
-  }
-
-  confirmUpgradeContractModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_contract_upgrade')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.submit(async (v) => {
-      const { versoin, ...params } = v;
-      try {
-        var _this$match, _this$match$params, _v$files, _v$files$fileList;
-        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
-          ...params,
-          network:
-            (_this$match = this.match) === null || _this$match === void 0
-              ? void 0
-              : (_this$match$params = _this$match.params) === null ||
-                _this$match$params === void 0
-              ? void 0
-              : _this$match$params.id,
-          files:
-            (_v$files = v.files) === null || _v$files === void 0
-              ? void 0
-              : (_v$files$fileList = _v$files.fileList) === null ||
-                _v$files$fileList === void 0
-              ? void 0
-              : _v$files$fileList.map((item) => item.originFileObj),
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-a4rcftyd'),
-        });
-        this.openAddChannelSuccessModal();
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        var _error$response;
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-7fxj402s'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
-        });
-      }
-    });
+        : _res$ibppeersForCreat3.filter((item) => {
+            var _item$children;
+            return (
+              (item === null || item === void 0
+                ? void 0
+                : (_item$children = item.children) === null ||
+                  _item$children === void 0
+                ? void 0
+                : _item$children.length) > 0
+            );
+          })) || [];
+    this.setState(
+      {
+        peers,
+        allPeers,
+      },
+      callback
+    );
   }
 
   formatContract() {
@@ -789,67 +404,6 @@ class NetworkDetail$$Page extends React.Component {
     return formatList;
   }
 
-  async getChannelsForCreateEpolicy(callback) {
-    var _this$match,
-      _this$match$params,
-      _res$channelsForCreat,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre,
-      _res$channelsForCreat2;
-    const res =
-      await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
-        network:
-          (_this$match = this.match) === null || _this$match === void 0
-            ? void 0
-            : (_this$match$params = _this$match.params) === null ||
-              _this$match$params === void 0
-            ? void 0
-            : _this$match$params.id,
-      });
-    this.setState(
-      {
-        strategy: {
-          ...this.state.strategy,
-          channels:
-            (res === null || res === void 0
-              ? void 0
-              : (_res$channelsForCreat = res.channelsForCreateEpolicy) ===
-                  null || _res$channelsForCreat === void 0
-              ? void 0
-              : _res$channelsForCreat.map((item) => ({
-                  value: JSON.stringify(item),
-                  label: item.name,
-                }))) || [],
-        },
-      },
-      callback
-    );
-    const form =
-      (_this$$ = this.$('formily_create_strategy')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
-    form.setFieldState('channel', {
-      dataSource:
-        (res === null || res === void 0
-          ? void 0
-          : (_res$channelsForCreat2 = res.channelsForCreateEpolicy) === null ||
-            _res$channelsForCreat2 === void 0
-          ? void 0
-          : _res$channelsForCreat2.map((item) => ({
-              value: JSON.stringify(item),
-              label: item.name,
-            }))) || [],
-    });
-  }
-
   getContractVersion(record) {
     var _this$state$initVersi, _record$versions, _record$versions$find;
     const name =
@@ -877,175 +431,25 @@ class NetworkDetail$$Page extends React.Component {
     );
   }
 
-  async getEpolicies() {
-    var _this$match, _this$match$params;
-    const res = await this.props.appHelper.utils.bff.getEpolicies({
-      network:
-        (_this$match = this.match) === null || _this$match === void 0
+  changeContractVersion(e, payload) {
+    var _payload$record;
+    this.setState({
+      initVersions: {
+        ...this.state.initVersions,
+        [payload === null || payload === void 0
           ? void 0
-          : (_this$match$params = _this$match.params) === null ||
-            _this$match$params === void 0
+          : (_payload$record = payload.record) === null ||
+            _payload$record === void 0
           ? void 0
-          : _this$match$params.id,
-    });
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        list: (res === null || res === void 0 ? void 0 : res.epolicies) || [],
+          : _payload$record.displayName]: e.key,
       },
     });
   }
 
-  async getPeers(v, callback, usedPeers) {
-    var _ref,
-      _res$ibppeersForCreat,
-      _res$ibppeersForCreat2,
-      _res$ibppeersForCreat3;
-    const { initiator, organizations } = v;
-    const res =
-      await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
-        members:
-          (_ref = [initiator, ...organizations]) === null || _ref === void 0
-            ? void 0
-            : _ref.filter((item) => item),
-      });
-    const allPeers = [];
-    res === null || res === void 0
-      ? void 0
-      : (_res$ibppeersForCreat = res.ibppeersForCreateChannel) === null ||
-        _res$ibppeersForCreat === void 0
-      ? void 0
-      : _res$ibppeersForCreat.forEach((item) => {
-          var _item$ibppeers;
-          (_item$ibppeers = item.ibppeers) === null || _item$ibppeers === void 0
-            ? void 0
-            : _item$ibppeers.forEach((peer) => {
-                allPeers.push({
-                  name: peer.name,
-                  namespace: item.name,
-                  key: item.name + peer.name,
-                });
-              });
-        });
-    const peers =
-      (res === null || res === void 0
-        ? void 0
-        : (_res$ibppeersForCreat2 = res.ibppeersForCreateChannel) === null ||
-          _res$ibppeersForCreat2 === void 0
-        ? void 0
-        : (_res$ibppeersForCreat3 = _res$ibppeersForCreat2.map((item) => {
-            var _item$ibppeers2, _item$ibppeers2$filte, _item$ibppeers2$filte2;
-            return {
-              key: item.name,
-              title: item.name,
-              children:
-                (_item$ibppeers2 = item.ibppeers) === null ||
-                _item$ibppeers2 === void 0
-                  ? void 0
-                  : (_item$ibppeers2$filte = _item$ibppeers2.filter(
-                      (item) => item.status === 'Deployed'
-                    )) === null || _item$ibppeers2$filte === void 0
-                  ? void 0
-                  : (_item$ibppeers2$filte2 = _item$ibppeers2$filte.map(
-                      (peer) => ({
-                        key: item.name + peer.name,
-                        title: peer.name,
-                      })
-                    )) === null || _item$ibppeers2$filte2 === void 0
-                  ? void 0
-                  : _item$ibppeers2$filte2.filter((peer) => {
-                      return usedPeers !== null &&
-                        usedPeers !== void 0 &&
-                        usedPeers.length
-                        ? usedPeers.every(
-                            (used) =>
-                              !(
-                                used.name === peer.title &&
-                                used.namespace === item.name
-                              )
-                          )
-                        : true;
-                    }),
-            };
-          })) === null || _res$ibppeersForCreat3 === void 0
-        ? void 0
-        : _res$ibppeersForCreat3.filter((item) => {
-            var _item$children;
-            return (
-              (item === null || item === void 0
-                ? void 0
-                : (_item$children = item.children) === null ||
-                  _item$children === void 0
-                ? void 0
-                : _item$children.length) > 0
-            );
-          })) || [];
-    this.setState(
-      {
-        peers,
-        allPeers,
-      },
-      callback
-    );
-  }
-
-  handleChannelPaginationChange(c, s) {
+  closeModal() {
     this.setState({
-      channel: {
-        ...this.state.channel,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleChannelSearchValueChange(e) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleChannelTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  handleContractPaginationChange(c, s) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleContractSearchValueChange(e) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleContractTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        pagination,
-        filters,
-        sorter,
-      },
+      isOpenModal: false,
+      channelPeers: [],
     });
   }
 
@@ -1053,6 +457,33 @@ class NetworkDetail$$Page extends React.Component {
     this.setState({
       filter: e.target.value,
     });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+    });
+  }
+
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
+  }
+
+  paginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
   }
 
   handleOrganizationPaginationChange(c, s) {
@@ -1076,42 +507,29 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  handlePaginationChange(c, s) {
+  handleChannelSearchValueChange(e) {
     this.setState({
-      size: s,
-      current: c,
+      channel: {
+        ...this.state.channel,
+        searchValue: e.target.value,
+      },
     });
   }
 
-  handleSearchValueChange(e) {
+  handleChannelPaginationChange(c, s) {
     this.setState({
-      searchValue: e.target.value,
-    });
-  }
-
-  handleStrategyPaginationChange(c, s) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
+      channel: {
+        ...this.state.channel,
         size: s,
         current: c,
       },
     });
   }
 
-  handleStrategySearchValueChange(e) {
+  handleChannelTableChange(pagination, filters, sorter, extra) {
     this.setState({
-      strategy: {
-        ...this.state.strategy,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleStrategyTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
+      channel: {
+        ...this.state.channel,
         pagination,
         filters,
         sorter,
@@ -1119,18 +537,17 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
   openAddChannelModal() {
     this.setState({
       isOpenModal: true,
       modalType: 'addchannel',
+    });
+  }
+
+  openAddChannelSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelsuccess',
     });
   }
 
@@ -1181,26 +598,211 @@ class NetworkDetail$$Page extends React.Component {
     );
   }
 
-  openAddChannelSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannelsuccess',
+  channelAddModalNext() {
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_create_channel')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      this.setState({
+        channel: {
+          ...this.state.channel,
+          addData: v,
+          step: 1,
+        },
+      });
+      this.getPeers(v, () => {});
     });
   }
 
-  openAddContractModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addcontract',
-    });
+  channelAddModalPre() {
+    this.setState(
+      {
+        channel: {
+          ...this.state.channel,
+          step: 0,
+        },
+      },
+      () => {
+        var _this$$, _this$$$formRef, _this$$$formRef$curre;
+        const form =
+          (_this$$ = this.$('formily_create_channel')) === null ||
+          _this$$ === void 0
+            ? void 0
+            : (_this$$$formRef = _this$$.formRef) === null ||
+              _this$$$formRef === void 0
+            ? void 0
+            : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+              _this$$$formRef$curre === void 0
+            ? void 0
+            : _this$$$formRef$curre.form;
+        form.setValues(this.state.channel.addData);
+      }
+    );
   }
 
-  openAddStrategyModal() {
+  async channelAddModalConfirm(e, payload) {
+    var _this$props$useGetNet, _this$props$useGetNet2;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    try {
+      var _this$state, _this$state$channel, _this$state$channelPe;
+      const res = await this.props.appHelper.utils.bff.createChannel({
+        network: network === null || network === void 0 ? void 0 : network.name,
+        channel: {
+          ...(((_this$state = this.state) === null || _this$state === void 0
+            ? void 0
+            : (_this$state$channel = _this$state.channel) === null ||
+              _this$state$channel === void 0
+            ? void 0
+            : _this$state$channel.addData) || {}),
+          peers:
+            (_this$state$channelPe = this.state.channelPeers) === null ||
+            _this$state$channelPe === void 0
+              ? void 0
+              : _this$state$channelPe.map((key) => {
+                  var _this$state$allPeers;
+                  const item =
+                    (_this$state$allPeers = this.state.allPeers) === null ||
+                    _this$state$allPeers === void 0
+                      ? void 0
+                      : _this$state$allPeers.find((item) => item.key === key);
+                  return {
+                    name: item.name,
+                    namespace: item.namespace,
+                  };
+                }),
+        },
+      });
+      // this.closeModal()
+      // this.utils.notification.success({
+      //   message: this.i18n('i18n-l8fybssesij'),
+      // })
+      this.openAddChannelSuccessModal();
+      this.props.useGetNetwork.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-85kkwp67i5u'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  channelAddOrganizationModalConfirm(e, payload) {
+    this.openAddChannelOrganizationSuccessModal();
+    // const network = this.props.useGetNetwork?.data?.network || {}
+    // const form = this.$('formily_create')?.formRef?.current?.form
+    // form.submit(async v => {
+    //   console.log(v)
+    //   try {
+    //     // const res = await this.props.appHelper.utils.bff.updateChannel({
+    //     //   name: network?.name,
+    //     //   organizations: v.organizations,
+    //     //   initiator: network?.initiator?.name
+    //     // })
+    //     // this.closeModal()
+    //     // this.utils.notification.success({
+    //     //   message: this.i18n('i18n-l8fybssesij'),
+    //     // })
+    //     this.openAddChannelSuccessModal()
+    //     this.props.useGetNetwork.mutate()
+    //   } catch (error) {
+    //     this.utils.notification.warnings({
+    //       message: this.i18n('i18n-85kkwp67i5u'),
+    //       errors: error?.response?.errors
+    //     })
+    //   }
+    // })
+  }
+
+  async channelAddPeerModalConfirm(e, payload) {
+    var _this$props$useGetNet, _this$props$useGetNet2;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    try {
+      var _this$state$channel, _this$state$channel$r, _this$state$channelPe;
+      const res = await this.props.appHelper.utils.bff.updateChannel({
+        name:
+          (_this$state$channel = this.state.channel) === null ||
+          _this$state$channel === void 0
+            ? void 0
+            : (_this$state$channel$r = _this$state$channel.record) === null ||
+              _this$state$channel$r === void 0
+            ? void 0
+            : _this$state$channel$r.name,
+        channel: {
+          operate: 'add',
+          // remove
+          peers:
+            (_this$state$channelPe = this.state.channelPeers) === null ||
+            _this$state$channelPe === void 0
+              ? void 0
+              : _this$state$channelPe.map((key) => {
+                  var _this$state$allPeers;
+                  const item =
+                    (_this$state$allPeers = this.state.allPeers) === null ||
+                    _this$state$allPeers === void 0
+                      ? void 0
+                      : _this$state$allPeers.find((item) => item.key === key);
+                  return {
+                    name: item.name,
+                    namespace: item.namespace,
+                  };
+                }),
+        },
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-knuex06q'),
+      });
+      // this.openAddChannelSuccessModal()
+      this.props.useGetNetwork.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-sunw6qwy'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  channelPeersChange(channelPeers) {
     this.setState({
-      isOpenModal: true,
-      modalType: 'addstrategy',
+      channelPeers,
     });
-    this.getChannelsForCreateEpolicy(() => {});
   }
 
   openDeleteChannelModal(e, payload) {
@@ -1215,14 +817,61 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  openDeleteContractModal(e, payload) {
+  async confirmDeleteChannelModal(e, payload) {
+    // const federation = this.props.useGetFederation?.data?.federation || {}
+    // try {
+    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
+    //     name: federation?.name,
+    //     organization: this.state.channelRecord?.name,
+    //     initiator: federation?.initiator?.name
+    //   })
+    //   this.closeModal()
+    //   this.utils.notification.success({
+    //     message: this.i18n('i18n-yy3f9rxigm'),
+    //   })
+    //   this.props.useGetFederation.mutate()
+    // } catch (error) {
+    //   this.utils.notification.warnings({
+    //     message: this.i18n('i18n-p5gea1q7fem'),
+    //     errors: error?.response?.errors
+    //   })
+    // }
+  }
+
+  handleContractSearchValueChange(e) {
     this.setState({
       contract: {
         ...this.state.contract,
-        record: payload.record,
+        searchValue: e.target.value,
       },
+    });
+  }
+
+  handleContractPaginationChange(c, s) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleContractTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  openAddContractModal() {
+    this.setState({
       isOpenModal: true,
-      modalType: 'deletecontract',
+      modalType: 'addcontract',
     });
   }
 
@@ -1331,10 +980,371 @@ class NetworkDetail$$Page extends React.Component {
     );
   }
 
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
-      'i18n-v7xu122b9o'
-    )}`;
+  openDeleteContractModal(e, payload) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletecontract',
+    });
+  }
+
+  confirmAddContractModal(e, payload) {
+    var _this$props$useGetNet,
+      _this$props$useGetNet2,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    const form =
+      (_this$$ = this.$('formily_create_contract')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      try {
+        var _this$match, _this$match$params, _v$files, _v$files$fileList;
+        const res = await this.props.appHelper.utils.bff.createChaincodebuild({
+          ...v,
+          network:
+            (_this$match = this.match) === null || _this$match === void 0
+              ? void 0
+              : (_this$match$params = _this$match.params) === null ||
+                _this$match$params === void 0
+              ? void 0
+              : _this$match$params.id,
+          files:
+            (_v$files = v.files) === null || _v$files === void 0
+              ? void 0
+              : (_v$files$fileList = _v$files.fileList) === null ||
+                _v$files$fileList === void 0
+              ? void 0
+              : _v$files$fileList.map((item) => {
+                  const file = item.originFileObj;
+                  return new File([file], file.webkitRelativePath, {
+                    type: file.type,
+                  });
+                }),
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-5eg2znpg'),
+        });
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-rw4x2dt7'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  confirmUpgradeContractModal(e, payload) {
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_contract_upgrade')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      const { versoin, ...params } = v;
+      try {
+        var _this$match, _this$match$params, _v$files, _v$files$fileList;
+        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
+          ...params,
+          network:
+            (_this$match = this.match) === null || _this$match === void 0
+              ? void 0
+              : (_this$match$params = _this$match.params) === null ||
+                _this$match$params === void 0
+              ? void 0
+              : _this$match$params.id,
+          files:
+            (_v$files = v.files) === null || _v$files === void 0
+              ? void 0
+              : (_v$files$fileList = _v$files.fileList) === null ||
+                _v$files$fileList === void 0
+              ? void 0
+              : _v$files$fileList.map((item) => {
+                  const file = item.originFileObj;
+                  return new File([file], file.webkitRelativePath, {
+                    type: file.type,
+                  });
+                }),
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-a4rcftyd'),
+        });
+        this.openAddChannelSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-7fxj402s'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  confirmDeploymentContractModal(e, payload) {
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_contract_deploy')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      const chaincode = {
+        channel: v.channel,
+        epolicy: v.epolicy,
+        name: v.name,
+        version: v.version,
+        // edit
+        // ibppeer: v.ibppeer
+      };
+
+      try {
+        const res = await this.props.appHelper.utils.bff.deployChaincode({
+          chaincode,
+        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-l8fybssesij'),
+        // })
+        this.openDeploymentContractSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-ekujezos'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  async confirmDeleteContractModal(e, payload) {
+    try {
+      var _this$match,
+        _this$match$params,
+        _this$state$contract,
+        _this$state$contract$;
+      await this.props.appHelper.utils.bff.deleteChaincodebuild({
+        network:
+          (_this$match = this.match) === null || _this$match === void 0
+            ? void 0
+            : (_this$match$params = _this$match.params) === null ||
+              _this$match$params === void 0
+            ? void 0
+            : _this$match$params.id,
+        displayName:
+          (_this$state$contract = this.state.contract) === null ||
+          _this$state$contract === void 0
+            ? void 0
+            : (_this$state$contract$ = _this$state$contract.record) === null ||
+              _this$state$contract$ === void 0
+            ? void 0
+            : _this$state$contract$.displayName,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-5m5bdexs'),
+      });
+      this.props.useGetChaincodebuilds.mutate();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-esbyfrwe'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  handleStrategySearchValueChange(e) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleStrategyPaginationChange(c, s) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleStrategyTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  openAddStrategyModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addstrategy',
+    });
+    this.getChannelsForCreateEpolicy(() => {});
+  }
+
+  confirmAddStrategyModal(e, payload) {
+    var _this$props$useGetNet,
+      _this$props$useGetNet2,
+      _this$$,
+      _this$$$formRef,
+      _this$$$formRef$curre;
+    const network =
+      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
+      _this$props$useGetNet === void 0
+        ? void 0
+        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
+          _this$props$useGetNet2 === void 0
+        ? void 0
+        : _this$props$useGetNet2.network) || {};
+    const form =
+      (_this$$ = this.$('formily_create_strategy')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      var _JSON$parse, _v$content, _v$content$value, _v$content$value$map;
+      const epolicy = {
+        channel:
+          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
+          _JSON$parse === void 0
+            ? void 0
+            : _JSON$parse.name,
+        description: v.description,
+        name: v.name,
+        value:
+          'OR(' +
+          ((_v$content = v.content) === null || _v$content === void 0
+            ? void 0
+            : (_v$content$value = _v$content.value) === null ||
+              _v$content$value === void 0
+            ? void 0
+            : (_v$content$value$map = _v$content$value.map((valueitem) => {
+                var _valueitem$item, _valueitem$item$map;
+                return (_valueitem$item = valueitem.item) === null ||
+                  _valueitem$item === void 0
+                  ? void 0
+                  : (_valueitem$item$map = _valueitem$item.map((item, i) => {
+                      item = `'${item}.member'`;
+                      if (i === 0) {
+                        return 'AND(' + item;
+                      }
+                      if (i === valueitem.item.length - 1) {
+                        return item + ')';
+                      }
+                      return item;
+                    })) === null || _valueitem$item$map === void 0
+                  ? void 0
+                  : _valueitem$item$map.join(',');
+              })) === null || _v$content$value$map === void 0
+            ? void 0
+            : _v$content$value$map.join(',')) +
+          ')',
+      };
+      try {
+        const res = await this.props.appHelper.utils.bff.createEpolicy({
+          epolicy,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-636u5idg'),
+        });
+        this.props.useGetNetwork.mutate();
+        this.getEpolicies();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-sivjo10j'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
+  }
+
+  beforeUpload() {
+    return false;
   }
 
   componentDidMount() {
