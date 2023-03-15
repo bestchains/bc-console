@@ -1018,7 +1018,12 @@ class NetworkDetail$$Page extends React.Component {
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
       try {
-        var _this$match, _this$match$params, _v$files, _v$files$fileList;
+        var _this$match,
+          _this$match$params,
+          _v$files,
+          _v$files$fileList,
+          _v$files2,
+          _v$files2$fileList;
         const res = await this.props.appHelper.utils.bff.createChaincodebuild({
           ...v,
           network:
@@ -1028,17 +1033,26 @@ class NetworkDetail$$Page extends React.Component {
                 _this$match$params === void 0
               ? void 0
               : _this$match$params.id,
+          // files: v.files?.fileList?.map(item => {
+          //   const file = item.originFileObj
+          //   return new File([file], file.webkitRelativePath, { type: file.type })
+          // }),
           files:
             (_v$files = v.files) === null || _v$files === void 0
               ? void 0
               : (_v$files$fileList = _v$files.fileList) === null ||
                 _v$files$fileList === void 0
               ? void 0
-              : _v$files$fileList.map((item) => {
+              : _v$files$fileList.map((item) => item.originFileObj),
+          fileRelativePaths:
+            (_v$files2 = v.files) === null || _v$files2 === void 0
+              ? void 0
+              : (_v$files2$fileList = _v$files2.fileList) === null ||
+                _v$files2$fileList === void 0
+              ? void 0
+              : _v$files2$fileList.map((item) => {
                   const file = item.originFileObj;
-                  return new File([file], file.webkitRelativePath, {
-                    type: file.type,
-                  });
+                  return file.webkitRelativePath;
                 }),
         });
         this.closeModal();
@@ -1078,7 +1092,12 @@ class NetworkDetail$$Page extends React.Component {
     form.submit(async (v) => {
       const { versoin, ...params } = v;
       try {
-        var _this$match, _this$match$params, _v$files, _v$files$fileList;
+        var _this$match,
+          _this$match$params,
+          _v$files,
+          _v$files$fileList,
+          _v$files2,
+          _v$files2$fileList;
         const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
           ...params,
           network:
@@ -1088,17 +1107,26 @@ class NetworkDetail$$Page extends React.Component {
                 _this$match$params === void 0
               ? void 0
               : _this$match$params.id,
+          // files: v.files?.fileList?.map(item => {
+          //   const file = item.originFileObj
+          //   return new File([file], file.webkitRelativePath, { type: file.type })
+          // }),
           files:
             (_v$files = v.files) === null || _v$files === void 0
               ? void 0
               : (_v$files$fileList = _v$files.fileList) === null ||
                 _v$files$fileList === void 0
               ? void 0
-              : _v$files$fileList.map((item) => {
+              : _v$files$fileList.map((item) => item.originFileObj),
+          fileRelativePaths:
+            (_v$files2 = v.files) === null || _v$files2 === void 0
+              ? void 0
+              : (_v$files2$fileList = _v$files2.fileList) === null ||
+                _v$files2$fileList === void 0
+              ? void 0
+              : _v$files2$fileList.map((item) => {
                   const file = item.originFileObj;
-                  return new File([file], file.webkitRelativePath, {
-                    type: file.type,
-                  });
+                  return file.webkitRelativePath;
                 }),
         });
         this.closeModal();
@@ -1204,6 +1232,50 @@ class NetworkDetail$$Page extends React.Component {
       var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-esbyfrwe'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
+  }
+
+  openDeleteStrategyModal(e, payload) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletestrategy',
+    });
+  }
+
+  async confirmDeleteStrategyModal(e, payload) {
+    try {
+      var _this$state$strategy, _this$state$strategy$;
+      await this.props.appHelper.utils.bff.deleteEpolicy({
+        name:
+          (_this$state$strategy = this.state.strategy) === null ||
+          _this$state$strategy === void 0
+            ? void 0
+            : (_this$state$strategy$ = _this$state$strategy.record) === null ||
+              _this$state$strategy$ === void 0
+            ? void 0
+            : _this$state$strategy$.name,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-u1byeit6'),
+      });
+      this.getEpolicies();
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-ctwrr17g'),
         errors:
           error === null || error === void 0
             ? void 0
@@ -1796,6 +1868,105 @@ class NetworkDetail$$Page extends React.Component {
               }}
             />
           </FormilyForm>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmDeleteStrategyModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+                disabled: false,
+              },
+              {
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+                disabled: true,
+              },
+              {
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+                disabled: true,
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmDeleteStrategyModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'deletestrategy'
+          )}
+          title={this.i18n('i18n-ppwtxqzo') /* 策略删除 */}
+        >
+          <Alert
+            __component_name="Alert"
+            message={
+              <Space align="center" direction="horizontal">
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {this.i18n('i18n-ol5t1k5q') /* 确认删除策略 */}
+                </Typography.Text>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(() => this.state.strategy?.record?.name || '-')}
+                </Typography.Text>
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {this.i18n('i18n-88tr11kq') /* 吗？ */}
+                </Typography.Text>
+              </Space>
+            }
+            showIcon={true}
+            type="warning"
+          />
         </Modal>
         <Modal
           __component_name="Modal"
@@ -5947,6 +6118,63 @@ class NetworkDetail$$Page extends React.Component {
                                   ),
                                 title:
                                   this.i18n('i18n-watjije0jk') /* 更新时间 */,
+                              },
+                              {
+                                dataIndex: 'op',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Button
+                                      __component_name="Button"
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      icon=""
+                                      shape="default"
+                                      type="link"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            type: 'componentEvent',
+                                            name: 'onClick',
+                                            relatedEventName:
+                                              'openDeleteStrategyModal',
+                                            paramStr:
+                                              '{\n \t "record":this.record \n}',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            name: 'onClick',
+                                            template:
+                                              "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                            disabled: true,
+                                          },
+                                        ],
+                                      }}
+                                      onClick={function () {
+                                        return this.openDeleteStrategyModal.apply(
+                                          this,
+                                          Array.prototype.slice
+                                            .call(arguments)
+                                            .concat([
+                                              {
+                                                record: record,
+                                              },
+                                            ])
+                                        );
+                                      }.bind(__$$context)}
+                                    >
+                                      {this.i18n('i18n-ias68eipm18') /* 删除 */}
+                                    </Button>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
+                                title: '标题',
                               },
                             ]}
                             dataSource={__$$eval(() =>

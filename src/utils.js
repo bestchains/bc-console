@@ -65,6 +65,13 @@ export const paginationShowTotal = function paginationShowTotal(
   )}`;
 };
 
+export const formatCpu = (v) => {
+  if (v.includes('m')) {
+    return parseFloat(v) / 1000;
+  }
+  return parseFloat(v);
+};
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -129,4 +136,6 @@ export default {
   isTokenExpired,
 
   paginationShowTotal,
+
+  formatCpu,
 };
