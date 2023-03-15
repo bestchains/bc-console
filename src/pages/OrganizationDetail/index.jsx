@@ -1688,7 +1688,9 @@ class OrganizationDetail$$Page extends React.Component {
                                     style={{ fontSize: '' }}
                                   >
                                     {__$$eval(() =>
-                                      parseInt(record?.limits?.cpu)
+                                      __$$context.utils.formatCpu(
+                                        record?.limits?.cpu
+                                      )
                                     )}
                                   </Typography.Text>
                                   <Typography.Text

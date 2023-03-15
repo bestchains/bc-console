@@ -391,6 +391,8 @@ export type NewChaincodebuild = {
   displayName: Scalars['String'];
   /** 合约文件 */
   file?: InputMaybe<Scalars['Upload']>;
+  /** 文件夹内文件的相对路径 */
+  fileRelativePaths?: InputMaybe<Array<Scalars['String']>>;
   /** 合约文件夹 */
   files?: InputMaybe<Array<Scalars['Upload']>>;
   /** 选择语言 */
@@ -725,6 +727,8 @@ export type UpgradeChaincodebuild = {
   displayName: Scalars['String'];
   /** 合约文件 */
   file?: InputMaybe<Scalars['Upload']>;
+  /** 文件夹内文件的相对路径 */
+  fileRelativePaths?: InputMaybe<Array<Scalars['String']>>;
   /** 合约文件夹 */
   files?: InputMaybe<Array<Scalars['Upload']>>;
   /** 选择语言 */
@@ -805,6 +809,7 @@ export type CreateChaincodebuildMutationVariables = Exact<{
   version: Scalars['String'];
   file?: InputMaybe<Scalars['Upload']>;
   files?: InputMaybe<Array<Scalars['Upload']> | Scalars['Upload']>;
+  fileRelativePaths?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
 }>;
 
 export type CreateChaincodebuildMutation = {
@@ -894,6 +899,7 @@ export type UpgradeChaincodebuildMutationVariables = Exact<{
   language?: InputMaybe<Scalars['String']>;
   network: Scalars['String'];
   newVersion: Scalars['String'];
+  fileRelativePaths?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
 }>;
 
 export type UpgradeChaincodebuildMutation = {
@@ -1596,6 +1602,7 @@ export const CreateChaincodebuildDocument = gql`
     $version: String!
     $file: Upload
     $files: [Upload!]
+    $fileRelativePaths: [String!]
   ) {
     chaincodebuildCreate(
       chaincodebuild: {
@@ -1606,6 +1613,7 @@ export const CreateChaincodebuildDocument = gql`
         version: $version
         file: $file
         files: $files
+        fileRelativePaths: $fileRelativePaths
       }
     ) {
       name
@@ -1679,6 +1687,7 @@ export const UpgradeChaincodebuildDocument = gql`
     $language: String
     $network: String!
     $newVersion: String!
+    $fileRelativePaths: [String!]
   ) {
     chaincodebuildUpgrade(
       chaincodebuild: {
@@ -1688,6 +1697,7 @@ export const UpgradeChaincodebuildDocument = gql`
         language: $language
         network: $network
         newVersion: $newVersion
+        fileRelativePaths: $fileRelativePaths
       }
     ) {
       name
