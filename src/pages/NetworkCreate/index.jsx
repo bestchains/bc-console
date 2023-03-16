@@ -510,6 +510,7 @@ class NetworkCreate$$Page extends React.Component {
                           },
                         ],
                         name: 'ordererType',
+                        required: true,
                         title: this.i18n('i18n-twykcar3l6l') /* 共识算法 */,
                         'x-validator': [],
                       }}

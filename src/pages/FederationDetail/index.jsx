@@ -777,14 +777,18 @@ class FederationDetail$$Page extends React.Component {
                                         }}
                                         block={false}
                                         danger={false}
-                                        disabled={__$$eval(() =>
-                                          [
-                                            'FederationPending',
-                                            'FederationDissolved',
-                                          ].includes(
+                                        disabled={__$$eval(
+                                          () =>
+                                            [
+                                              'FederationPending',
+                                              'FederationDissolved',
+                                            ].includes(
+                                              __$$context.props.useGetFederation
+                                                ?.data?.federation?.status
+                                            ) ||
                                             __$$context.props.useGetFederation
-                                              ?.data?.federation?.status
-                                          )
+                                              ?.data?.federation?.initiator
+                                              ?.name === record?.name
                                         )}
                                         ghost={false}
                                         icon={__$$eval(() =>
