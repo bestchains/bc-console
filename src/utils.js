@@ -72,6 +72,40 @@ export const formatCpu = (v) => {
   return parseFloat(v);
 };
 
+export const downloadFile = (
+  data,
+  filename = 'profile.json',
+  type = 'text/json'
+) => {
+  if (typeof data === 'object') {
+    data = JSON.stringify(data, undefined, 4);
+  }
+  const blob = new Blob([data], { type }),
+    e = document.createEvent('MouseEvents'),
+    a = document.createElement('a');
+  a.download = filename;
+  a.href = window.URL.createObjectURL(blob);
+  a.dataset.downloadurl = [type, a.download, a.href].join(':');
+  e.initMouseEvent(
+    'click',
+    true,
+    false,
+    window,
+    0,
+    0,
+    0,
+    0,
+    0,
+    false,
+    false,
+    false,
+    false,
+    0,
+    null
+  );
+  a.dispatchEvent(e);
+};
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -138,4 +172,6 @@ export default {
   paginationShowTotal,
 
   formatCpu,
+
+  downloadFile,
 };

@@ -1247,6 +1247,13 @@ class FederationDetail$$Page extends React.Component {
                               id: 'Created',
                               type: 'success',
                             },
+                            {
+                              id: 'Deployed',
+                              children:
+                                this.i18n('i18n-1vangoko4yf') /* 正常 */,
+                              icon: 'CheckCircleFilled',
+                              type: 'success',
+                            },
                           ]}
                         />
                       ))(
@@ -1750,7 +1757,7 @@ class FederationDetail$$Page extends React.Component {
             message={
               this.i18n(
                 'i18n-asxi59j4'
-              ) /* 删除成员会同步从联盟下所有网络和通道中删除，请慎重！ */
+              ) /* 请确保该成员的节点未加入联盟下的通道 */
             }
             showIcon={true}
             type="warning"

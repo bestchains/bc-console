@@ -27,6 +27,32 @@ export type Scalars = {
   Upload: any;
 };
 
+export type Chaincode = {
+  __typename?: 'Chaincode';
+  /** 通道 */
+  channel?: Maybe<Scalars['String']>;
+  /** 策略 */
+  epolicy?: Maybe<Scalars['String']>;
+  /** name */
+  name: Scalars['ID'];
+  /** 状态 */
+  phase?: Maybe<ChaincodePhase>;
+  /** 版本 */
+  version?: Maybe<Scalars['String']>;
+};
+
+/** 「通道」状态 */
+export enum ChaincodePhase {
+  /** 投票通过 */
+  ChaincodeApproved = 'ChaincodeApproved',
+  /** 等待投票 */
+  ChaincodePending = 'ChaincodePending',
+  /** 已经安装，Pod正常运行 */
+  ChaincodeRunning = 'ChaincodeRunning',
+  /** 投票不通过 */
+  ChaincodeUnapproved = 'ChaincodeUnapproved',
+}
+
 export type Chaincodebuild = {
   __typename?: 'Chaincodebuild';
   /** 通道 */
@@ -53,9 +79,11 @@ export type Chaincodebuild = {
 
 export type Channel = {
   __typename?: 'Channel';
+  /** 合约 */
+  chaincode?: Maybe<Array<Chaincode>>;
   /** 我创建的 */
   createdByMe?: Maybe<Scalars['Boolean']>;
-  /** 合约数量 */
+  /** 创建时间 */
   creationTimestamp?: Maybe<Scalars['String']>;
   /** 描述 */
   description?: Maybe<Scalars['String']>;
@@ -69,6 +97,8 @@ export type Channel = {
   name: Scalars['ID'];
   /** 我的节点 */
   peers?: Maybe<Array<SpecPeer>>;
+  /** 通道连接文件（profile.json） */
+  profileJson?: Maybe<Scalars['String']>;
   /** 状态 */
   status?: Maybe<CrdStatusType>;
 };
@@ -939,6 +969,12 @@ export type GetChannelQuery = {
       name?: string | null;
       namespace?: string | null;
     }> | null;
+    chaincode?: Array<{
+      __typename?: 'Chaincode';
+      name: string;
+      version?: string | null;
+      phase?: ChaincodePhase | null;
+    }> | null;
   };
 };
 
@@ -981,6 +1017,19 @@ export type UpdateChannelMutation = {
       name?: string | null;
       namespace?: string | null;
     }> | null;
+  };
+};
+
+export type GetChannelProfileQueryVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type GetChannelProfileQuery = {
+  __typename?: 'Query';
+  channel: {
+    __typename?: 'Channel';
+    name: string;
+    profileJson?: string | null;
   };
 };
 
@@ -1730,6 +1779,11 @@ export const GetChannelDocument = gql`
         name
         namespace
       }
+      chaincode {
+        name
+        version
+        phase
+      }
     }
   }
 `;
@@ -1762,6 +1816,14 @@ export const UpdateChannelDocument = gql`
       }
       creationTimestamp
       status
+    }
+  }
+`;
+export const GetChannelProfileDocument = gql`
+  query getChannelProfile($name: String!) {
+    channel(name: $name) {
+      name
+      profileJson
     }
   }
 `;
@@ -2363,6 +2425,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
         'mutation'
       );
     },
+    getChannelProfile(
+      variables: GetChannelProfileQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetChannelProfileQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetChannelProfileQuery>(GetChannelProfileDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getChannelProfile',
+        'query'
+      );
+    },
     getEpolicies(
       variables?: GetEpoliciesQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -2791,6 +2867,16 @@ export function getSdkWithHooks(
       return useSWR<GetChannelQuery, ClientError>(
         genKey<GetChannelQueryVariables>('GetChannel', variables),
         () => sdk.getChannel(variables),
+        config
+      );
+    },
+    useGetChannelProfile(
+      variables: GetChannelProfileQueryVariables,
+      config?: SWRConfigInterface<GetChannelProfileQuery, ClientError>
+    ) {
+      return useSWR<GetChannelProfileQuery, ClientError>(
+        genKey<GetChannelProfileQueryVariables>('GetChannelProfile', variables),
+        () => sdk.getChannelProfile(variables),
         config
       );
     },
