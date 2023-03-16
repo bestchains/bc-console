@@ -123,6 +123,8 @@ export type Epolicy = {
   creationTimestamp?: Maybe<Scalars['String']>;
   /** 描述 */
   description?: Maybe<Scalars['String']>;
+  /** 策略名称 */
+  displayName?: Maybe<Scalars['String']>;
   /** 更新时间 */
   lastHeartbeatTime?: Maybe<Scalars['String']>;
   /** name */
@@ -423,8 +425,8 @@ export type NewEpolicyInput = {
   channel?: InputMaybe<Scalars['String']>;
   /** 策略描述 */
   description?: InputMaybe<Scalars['String']>;
-  /** 策略名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*） */
-  name: Scalars['String'];
+  /** 策略名称 */
+  displayName: Scalars['String'];
   /** 策略内容：可选组织为已选通道内的成员，语法参考（https://hyperledger-fabric.readthedocs.io/en/latest/endorsement-policies.html#endorsement-policy-syntax） */
   value?: InputMaybe<Scalars['String']>;
 };
@@ -991,6 +993,7 @@ export type GetEpoliciesQuery = {
   epolicies: Array<{
     __typename?: 'Epolicy';
     name: string;
+    displayName?: string | null;
     description?: string | null;
     channel: string;
     value: string;
@@ -1008,6 +1011,7 @@ export type CreateEpolicyMutation = {
   epolicyCreate: {
     __typename?: 'Epolicy';
     name: string;
+    displayName?: string | null;
     value: string;
     description?: string | null;
     channel: string;
@@ -1765,6 +1769,7 @@ export const GetEpoliciesDocument = gql`
   query getEpolicies($network: String) {
     epolicies(network: $network) {
       name
+      displayName
       description
       channel
       value
@@ -1777,6 +1782,7 @@ export const CreateEpolicyDocument = gql`
   mutation createEpolicy($epolicy: NewEpolicyInput!) {
     epolicyCreate(epolicy: $epolicy) {
       name
+      displayName
       value
       description
       channel
