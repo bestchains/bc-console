@@ -77,7 +77,7 @@ class NetworkContractDetail$$Page extends React.Component {
           </Col>
           <Col __component_name="Col" span={24}>
             <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={12}>
+              <Col __component_name="Col" span={12} style={{ display: 'flex' }}>
                 <Card
                   __component_name="Card"
                   actions={[]}
@@ -87,10 +87,10 @@ class NetworkContractDetail$$Page extends React.Component {
                     () => this.props.useGetChaincodebuild?.loading
                   )}
                   size="default"
-                  style={{ height: '300px' }}
+                  style={{}}
                   type="default"
                 >
-                  <Row __component_name="Row" wrap={true}>
+                  <Row __component_name="Row" wrap={true} style={{}}>
                     <Col __component_name="Col" span={24}>
                       <Typography.Title
                         __component_name="Typography.Title"
@@ -342,7 +342,7 @@ class NetworkContractDetail$$Page extends React.Component {
                   </Row>
                 </Card>
               </Col>
-              <Col __component_name="Col" span={12}>
+              <Col __component_name="Col" span={12} style={{ display: 'flex' }}>
                 <Card
                   __component_name="Card"
                   actions={[]}
@@ -350,10 +350,14 @@ class NetworkContractDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={false}
                   size="default"
-                  style={{ height: '300px' }}
+                  style={{}}
                   type="default"
                 >
-                  <Row __component_name="Row" wrap={true}>
+                  <Row
+                    __component_name="Row"
+                    wrap={true}
+                    style={{ display: 'flex' }}
+                  >
                     <Col __component_name="Col" span={24}>
                       <Typography.Title
                         __component_name="Typography.Title"
@@ -389,7 +393,7 @@ class NetworkContractDetail$$Page extends React.Component {
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
                         showHeader={true}
-                        size="default"
+                        size="small"
                       />
                     </Col>
                   </Row>
@@ -399,7 +403,7 @@ class NetworkContractDetail$$Page extends React.Component {
           </Col>
           <Col __component_name="Col" span={24}>
             <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={12}>
+              <Col __component_name="Col" span={12} style={{ display: 'flex' }}>
                 <Card
                   __component_name="Card"
                   actions={[]}
@@ -407,7 +411,7 @@ class NetworkContractDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={false}
                   size="default"
-                  style={{ height: '300px' }}
+                  style={{}}
                   type="default"
                 >
                   <Row __component_name="Row" wrap={true}>
@@ -475,13 +479,13 @@ class NetworkContractDetail$$Page extends React.Component {
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
                         showHeader={true}
-                        size="default"
+                        size="small"
                       />
                     </Col>
                   </Row>
                 </Card>
               </Col>
-              <Col __component_name="Col" span={12}>
+              <Col __component_name="Col" span={12} style={{ display: 'flex' }}>
                 <Card
                   __component_name="Card"
                   actions={[]}
@@ -489,7 +493,7 @@ class NetworkContractDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={false}
                   size="default"
-                  style={{ height: '300px' }}
+                  style={{}}
                   type="default"
                 >
                   <Row __component_name="Row" wrap={true}>
@@ -554,7 +558,7 @@ class NetworkContractDetail$$Page extends React.Component {
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
                         showHeader={true}
-                        size="default"
+                        size="small"
                       />
                     </Col>
                   </Row>

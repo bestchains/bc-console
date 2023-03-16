@@ -52,6 +52,42 @@ class NetworkChannelDetail$$Page extends React.Component {
     console.log('will unmount');
   }
 
+  async downLoadFile() {
+    var _this$appHelper,
+      _this$appHelper$utils,
+      _this$appHelper$utils2,
+      _this$match,
+      _this$match$params,
+      _res$channel;
+    const res = await ((_this$appHelper = this.appHelper) === null ||
+    _this$appHelper === void 0
+      ? void 0
+      : (_this$appHelper$utils = _this$appHelper.utils) === null ||
+        _this$appHelper$utils === void 0
+      ? void 0
+      : (_this$appHelper$utils2 = _this$appHelper$utils.bff) === null ||
+        _this$appHelper$utils2 === void 0
+      ? void 0
+      : _this$appHelper$utils2.getChannelProfile({
+          name:
+            this === null || this === void 0
+              ? void 0
+              : (_this$match = this.match) === null || _this$match === void 0
+              ? void 0
+              : (_this$match$params = _this$match.params) === null ||
+                _this$match$params === void 0
+              ? void 0
+              : _this$match$params.id,
+        }));
+    this.utils.downloadFile(
+      res === null || res === void 0
+        ? void 0
+        : (_res$channel = res.channel) === null || _res$channel === void 0
+        ? void 0
+        : _res$channel.profileJson
+    );
+  }
+
   componentDidMount() {
     console.log('did mount');
   }
@@ -75,7 +111,7 @@ class NetworkChannelDetail$$Page extends React.Component {
           </Col>
           <Col __component_name="Col" span={24}>
             <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={12}>
+              <Col __component_name="Col" span={12} style={{ display: 'flex' }}>
                 <Card
                   __component_name="Card"
                   actions={[]}
@@ -83,7 +119,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={__$$eval(() => this.props.useGetChannel?.loading)}
                   size="default"
-                  style={{ height: '250px' }}
+                  style={{}}
                   type="default"
                 >
                   <Row __component_name="Row" wrap={true}>
@@ -103,7 +139,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                         __component_name="Descriptions"
                         bordered={false}
                         colon={false}
-                        column={1}
+                        column={2}
                         items={[
                           {
                             children: (
@@ -126,6 +162,13 @@ class NetworkChannelDetail$$Page extends React.Component {
                             span: 1,
                           },
                           {
+                            children: null,
+                            key: 'uwryumjd0x7',
+                            label:
+                              this.i18n('i18n-aw2q2zra') /* 通道链接文件 */,
+                            span: 1,
+                          },
+                          {
                             children: (
                               <Typography.Text
                                 __component_name="Typography.Text"
@@ -145,6 +188,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                             label: this.i18n('i18n-8weq4mfy9lf') /* 描述 */,
                             span: 1,
                           },
+                          { children: null, key: 'lna3pj2de7', span: 1 },
                           {
                             children: (
                               <Typography.Time
@@ -190,6 +234,52 @@ class NetworkChannelDetail$$Page extends React.Component {
                           }
                         </Descriptions.Item>
                         <Descriptions.Item
+                          key="uwryumjd0x7"
+                          label={this.i18n('i18n-aw2q2zra') /* 通道链接文件 */}
+                          span={1}
+                        >
+                          {
+                            <Button
+                              __component_name="Button"
+                              __events={{
+                                eventDataList: [
+                                  {
+                                    name: 'onClick',
+                                    relatedEventName: 'downLoadFile',
+                                    type: 'componentEvent',
+                                  },
+                                ],
+                                eventList: [
+                                  {
+                                    disabled: true,
+                                    name: 'onClick',
+                                    template:
+                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                  },
+                                ],
+                              }}
+                              block={false}
+                              danger={false}
+                              disabled={false}
+                              ghost={false}
+                              icon=""
+                              onClick={function () {
+                                return this.downLoadFile.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this)}
+                              shape="default"
+                              size="small"
+                              type="link"
+                            >
+                              {this.i18n('i18n-r1gt8gfi') /* 下载 */}
+                            </Button>
+                          }
+                        </Descriptions.Item>
+                        <Descriptions.Item
                           key="pvlb9npuf1"
                           label={this.i18n('i18n-8weq4mfy9lf') /* 描述 */}
                           span={1}
@@ -209,6 +299,9 @@ class NetworkChannelDetail$$Page extends React.Component {
                               )}
                             </Typography.Text>
                           }
+                        </Descriptions.Item>
+                        <Descriptions.Item key="lna3pj2de7" span={1}>
+                          {null}
                         </Descriptions.Item>
                         <Descriptions.Item
                           key="3fvfujee7p7"
@@ -233,7 +326,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                   </Row>
                 </Card>
               </Col>
-              <Col __component_name="Col" span={12}>
+              <Col __component_name="Col" span={12} style={{ display: 'flex' }}>
                 <Card
                   __component_name="Card"
                   actions={[]}
@@ -241,7 +334,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={false}
                   size="default"
-                  style={{ height: '250px' }}
+                  style={{}}
                   type="default"
                 >
                   <Row __component_name="Row" wrap={true}>
@@ -271,15 +364,19 @@ class NetworkChannelDetail$$Page extends React.Component {
                             title: this.i18n('i18n-hbf63hki898') /* 版本 */,
                           },
                         ]}
-                        dataSource={__$$eval(() => [{}])}
+                        dataSource={__$$eval(
+                          () =>
+                            this.props.useGetChannel?.data?.channel
+                              ?.chaincode || []
+                        )}
                         loading={__$$eval(
                           () => this.props.useGetChannel?.loading
                         )}
                         pagination={false}
-                        rowKey="id"
+                        rowKey="name"
                         scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
                         showHeader={true}
-                        size="default"
+                        size="small"
                       />
                     </Col>
                   </Row>
@@ -288,8 +385,8 @@ class NetworkChannelDetail$$Page extends React.Component {
             </Row>
           </Col>
           <Col __component_name="Col" span={24}>
-            <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={12}>
+            <Row __component_name="Row" style={{}} wrap={true}>
+              <Col __component_name="Col" span={12} style={{ display: 'flex' }}>
                 <Card
                   __component_name="Card"
                   actions={[]}
@@ -297,7 +394,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={false}
                   size="default"
-                  style={{ height: '250px' }}
+                  style={{}}
                   type="default"
                 >
                   <Row __component_name="Row" wrap={true}>
@@ -340,7 +437,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
                         showHeader={true}
-                        size="default"
+                        size="small"
                       />
                     </Col>
                   </Row>
@@ -354,7 +451,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={false}
                   size="default"
-                  style={{ height: '250px' }}
+                  style={{}}
                   type="default"
                 >
                   <Row __component_name="Row" wrap={true}>
@@ -404,7 +501,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                         rowKey="id"
                         scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
                         showHeader={true}
-                        size="default"
+                        size="small"
                       />
                     </Col>
                   </Row>
@@ -420,7 +517,7 @@ class NetworkChannelDetail$$Page extends React.Component {
               hoverable={false}
               loading={false}
               size="default"
-              style={{ height: '250px' }}
+              style={{}}
               type="default"
             >
               <Row __component_name="Row" wrap={true}>
@@ -485,7 +582,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                     rowKey="id"
                     scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
                     showHeader={true}
-                    size="default"
+                    size="small"
                   />
                 </Col>
               </Row>

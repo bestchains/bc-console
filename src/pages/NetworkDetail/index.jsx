@@ -278,7 +278,7 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   async channelAddPeerModalConfirm(e, payload) {
-    var _this$props$useGetNet, _this$props$useGetNet2;
+    var _this$props$useGetNet, _this$props$useGetNet2, _this$state$channelPe;
     const network =
       ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
       _this$props$useGetNet === void 0
@@ -287,8 +287,16 @@ class NetworkDetail$$Page extends React.Component {
           _this$props$useGetNet2 === void 0
         ? void 0
         : _this$props$useGetNet2.network) || {};
+    if (
+      ((_this$state$channelPe = this.state.channelPeers) === null ||
+      _this$state$channelPe === void 0
+        ? void 0
+        : _this$state$channelPe.length) < 1
+    ) {
+      return;
+    }
     try {
-      var _this$state$channel, _this$state$channel$r, _this$state$channelPe;
+      var _this$state$channel, _this$state$channel$r, _this$state$channelPe2;
       const res = await this.props.appHelper.utils.bff.updateChannel({
         name:
           (_this$state$channel = this.state.channel) === null ||
@@ -302,10 +310,10 @@ class NetworkDetail$$Page extends React.Component {
           operate: 'add',
           // remove
           peers:
-            (_this$state$channelPe = this.state.channelPeers) === null ||
-            _this$state$channelPe === void 0
+            (_this$state$channelPe2 = this.state.channelPeers) === null ||
+            _this$state$channelPe2 === void 0
               ? void 0
-              : _this$state$channelPe.map((key) => {
+              : _this$state$channelPe2.map((key) => {
                   var _this$state$allPeers;
                   const item =
                     (_this$state$allPeers = this.state.allPeers) === null ||
@@ -6587,6 +6595,7 @@ class NetworkDetail$$Page extends React.Component {
                     );
                   }.bind(this)}
                   shape="default"
+                  type="primary"
                 >
                   {this.i18n('i18n-tixlz8m0le9') /* 确定 */}
                 </Button>
