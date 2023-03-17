@@ -6,14 +6,21 @@ import { getLocale } from '../i18n';
 import Request from '@tenx-ui/utils/es/request';
 import queryString from '@tenx-ui/utils/es/queryString';
 import PageLoading from '@/components/PageLoading';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme } from 'antd';
 import enUS from 'antd/locale/en_US';
 import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
+import { useQiankunGlobalState } from '@/utils/helper';
+import { useModel } from '@@/exports';
 
 const request = Request('');
 
 const Layout: React.FC = () => {
+  // 调用一次即可
+  useQiankunGlobalState();
+  // 获取 dock-app 数据使用 useModel('qiankun')
+  const { qiankun } = useModel('qiankun');
+
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const query = useMemo(() => queryString.parse(location.search), [location.search]);
@@ -66,7 +73,15 @@ const Layout: React.FC = () => {
     return <PageLoading />;
   }
   return (
-    <ConfigProvider locale={locale === 'zh-cn' ? zhCN : enUS}>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: qiankun?.theme?.colorPrimary,
+        },
+        algorithm: qiankun?.theme?.isDark ? theme.darkAlgorithm : undefined,
+      }}
+      locale={locale === 'zh-cn' ? zhCN : enUS}
+    >
       <Outlet />
     </ConfigProvider>
   );
