@@ -21,11 +21,11 @@ import { basename, IS_PROD, IS_QIAN_KUN } from './constants';
 import { getLocale, setLocale } from './i18n';
 import { Tooltip } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
+import { _qiankunData } from '@/utils/helper';
 
 // TODO：qiankun umi 子应用 window.routerBase 问题，目前需要手动设置一下 routerBase 的值
 window.routerBase = basename;
 
-let qiankunHistory: any;
 export const qiankun = {
   // 应用加载之前
   async bootstrap(props) {
@@ -33,12 +33,7 @@ export const qiankun = {
   },
   // 应用 render 之前触发
   async mount(props) {
-    setTimeout(() => {
-      props.onGlobalStateChange((state, prev) => {
-        // state: 变更后的状态; prev 变更前的状态
-        qiankunHistory = state.history;
-      }, true);
-    }, 50);
+    // do something here before render
   },
   // 应用卸载之后触发
   async unmount(props) {
@@ -70,9 +65,15 @@ const Title = ({ icon }: any) => {
   return <div style={{ color: '#fff' }}>{userName}</div>;
 };
 
-export const layout: RunTimeLayoutConfig = () => {
+export const getInitialState = () => ({});
+
+export const layout: RunTimeLayoutConfig = initState => {
+  if (!_qiankunData.setInitialState) {
+    _qiankunData.setInitialState = initState.setInitialState;
+  }
+  const _theme = initState.initialState?.theme;
   initUnifiedLinkHistory(
-    qiankunHistory || {
+    initState.initialState?.history || {
       goBack: history.back,
       ...history,
     }
@@ -141,18 +142,13 @@ export const layout: RunTimeLayoutConfig = () => {
       //
     },
     token: {
-      colorPrimary: theme.token.colorPrimary,
-      bgLayout: '#ffffff',
-      header: {
-        colorBgHeader: '#272a32',
-        colorHeaderTitle: '#fff',
-        colorTextMenu: '#fff',
-      },
+      colorPrimary: _theme?.colorPrimary || theme.token.colorPrimary,
+      bgLayout: _theme?.colors?.['--background-color'] || '#ffffff',
       sider: {
         // #ffffff
       },
       pageContainer: {
-        colorBgPageContainer: '#f6f6f6',
+        colorBgPageContainer: _theme?.colors?.['--background-color-body'] || '#f6f6f6',
         paddingInlinePageContainerContent: 0,
         paddingBlockPageContainerContent: 0,
       },
