@@ -53,39 +53,43 @@ class NetworkChannelDetail$$Page extends React.Component {
   }
 
   async downLoadFile() {
-    var _this$appHelper,
-      _this$appHelper$utils,
-      _this$appHelper$utils2,
-      _this$match,
-      _this$match$params,
-      _res$channel;
-    const res = await ((_this$appHelper = this.appHelper) === null ||
-    _this$appHelper === void 0
-      ? void 0
-      : (_this$appHelper$utils = _this$appHelper.utils) === null ||
-        _this$appHelper$utils === void 0
-      ? void 0
-      : (_this$appHelper$utils2 = _this$appHelper$utils.bff) === null ||
-        _this$appHelper$utils2 === void 0
-      ? void 0
-      : _this$appHelper$utils2.getChannelProfile({
-          name:
-            this === null || this === void 0
-              ? void 0
-              : (_this$match = this.match) === null || _this$match === void 0
-              ? void 0
-              : (_this$match$params = _this$match.params) === null ||
-                _this$match$params === void 0
-              ? void 0
-              : _this$match$params.id,
-        }));
-    this.utils.downloadFile(
-      res === null || res === void 0
+    try {
+      var _this$props$appHelper, _this$match, _this$match$params, _res$channel;
+      const res = await ((_this$props$appHelper =
+        this.props.appHelper.utils.bff) === null ||
+      _this$props$appHelper === void 0
         ? void 0
-        : (_res$channel = res.channel) === null || _res$channel === void 0
-        ? void 0
-        : _res$channel.profileJson
-    );
+        : _this$props$appHelper.getChannelProfile({
+            name:
+              this === null || this === void 0
+                ? void 0
+                : (_this$match = this.match) === null || _this$match === void 0
+                ? void 0
+                : (_this$match$params = _this$match.params) === null ||
+                  _this$match$params === void 0
+                ? void 0
+                : _this$match$params.id,
+          }));
+      this.utils.downloadFile(
+        res === null || res === void 0
+          ? void 0
+          : (_res$channel = res.channel) === null || _res$channel === void 0
+          ? void 0
+          : _res$channel.profileJson
+      );
+    } catch (error) {
+      var _error$response;
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-62p13m1r'),
+        errors:
+          error === null || error === void 0
+            ? void 0
+            : (_error$response = error.response) === null ||
+              _error$response === void 0
+            ? void 0
+            : _error$response.errors,
+      });
+    }
   }
 
   componentDidMount() {
@@ -374,7 +378,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                         )}
                         pagination={false}
                         rowKey="name"
-                        scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
+                        scroll={{ scrollToFirstRowOnChange: false, y: 130 }}
                         showHeader={true}
                         size="small"
                       />
@@ -435,7 +439,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                         )}
                         pagination={false}
                         rowKey="id"
-                        scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
+                        scroll={{ scrollToFirstRowOnChange: false, y: 130 }}
                         showHeader={true}
                         size="small"
                       />
@@ -499,7 +503,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                         )}
                         pagination={false}
                         rowKey="id"
-                        scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
+                        scroll={{ scrollToFirstRowOnChange: false, y: 130 }}
                         showHeader={true}
                         size="small"
                       />
@@ -580,7 +584,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                     loading={__$$eval(() => this.props.useGetChannel?.loading)}
                     pagination={false}
                     rowKey="id"
-                    scroll={{ scrollToFirstRowOnChange: true, y: 130 }}
+                    scroll={{ scrollToFirstRowOnChange: false, y: 130 }}
                     showHeader={true}
                     size="small"
                   />
