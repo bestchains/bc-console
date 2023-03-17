@@ -86,23 +86,7 @@ export const downloadFile = (
   a.download = filename;
   a.href = window.URL.createObjectURL(blob);
   a.dataset.downloadurl = [type, a.download, a.href].join(':');
-  e.initMouseEvent(
-    'click',
-    true,
-    false,
-    window,
-    0,
-    0,
-    0,
-    0,
-    0,
-    false,
-    false,
-    false,
-    false,
-    0,
-    null
-  );
+  e.initMouseEvent('click');
   a.dispatchEvent(e);
 };
 
