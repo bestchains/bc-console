@@ -3,7 +3,7 @@ import { message } from 'antd';
 import { notification } from '@tenx-ui/materials';
 
 import { createRef } from 'react';
-import { sdk as bff } from '../bff-sdk';
+import { sdk as bff } from '../../bff-sdk';
 
 export const AUTH_DATA = 'authData';
 

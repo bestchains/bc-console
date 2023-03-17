@@ -16,7 +16,7 @@ const useQiankunGlobalState = () => {
   const u = useModel('@@qiankunStateFromMaster');
   const { setQiankun } = useModel('qiankun');
   React.useEffect(() => {
-    u.onGlobalStateChange((state, prev) => {
+    u?.onGlobalStateChange((state, prev) => {
       // state: 变更后的状态; prev 变更前的状态
       setQiankun(state);
       // 给 app.tsx layout 使用

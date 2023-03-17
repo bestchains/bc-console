@@ -12,6 +12,7 @@ import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import { useQiankunGlobalState } from '@/utils/helper';
 import { useModel } from '@@/exports';
+import themeConfig from '../../config/theme';
 
 const request = Request('');
 
@@ -76,7 +77,8 @@ const Layout: React.FC = () => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: qiankun?.theme?.colorPrimary,
+          ...themeConfig.token,
+          colorPrimary: qiankun?.theme?.colorPrimary || themeConfig.token.colorPrimary,
         },
         algorithm: qiankun?.theme?.isDark ? theme.darkAlgorithm : undefined,
       }}
