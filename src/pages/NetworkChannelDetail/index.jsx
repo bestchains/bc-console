@@ -68,7 +68,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                 : (_this$match$params = _this$match.params) === null ||
                   _this$match$params === void 0
                 ? void 0
-                : _this$match$params.id,
+                : _this$match$params.channelId,
           }));
       this.utils.downloadFile(
         res === null || res === void 0
