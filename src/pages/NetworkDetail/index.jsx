@@ -5,6 +5,10 @@ import React from 'react';
 import {
   Page,
   Modal,
+  Descriptions,
+  Typography,
+  Row,
+  Col,
   FormilyForm,
   FormilyInput,
   FormilyTextArea,
@@ -16,16 +20,12 @@ import {
   Icon,
   Alert,
   Space,
-  Typography,
   UnifiedLink,
-  Row,
-  Col,
   Transfer,
   Tabs,
   Spin,
   Card,
   Divider,
-  Descriptions,
   Status,
   Table,
   Input,
@@ -82,6 +82,7 @@ class NetworkDetail$$Page extends React.Component {
         size: 10,
         current: 1,
         record: {},
+        createLoading: false,
       },
       isOpenModal: false,
       modalType: 'addchannel',
@@ -148,7 +149,13 @@ class NetworkDetail$$Page extends React.Component {
         ? void 0
         : _this$props$useGetNet2.network) || {};
     try {
-      var _this$state, _this$state$channel, _this$state$channelPe;
+      var _this$state,
+        _this$state$channel,
+        _this$state$channelPe,
+        _this$state2,
+        _this$state2$channel,
+        _this$state2$channel$,
+        _this$state2$channel$2;
       const res = await this.props.appHelper.utils.bff.createChannel({
         network: network === null || network === void 0 ? void 0 : network.name,
         channel: {
@@ -176,11 +183,27 @@ class NetworkDetail$$Page extends React.Component {
                 }),
         },
       });
-      // this.closeModal()
-      // this.utils.notification.success({
-      //   message: this.i18n('i18n-l8fybssesij'),
-      // })
-      this.openAddChannelSuccessModal();
+      if (
+        ((_this$state2 = this.state) === null || _this$state2 === void 0
+          ? void 0
+          : (_this$state2$channel = _this$state2.channel) === null ||
+            _this$state2$channel === void 0
+          ? void 0
+          : (_this$state2$channel$ = _this$state2$channel.addData) === null ||
+            _this$state2$channel$ === void 0
+          ? void 0
+          : (_this$state2$channel$2 = _this$state2$channel$.organizations) ===
+              null || _this$state2$channel$2 === void 0
+          ? void 0
+          : _this$state2$channel$2.length) > 0
+      ) {
+        this.openAddChannelSuccessModal();
+      } else {
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-l8fybssesij'),
+        });
+      }
       setTimeout(() => {
         this.props.useGetNetwork.mutate();
       }, 200);
@@ -251,30 +274,52 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   channelAddOrganizationModalConfirm(e, payload) {
-    this.openAddChannelOrganizationSuccessModal();
-    // const network = this.props.useGetNetwork?.data?.network || {}
-    // const form = this.$('formily_create')?.formRef?.current?.form
-    // form.submit(async v => {
-    //   console.log(v)
-    //   try {
-    //     // const res = await this.props.appHelper.utils.bff.updateChannel({
-    //     //   name: network?.name,
-    //     //   organizations: v.organizations,
-    //     //   initiator: network?.initiator?.name
-    //     // })
-    //     // this.closeModal()
-    //     // this.utils.notification.success({
-    //     //   message: this.i18n('i18n-l8fybssesij'),
-    //     // })
-    //     this.openAddChannelSuccessModal()
-    //     this.props.useGetNetwork.mutate()
-    //   } catch (error) {
-    //     this.utils.notification.warnings({
-    //       message: this.i18n('i18n-85kkwp67i5u'),
-    //       errors: error?.response?.errors
-    //     })
-    //   }
-    // })
+    var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    const form =
+      (_this$$ = this.$('formily_create_channel_organization')) === null ||
+      _this$$ === void 0
+        ? void 0
+        : (_this$$$formRef = _this$$.formRef) === null ||
+          _this$$$formRef === void 0
+        ? void 0
+        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
+          _this$$$formRef$curre === void 0
+        ? void 0
+        : _this$$$formRef$curre.form;
+    form.submit(async (v) => {
+      try {
+        var _this$state$channel, _this$state$channel$r;
+        const res = await this.props.appHelper.utils.bff.updateMemberChannel({
+          name:
+            (_this$state$channel = this.state.channel) === null ||
+            _this$state$channel === void 0
+              ? void 0
+              : (_this$state$channel$r = _this$state$channel.record) === null ||
+                _this$state$channel$r === void 0
+              ? void 0
+              : _this$state$channel$r.name,
+          members: v.members,
+        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-t4zc5jan'),
+        // })
+        this.openAddChannelOrganizationSuccessModal();
+        this.props.useGetNetwork.mutate();
+      } catch (error) {
+        var _error$response;
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-2hz9pwzp'),
+          errors:
+            error === null || error === void 0
+              ? void 0
+              : (_error$response = error.response) === null ||
+                _error$response === void 0
+              ? void 0
+              : _error$response.errors,
+        });
+      }
+    });
   }
 
   async channelAddPeerModalConfirm(e, payload) {
@@ -387,6 +432,12 @@ class NetworkDetail$$Page extends React.Component {
         ? void 0
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
+      this.setState({
+        contract: {
+          ...this.state.contract,
+          createLoading: true,
+        },
+      });
       try {
         var _this$match,
           _this$match$params,
@@ -430,8 +481,20 @@ class NetworkDetail$$Page extends React.Component {
           message: this.i18n('i18n-5eg2znpg'),
         });
         this.props.useGetChaincodebuilds.mutate();
+        this.setState({
+          contract: {
+            ...this.state.contract,
+            createLoading: false,
+          },
+        });
       } catch (error) {
         var _error$response;
+        this.setState({
+          contract: {
+            ...this.state.contract,
+            createLoading: false,
+          },
+        });
         this.utils.notification.warnings({
           message: this.i18n('i18n-rw4x2dt7'),
           errors:
@@ -657,8 +720,13 @@ class NetworkDetail$$Page extends React.Component {
         ? void 0
         : _this$$$formRef$curre.form;
     form.submit(async (v) => {
+      var _JSON$parse;
       const chaincode = {
-        channel: v.channel,
+        channel:
+          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
+          _JSON$parse === void 0
+            ? void 0
+            : _JSON$parse.name,
         epolicy: v.epolicy,
         name: v.name,
         version: v.version,
@@ -1416,6 +1484,17 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
+  openStrategyDetailModal(e, payload) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'strategydetail',
+    });
+  }
+
   openUpgradeContractModal(e, payload) {
     this.setState(
       {
@@ -1468,6 +1547,31 @@ class NetworkDetail$$Page extends React.Component {
     )}`;
   }
 
+  async validatorChannelName(value) {
+    try {
+      var _this$props,
+        _this$props$appHelper,
+        _this$props$appHelper2,
+        _this$props$appHelper3;
+      const res = await ((_this$props = this.props) === null ||
+      _this$props === void 0
+        ? void 0
+        : (_this$props$appHelper = _this$props.appHelper) === null ||
+          _this$props$appHelper === void 0
+        ? void 0
+        : (_this$props$appHelper2 = _this$props$appHelper.utils) === null ||
+          _this$props$appHelper2 === void 0
+        ? void 0
+        : (_this$props$appHelper3 = _this$props$appHelper2.bff) === null ||
+          _this$props$appHelper3 === void 0
+        ? void 0
+        : _this$props$appHelper3.getChannel({
+            name: value,
+          }));
+      return this.i18n('i18n-0imredkn');
+    } catch (error) {}
+  }
+
   componentDidMount() {
     const getOrganizations = async () => {
       var _res$organizations;
@@ -1503,9 +1607,188 @@ class NetworkDetail$$Page extends React.Component {
                 relatedEventName: 'closeModal',
                 type: 'componentEvent',
               },
+            ],
+            eventList: [
               {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
                 name: 'onOk',
-                relatedEventName: 'confirmAddStrategyModal',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" span={6} />
+              <Col __component_name="Col" span={6} />
+              <Col __component_name="Col" span={6} />
+              <Col __component_name="Col" span={6} />
+            </Row>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'strategydetail'
+          )}
+          ref={this._refsManager.linkRef('modal-f48ee40c')}
+          title={this.i18n('i18n-5ruzwlr4') /* 背书策略详情 */}
+        >
+          <Descriptions
+            __component_name="Descriptions"
+            bordered={false}
+            colon={false}
+            column={1}
+            items={[
+              {
+                children: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(() => this.state.strategy?.record?.name || '-')}
+                  </Typography.Text>
+                ),
+                key: '2xnokcznohl',
+                label: this.i18n('i18n-87kp314f') /* 策略名称 */,
+                span: 1,
+              },
+              {
+                children: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(
+                      () => this.state.strategy?.record?.description || '-'
+                    )}
+                  </Typography.Text>
+                ),
+                key: '0h2dnnfyj23',
+                label: this.i18n('i18n-tcgbsroi') /* 策略内容 */,
+                span: 1,
+              },
+              {
+                children: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(
+                      () => this.state.strategy?.record?.content || '-'
+                    )}
+                  </Typography.Text>
+                ),
+                key: '3k9rb4ji034',
+                label: this.i18n('i18n-w3qy6omh') /* 策略描述 */,
+                span: 1,
+              },
+            ]}
+            labelStyle={{ width: 100 }}
+            layout="horizontal"
+            size="default"
+            title=" "
+          >
+            <Descriptions.Item
+              key="2xnokcznohl"
+              label={this.i18n('i18n-87kp314f') /* 策略名称 */}
+              span={1}
+            >
+              {
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(
+                    () =>
+                      `${this.state.strategy?.record?.displayName || '-'}(${
+                        this.state.strategy?.record?.name
+                      })`
+                  )}
+                </Typography.Text>
+              }
+            </Descriptions.Item>
+            <Descriptions.Item
+              key="0h2dnnfyj23"
+              label={this.i18n('i18n-tcgbsroi') /* 策略内容 */}
+              span={1}
+            >
+              {
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(
+                    () => this.state.strategy?.record?.description || '-'
+                  )}
+                </Typography.Text>
+              }
+            </Descriptions.Item>
+            <Descriptions.Item
+              key="3k9rb4ji034"
+              label={this.i18n('i18n-w3qy6omh') /* 策略描述 */}
+              span={1}
+            >
+              {
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(() => this.state.strategy?.record?.value || '-')}
+                </Typography.Text>
+              }
+            </Descriptions.Item>
+          </Descriptions>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
                 type: 'componentEvent',
               },
             ],
@@ -1583,10 +1866,19 @@ class NetworkDetail$$Page extends React.Component {
                     icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
+                      this.i18n('i18n-o3gly28f') /* 长度为 3- 20 个字符 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_LENGTH_REG),
+                    type: 'disabled',
+                  },
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    message:
                       this.i18n(
-                        'i18n-1icnfyd1'
-                      ) /* 策略名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-z0-9_]{3,10}$',
+                        'i18n-36661y2t'
+                      ) /* 由小写字母、数字、“-”组成，开头和结尾只能是字母或数字 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_K8S_REG),
                     type: 'disabled',
                   },
                 ],
@@ -2408,7 +2700,15 @@ class NetworkDetail$$Page extends React.Component {
                       enum: __$$eval(() =>
                         this.props.useGetNetwork?.data?.network?.channels?.map(
                           (item) => ({
-                            value: item.name,
+                            value: JSON.stringify({
+                              ...item,
+                              strategy: this.state.strategy?.list
+                                ?.filter((s) => s.channel === item.name)
+                                ?.map((s) => ({
+                                  value: s.name,
+                                  label: `${s.displayName || '-'}(${s.name})`,
+                                })),
+                            }),
                             label: item.name,
                           })
                         )
@@ -2429,15 +2729,10 @@ class NetworkDetail$$Page extends React.Component {
                   __component_name="FormilySelect"
                   componentProps={{
                     'x-component-props': {
-                      _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                      _unsafe_MixedSetter_enum_select: 'StringSetter',
                       allowClear: false,
                       disabled: false,
-                      enum: __$$eval(() =>
-                        this.state.strategy?.list?.map((item) => ({
-                          value: item.name,
-                          label: `${item.displayName || '-'}(${item.name})`,
-                        }))
-                      ),
+                      enum: '{{$form?.values?.channel ? (JSON.parse($form?.values?.channel)?.strategy ||[]) : []}}',
                       notFoundContent: {},
                       placeholder:
                         this.i18n('i18n-e0gcsyat') /* 请选择背书策略 */,
@@ -5001,6 +5296,26 @@ class NetworkDetail$$Page extends React.Component {
                               {
                                 dataIndex: 'hy',
                                 key: 'hy',
+                                render: (text, record, index) =>
+                                  ((__$$context) => (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {__$$eval(
+                                        () => record?.chaincode?.length || '0'
+                                      )}
+                                    </Typography.Text>
+                                  ))(
+                                    __$$createChildContext(__$$context, {
+                                      text,
+                                      record,
+                                      index,
+                                    })
+                                  ),
                                 title:
                                   this.i18n('i18n-4lrtaenb') /* 合约数量 */,
                               },
@@ -5692,7 +6007,9 @@ class NetworkDetail$$Page extends React.Component {
                                       strong={false}
                                       style={{ fontSize: '' }}
                                     >
-                                      {__$$eval(() => record?.length || '0')}
+                                      {__$$eval(
+                                        () => record?.channels?.length || '0'
+                                      )}
                                     </Typography.Text>
                                   ))(
                                     __$$createChildContext(__$$context, {
@@ -5757,6 +6074,15 @@ class NetworkDetail$$Page extends React.Component {
                                           id: 'Error',
                                           type: 'error',
                                         },
+                                        {
+                                          children:
+                                            this.i18n(
+                                              'i18n-5bhot42b'
+                                            ) /* 部署中 */,
+                                          icon: 'ClockCircleFilled',
+                                          id: 'Deploying',
+                                          type: 'info',
+                                        },
                                       ]}
                                     />
                                   ))(
@@ -5797,7 +6123,11 @@ class NetworkDetail$$Page extends React.Component {
                                       }}
                                       block={false}
                                       danger={false}
-                                      disabled={false}
+                                      disabled={__$$eval(
+                                        () =>
+                                          __$$context?.record?.status !==
+                                          'Created'
+                                      )}
                                       ghost={false}
                                       onClick={function () {
                                         return this.openDeploymentContractModal.apply(
@@ -6258,7 +6588,7 @@ class NetworkDetail$$Page extends React.Component {
                               {
                                 dataIndex: 'op',
                                 render: (text, record, index) =>
-                                  ((__$$context) => (
+                                  ((__$$context) => [
                                     <Button
                                       __component_name="Button"
                                       __events={{
@@ -6302,15 +6632,62 @@ class NetworkDetail$$Page extends React.Component {
                                       type="link"
                                     >
                                       {this.i18n('i18n-ias68eipm18') /* 删除 */}
-                                    </Button>
-                                  ))(
+                                    </Button>,
+                                    <Button
+                                      __component_name="Button"
+                                      __events={{
+                                        eventDataList: [
+                                          {
+                                            name: 'onClick',
+                                            paramStr:
+                                              '{\n \t "record":this.record \n}',
+                                            relatedEventName:
+                                              'openStrategyDetailModal',
+                                            type: 'componentEvent',
+                                          },
+                                        ],
+                                        eventList: [
+                                          {
+                                            disabled: true,
+                                            name: 'onClick',
+                                            template:
+                                              "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          },
+                                        ],
+                                      }}
+                                      block={false}
+                                      danger={false}
+                                      disabled={false}
+                                      ghost={false}
+                                      icon=""
+                                      onClick={function () {
+                                        return this.openStrategyDetailModal.apply(
+                                          this,
+                                          Array.prototype.slice
+                                            .call(arguments)
+                                            .concat([
+                                              {
+                                                record: record,
+                                              },
+                                            ])
+                                        );
+                                      }.bind(__$$context)}
+                                      ref={this._refsManager.linkRef(
+                                        'button-6bf7990c'
+                                      )}
+                                      shape="default"
+                                      type="link"
+                                    >
+                                      {this.i18n('i18n-m6n5fnxybu') /* 详情 */}
+                                    </Button>,
+                                  ])(
                                     __$$createChildContext(__$$context, {
                                       text,
                                       record,
                                       index,
                                     })
                                   ),
-                                title: '标题',
+                                title: this.i18n('i18n-k5inn5jmnt9') /* 操作 */,
                               },
                             ]}
                             dataSource={__$$eval(() =>
@@ -6669,13 +7046,42 @@ class NetworkDetail$$Page extends React.Component {
                       title: this.i18n('i18n-9e87qfos') /* 名称 */,
                       'x-validator': [
                         {
+                          children: '未知',
+                          icon: 'tenx-ui-icon:Circle',
+                          id: 'disabled',
                           message:
                             this.i18n(
-                              'i18n-0u5pwt0jtl4'
-                            ) /* 通道名称由 3 ~ 50 个大小写字母, 数字, 下划线组成 */,
-                          pattern: '^[a-z0-9_]{3,50}$',
-                          required: true,
-                          whitespace: true,
+                              'i18n-o3gly28f'
+                            ) /* 长度为 3- 20 个字符 */,
+                          pattern: __$$eval(
+                            () => this?.constants?.NAME_LENGTH_REG
+                          ),
+                          type: 'disabled',
+                        },
+                        {
+                          children: '未知',
+                          icon: 'tenx-ui-icon:Circle',
+                          id: 'disabled',
+                          message:
+                            this.i18n(
+                              'i18n-36661y2t'
+                            ) /* 由小写字母、数字、“-”组成，开头和结尾只能是字母或数字 */,
+                          pattern: __$$eval(
+                            () => this?.constants?.NAME_K8S_REG
+                          ),
+                          type: 'disabled',
+                        },
+                        {
+                          children: '未知',
+                          icon: 'tenx-ui-icon:Circle',
+                          id: 'disabled',
+                          type: 'disabled',
+                          validator: function () {
+                            return this.validatorChannelName.apply(
+                              this,
+                              Array.prototype.slice.call(arguments).concat([])
+                            );
+                          }.bind(this),
                         },
                       ],
                     }}
@@ -7091,12 +7497,16 @@ class NetworkDetail$$Page extends React.Component {
                   disabled: false,
                   enum: __$$eval(
                     () =>
-                      this.props.useGetNetwork?.data?.network?.organizations?.map(
-                        (item) => ({
+                      this.props.useGetNetwork?.data?.network?.organizations
+                        ?.filter((item) =>
+                          this.state?.record?.channel?.members?.every(
+                            (m) => m?.name !== item.name
+                          )
+                        )
+                        ?.map((item) => ({
                           value: item.name,
                           label: `${item.name}(${item.admin})`,
-                        })
-                      ) || []
+                        })) || []
                   ),
                   placeholder: this.i18n('i18n-vg3668rl') /* 请选择组织 */,
                 },
@@ -7119,7 +7529,7 @@ class NetworkDetail$$Page extends React.Component {
                     }
                   </Typography.Text>
                 ),
-                name: 'Select',
+                name: 'members',
                 required: true,
                 title: this.i18n('i18n-ddvens87') /* 邀请组织 */,
                 'x-validator': [],
@@ -7164,7 +7574,7 @@ class NetworkDetail$$Page extends React.Component {
             ],
           }}
           centered={false}
-          confirmLoading={false}
+          confirmLoading={__$$eval(() => this.state.contract?.createLoading)}
           destroyOnClose={true}
           forceRender={false}
           keyboard={true}
@@ -7216,10 +7626,19 @@ class NetworkDetail$$Page extends React.Component {
                     icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
+                      this.i18n('i18n-o3gly28f') /* 长度为 3- 20 个字符 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_LENGTH_REG),
+                    type: 'disabled',
+                  },
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    message:
                       this.i18n(
-                        'i18n-1h2618xx'
-                      ) /* 合约名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-z0-9_]{3,10}$',
+                        'i18n-36661y2t'
+                      ) /* 由小写字母、数字、“-”组成，开头和结尾只能是字母或数字 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_K8S_REG),
                     type: 'disabled',
                   },
                 ],

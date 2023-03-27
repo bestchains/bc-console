@@ -57,6 +57,11 @@ const routes = [
         path: '/network/detail/:id/contract/:contractId',
         component: '@/pages/NetworkContractDetail',
       },
+      {
+        name: '区块链浏览器',
+        path: '/browser',
+        component: '@/pages/Browser',
+      },
     ],
   },
 ];

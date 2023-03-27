@@ -47,13 +47,13 @@ class Proposal$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      current: 1,
-      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
-      searchKey: 'name',
+      filter: 'ALL',
       searchValue: undefined,
+      searchKey: 'name',
       size: 10,
+      current: 1,
       types: [
         {
           text: this.i18n('i18n-gspz6pec67u'),
@@ -75,6 +75,20 @@ class Proposal$$Page extends React.Component {
           text: this.i18n('i18n-9utg1r58kz'),
           value: 'DissolveNetworkProposal',
         },
+        {
+          text: this.i18n('i18n-ygq2hyfs'),
+          value: 'DeployChaincodeProposal',
+        },
+        {
+          text: this.i18n('i18n-bkwwrk8c'),
+          value: 'UpgradeChaincodeProposal',
+        },
+        {
+          text: this.i18n('i18n-iu3csmhm'),
+          value: 'UpdateChannelMemberProposal',
+        },
+        // ArchiveChannelProposal
+        // UnarchiveChannelProposal
       ],
     };
   }
@@ -88,6 +102,13 @@ class Proposal$$Page extends React.Component {
   };
 
   componentWillUnmount() {}
+
+  openCreateModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'create',
+    });
+  }
 
   closeModal() {
     this.setState({
@@ -124,17 +145,17 @@ class Proposal$$Page extends React.Component {
     });
   }
 
-  handlePaginationChange(c, s) {
-    this.setState({
-      size: s,
-      current: c,
-    });
-  }
-
   handleSearchValueChange(e) {
     this.setState({
       searchValue: e.target.value,
       current: 1,
+    });
+  }
+
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
     });
   }
 
@@ -143,13 +164,6 @@ class Proposal$$Page extends React.Component {
       pagination,
       filters,
       sorter,
-    });
-  }
-
-  openCreateModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'create',
     });
   }
 

@@ -261,9 +261,24 @@ class NetworkCreate$$Page extends React.Component {
                             id: 'disabled',
                             message:
                               this.i18n(
-                                'i18n-4v5vky0x'
-                              ) /* 网络名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
-                            pattern: '^[a-z0-9_]{3,20}$',
+                                'i18n-o3gly28f'
+                              ) /* 长度为 3- 20 个字符 */,
+                            pattern: __$$eval(
+                              () => this?.constants?.NAME_LENGTH_REG
+                            ),
+                            type: 'disabled',
+                          },
+                          {
+                            children: '未知',
+                            icon: 'tenx-ui-icon:Circle',
+                            id: 'disabled',
+                            message:
+                              this.i18n(
+                                'i18n-36661y2t'
+                              ) /* 由小写字母、数字、“-”组成，开头和结尾只能是字母或数字 */,
+                            pattern: __$$eval(
+                              () => this?.constants?.NAME_K8S_REG
+                            ),
                             type: 'disabled',
                           },
                           {
@@ -518,12 +533,17 @@ class NetworkCreate$$Page extends React.Component {
                     <FormilyNumberPicker
                       __component_name="FormilyNumberPicker"
                       componentProps={{
-                        'x-component-props': { placeholder: '请输入' },
+                        'x-component-props': {
+                          max: 5,
+                          min: 0,
+                          placeholder: '请输入',
+                        },
                       }}
                       decoratorProps={{
                         'x-decorator-props': { wrapperWidth: '100px' },
                       }}
                       fieldProps={{
+                        enum: [],
                         name: 'clusterSize',
                         title: this.i18n('i18n-vo8kd18n6pd') /* 共识集群节点 */,
                         'x-validator': [],

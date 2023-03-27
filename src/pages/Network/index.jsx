@@ -23,7 +23,7 @@ import {
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 
-import utils from '../../utils';
+import utils, { RefsManager } from '../../utils';
 
 import * as __$$i18n from '../../i18n';
 
@@ -46,6 +46,8 @@ class Network$$Page extends React.Component {
 
     this.utils = utils;
 
+    this._refsManager = new RefsManager();
+
     __$$i18n._inject2(this);
 
     this.state = {
@@ -61,9 +63,13 @@ class Network$$Page extends React.Component {
     };
   }
 
-  $ = () => null;
+  $ = (refName) => {
+    return this._refsManager.get(refName);
+  };
 
-  $$ = () => [];
+  $$ = (refName) => {
+    return this._refsManager.getAll(refName);
+  };
 
   componentWillUnmount() {}
 
@@ -503,91 +509,107 @@ class Network$$Page extends React.Component {
                             >
                               {this.i18n('i18n-4t70z9gdf8u') /* 查看详情 */}
                             </Button>
-                            <Button
-                              __events={{
-                                eventDataList: [
-                                  {
-                                    name: 'onClick',
-                                    paramStr:
-                                      '{\n \t"record":this.item,\n\t"key": "dissolve" \n}',
-                                    relatedEventName: 'onMenuClick',
-                                    type: 'componentEvent',
-                                  },
-                                ],
-                                eventList: [
-                                  {
-                                    disabled: true,
-                                    name: 'onClick',
-                                    template:
-                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
-                                  },
-                                ],
-                              }}
-                              block={false}
-                              danger={false}
-                              disabled={false}
-                              ghost={false}
-                              onClick={function () {
-                                return this.onMenuClick.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([
+                            {!!__$$eval(() => item?.status === 'Deployed') && (
+                              <Button
+                                __events={{
+                                  eventDataList: [
                                     {
-                                      record: item,
-                                      key: 'dissolve',
+                                      name: 'onClick',
+                                      paramStr:
+                                        '{\n \t"record":this.item,\n\t"key": "dissolve" \n}',
+                                      relatedEventName: 'onMenuClick',
+                                      type: 'componentEvent',
                                     },
-                                  ])
-                                );
-                              }.bind(__$$context)}
-                              shape="default"
-                              type="link"
-                            >
-                              {this.i18n('i18n-0ionguia') /* 停止 */}
-                            </Button>
-                            <Button
-                              __events={{
-                                eventDataList: [
-                                  {
-                                    name: 'onClick',
-                                    paramStr:
-                                      '{\n\t"record":this.item,\n\t"key": "delete"\n}',
-                                    relatedEventName: 'onMenuClick',
-                                    type: 'componentEvent',
-                                  },
-                                ],
-                                eventList: [
-                                  {
-                                    disabled: true,
-                                    name: 'onClick',
-                                    template:
-                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
-                                  },
-                                ],
-                              }}
-                              block={false}
-                              danger={false}
-                              disabled={__$$eval(() =>
-                                item?.initiator?.admin ===
-                                __$$context.props.authData?.user?.name
-                                  ? undefined
-                                  : 'disabled'
-                              )}
-                              ghost={false}
-                              onClick={function () {
-                                return this.onMenuClick.apply(
-                                  this,
-                                  Array.prototype.slice.call(arguments).concat([
+                                  ],
+                                  eventList: [
                                     {
-                                      record: item,
-                                      key: 'delete',
+                                      disabled: true,
+                                      name: 'onClick',
+                                      template:
+                                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
                                     },
-                                  ])
-                                );
-                              }.bind(__$$context)}
-                              shape="default"
-                              type="link"
-                            >
-                              {this.i18n('i18n-dpjl9tfj') /* 删除网络 */}
-                            </Button>
+                                  ],
+                                }}
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                onClick={function () {
+                                  return this.onMenuClick.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([
+                                        {
+                                          record: item,
+                                          key: 'dissolve',
+                                        },
+                                      ])
+                                  );
+                                }.bind(__$$context)}
+                                ref={this._refsManager.linkRef(
+                                  'button-bfc1f43b'
+                                )}
+                                shape="default"
+                                type="link"
+                              >
+                                {this.i18n('i18n-0ionguia') /* 停止 */}
+                              </Button>
+                            )}
+                            {!!__$$eval(
+                              () => item?.status === 'NetworkDissolved'
+                            ) && (
+                              <Button
+                                __events={{
+                                  eventDataList: [
+                                    {
+                                      name: 'onClick',
+                                      paramStr:
+                                        '{\n\t"record":this.item,\n\t"key": "delete"\n}',
+                                      relatedEventName: 'onMenuClick',
+                                      type: 'componentEvent',
+                                    },
+                                  ],
+                                  eventList: [
+                                    {
+                                      disabled: true,
+                                      name: 'onClick',
+                                      template:
+                                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    },
+                                  ],
+                                }}
+                                block={false}
+                                danger={false}
+                                disabled={__$$eval(() =>
+                                  item?.initiator?.admin ===
+                                  __$$context.props.authData?.user?.name
+                                    ? undefined
+                                    : 'disabled'
+                                )}
+                                ghost={false}
+                                onClick={function () {
+                                  return this.onMenuClick.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([
+                                        {
+                                          record: item,
+                                          key: 'delete',
+                                        },
+                                      ])
+                                  );
+                                }.bind(__$$context)}
+                                ref={this._refsManager.linkRef(
+                                  'button-f764a5d7'
+                                )}
+                                shape="default"
+                                type="link"
+                              >
+                                {this.i18n('i18n-dpjl9tfj') /* 删除网络 */}
+                              </Button>
+                            )}
                           </Col>
                           <Col />
                         </Row>,
@@ -980,23 +1002,38 @@ class Network$$Page extends React.Component {
                                   time={__$$eval(() => item?.expiredTime)}
                                 />
                               </Col>
-                              <Col __component_name="Col" span={24}>
-                                <Typography.Time
-                                  __component_name="Typography.Time"
-                                  format=""
-                                  relativeTime={true}
-                                  time={__$$eval(() => item?.expiredTime)}
-                                />
-                                <Typography.Text
-                                  __component_name="Typography.Text"
-                                  disabled={false}
-                                  ellipsis={true}
-                                  strong={false}
-                                  style={{ fontSize: '' }}
+                              {!!__$$eval(() => item?.expiredTime) && (
+                                <Col
+                                  __component_name="Col"
+                                  ref={this._refsManager.linkRef(
+                                    'col-03e47256'
+                                  )}
+                                  span=""
                                 >
-                                  {this.i18n('i18n-9v1fm4itv3m') /* 过期 */}
-                                </Typography.Text>
-                              </Col>
+                                  <Typography.Time
+                                    __component_name="Typography.Time"
+                                    format=""
+                                    relativeTime={true}
+                                    time={__$$eval(
+                                      () => item?.expiredTime || ''
+                                    )}
+                                  />
+                                  {!!__$$eval(() => item?.expiredTime) && (
+                                    <Typography.Text
+                                      __component_name="Typography.Text"
+                                      disabled={false}
+                                      ellipsis={true}
+                                      ref={this._refsManager.linkRef(
+                                        'typography.text-e6fedf4d'
+                                      )}
+                                      strong={false}
+                                      style={{ fontSize: '' }}
+                                    >
+                                      {this.i18n('i18n-9v1fm4itv3m') /* 过期 */}
+                                    </Typography.Text>
+                                  )}
+                                </Col>
+                              )}
                             </Row>
                           }
                         </Descriptions.Item>
