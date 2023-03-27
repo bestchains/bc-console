@@ -54,7 +54,19 @@ class NetworkContractDetail$$Page extends React.Component {
     console.log('will unmount');
   }
 
+  testFunc() {
+    console.log('test aliLowcode func');
+    return /*#__PURE__*/ React.createElement(
+      'div',
+      {
+        className: 'test-aliLowcode-func',
+      },
+      this.state.test
+    );
+  }
+
   componentDidMount() {
+    console.log(this);
     console.log('did mount');
   }
 
@@ -90,7 +102,7 @@ class NetworkContractDetail$$Page extends React.Component {
                   style={{}}
                   type="default"
                 >
-                  <Row __component_name="Row" wrap={true} style={{}}>
+                  <Row __component_name="Row" style={{}} wrap={true}>
                     <Col __component_name="Col" span={24}>
                       <Typography.Title
                         __component_name="Typography.Title"
@@ -208,7 +220,12 @@ class NetworkContractDetail$$Page extends React.Component {
                               <UnifiedLink
                                 __component_name="UnifiedLink"
                                 target="_blank"
-                                to="https://alibaba.com"
+                                to={__$$eval(
+                                  () =>
+                                    this.props.appHelper?.constants
+                                      ?.downloadMinioUrl +
+                                    `bucket=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.bucket}&object=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.object}`
+                                )}
                               >
                                 {this.i18n('i18n-r1gt8gfi') /* 下载 */}
                               </UnifiedLink>
@@ -331,7 +348,12 @@ class NetworkContractDetail$$Page extends React.Component {
                             <UnifiedLink
                               __component_name="UnifiedLink"
                               target="_blank"
-                              to="https://alibaba.com"
+                              to={__$$eval(
+                                () =>
+                                  this.props.appHelper?.constants
+                                    ?.downloadMinioUrl +
+                                  `?bucket=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.bucket}&object=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.object}`
+                              )}
                             >
                               {this.i18n('i18n-r1gt8gfi') /* 下载 */}
                             </UnifiedLink>
@@ -355,8 +377,8 @@ class NetworkContractDetail$$Page extends React.Component {
                 >
                   <Row
                     __component_name="Row"
-                    wrap={true}
                     style={{ display: 'flex' }}
+                    wrap={true}
                   >
                     <Col __component_name="Col" span={24}>
                       <Typography.Title
@@ -391,7 +413,7 @@ class NetworkContractDetail$$Page extends React.Component {
                         )}
                         pagination={false}
                         rowKey="id"
-                        scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
+                        scroll={{ scrollToFirstRowOnChange: false, y: 180 }}
                         showHeader={true}
                         size="small"
                       />
@@ -475,9 +497,14 @@ class NetworkContractDetail$$Page extends React.Component {
                         loading={__$$eval(
                           () => this.props.useGetChaincodebuild?.loading
                         )}
-                        pagination={false}
+                        pagination={{
+                          showQuickJumper: false,
+                          showSizeChanger: false,
+                          simple: false,
+                          size: 'default',
+                        }}
                         rowKey="id"
-                        scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
+                        scroll={{ scrollToFirstRowOnChange: false, y: 180 }}
                         showHeader={true}
                         size="small"
                       />
@@ -556,7 +583,7 @@ class NetworkContractDetail$$Page extends React.Component {
                         )}
                         pagination={false}
                         rowKey="id"
-                        scroll={{ scrollToFirstRowOnChange: true, y: 180 }}
+                        scroll={{ scrollToFirstRowOnChange: false, y: 180 }}
                         showHeader={true}
                         size="small"
                       />

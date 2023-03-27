@@ -361,13 +361,24 @@ class Organization$$Page extends React.Component {
                 title: this.i18n('i18n-ycr2zketd3o') /* 组织名称 */,
                 'x-validator': [
                   {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    message:
+                      this.i18n('i18n-wprl86g5wy') /* 字符长度为 3 ~ 20 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_LENGTH_REG),
+                    type: 'disabled',
+                  },
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
                     message:
                       this.i18n(
-                        'i18n-iiub6ybv6ms'
-                      ) /* 组织名称由 3 ~ 10 个大小写字母, 数字, 下划线组成 */,
-                    pattern: '^[a-z0-9_]{3,10}$',
-                    required: true,
-                    whitespace: true,
+                        'i18n-36661y2t'
+                      ) /* 由小写字母、数字、“-”组成，开头和结尾只能是字母或数字 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_K8S_REG),
+                    type: 'disabled',
                   },
                   {
                     children: '未知',

@@ -1248,10 +1248,10 @@ class FederationDetail$$Page extends React.Component {
                               type: 'success',
                             },
                             {
-                              id: 'Deployed',
                               children:
                                 this.i18n('i18n-1vangoko4yf') /* 正常 */,
                               icon: 'CheckCircleFilled',
+                              id: 'Deployed',
                               type: 'success',
                             },
                           ]}

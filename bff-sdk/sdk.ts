@@ -31,6 +31,8 @@ export type Chaincode = {
   __typename?: 'Chaincode';
   /** 通道 */
   channel?: Maybe<Scalars['String']>;
+  /** 名称(chaincodebuild.spec.id) */
+  displayName?: Maybe<Scalars['String']>;
   /** 策略 */
   epolicy?: Maybe<Scalars['String']>;
   /** name */
@@ -65,13 +67,17 @@ export type Chaincodebuild = {
   ibppeers?: Maybe<Array<SpecPeer>>;
   /** 发起者（组织） */
   initiator?: Maybe<Scalars['String']>;
+  /** MinIO信息 */
+  minio?: Maybe<MinIo>;
   /** metadata.name */
   name: Scalars['ID'];
   /** 所在网络 */
   network?: Maybe<Scalars['String']>;
   /** 组织 */
   organizations?: Maybe<Array<Organization>>;
-  /** 状态（Created时，才能部署升级） */
+  /** Pipeline Results */
+  pipelineImageUrl?: Maybe<Scalars['String']>;
+  /** 状态（为Created且pipelineImageUrl有值时，才能部署升级） */
   status?: Maybe<CrdStatusType>;
   /** 版本 */
   version?: Maybe<Scalars['String']>;
@@ -225,6 +231,12 @@ export type K8sV1StatusDetails = {
   uid?: Maybe<Scalars['String']>;
 };
 
+export type MinIo = {
+  __typename?: 'MinIO';
+  bucket?: Maybe<Scalars['String']>;
+  object?: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   /** 部署合约（返回true，只表示这个操作触发成功，而不是部署合约成功） */
@@ -237,6 +249,8 @@ export type Mutation = {
   chaincodebuildUpgrade: Chaincodebuild;
   /** 创建通道 */
   channelCreate: Channel;
+  /** 邀请组织 */
+  channelMemberUpdate: Scalars['Boolean'];
   /** 加入/去除Peer节点 */
   channelUpdate: Channel;
   /** 创建策略 */
@@ -291,6 +305,11 @@ export type MutationChaincodebuildUpgradeArgs = {
 export type MutationChannelCreateArgs = {
   channel: NewChannel;
   network: Scalars['String'];
+};
+
+export type MutationChannelMemberUpdateArgs = {
+  members: Array<Scalars['String']>;
+  name: Scalars['String'];
 };
 
 export type MutationChannelUpdateArgs = {
@@ -395,7 +414,7 @@ export type Network = {
   organizations?: Maybe<Array<Organization>>;
   /** 网络中的所有节点 */
   peers?: Maybe<Array<Ibppeer>>;
-  /** 状态 */
+  /** 状态（网络运行中：Deployed，网络停止：NetworkDissolved） */
   status?: Maybe<CrdStatusType>;
   /** 节点存储 */
   storage?: Maybe<Scalars['String']>;
@@ -440,7 +459,7 @@ export type NewChannel = {
   description?: InputMaybe<Scalars['String']>;
   /** 发起者（组织） */
   initiator: Scalars['String'];
-  /** 通道名称（channel name） */
+  /** 通道名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字`（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*）` */
   name: Scalars['String'];
   /** 配置成员（组织） */
   organizations?: InputMaybe<Array<Scalars['String']>>;
@@ -466,7 +485,7 @@ export type NewFederationInput = {
   description?: InputMaybe<Scalars['String']>;
   /** 发起者（当前用户所在的组织） */
   initiator: Scalars['String'];
-  /** 联盟名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*） */
+  /** 联盟名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字`（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*）` */
   name: Scalars['String'];
   /** 选择组织 */
   organizations?: InputMaybe<Array<Scalars['String']>>;
@@ -483,7 +502,7 @@ export type NewNetworkInput = {
   federation: Scalars['String'];
   /** 发起者（当前用户所在的组织） */
   initiator: Scalars['String'];
-  /** 网络名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*） */
+  /** 网络名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字`（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*）` */
   name: Scalars['String'];
   /** 共识算法 */
   ordererType?: InputMaybe<Scalars['String']>;
@@ -496,7 +515,7 @@ export type NewOrganizationInput = {
   description?: InputMaybe<Scalars['String']>;
   /** 展示名 */
   displayName?: InputMaybe<Scalars['String']>;
-  /** 组织名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*） */
+  /** 组织名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字`（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*）` */
   name: Scalars['String'];
 };
 
@@ -618,6 +637,8 @@ export enum ProposalType {
   DissolveNetworkProposal = 'DissolveNetworkProposal',
   /** UnarchiveChannelProposal */
   UnarchiveChannelProposal = 'UnarchiveChannelProposal',
+  /** 通道邀请组织的提议 */
+  UpdateChannelMemberProposal = 'UpdateChannelMemberProposal',
   /** 更新合约时创建的提议 */
   UpgradeChaincodeProposal = 'UpgradeChaincodeProposal',
 }
@@ -869,6 +890,7 @@ export type GetChaincodebuildsQuery = {
     creationTimestamp?: string | null;
     version?: string | null;
     status?: CrdStatusType | null;
+    pipelineImageUrl?: string | null;
     network?: string | null;
     initiator?: string | null;
     ibppeers?: Array<{ __typename?: 'SpecPeer'; name?: string | null }> | null;
@@ -889,6 +911,7 @@ export type GetChaincodebuildQuery = {
     creationTimestamp?: string | null;
     version?: string | null;
     status?: CrdStatusType | null;
+    pipelineImageUrl?: string | null;
     network?: string | null;
     initiator?: string | null;
     organizations?: Array<{ __typename?: 'Organization'; name: string }> | null;
@@ -906,6 +929,11 @@ export type GetChaincodebuildQuery = {
         value: string;
       }> | null;
     }> | null;
+    minio?: {
+      __typename?: 'MinIO';
+      bucket?: string | null;
+      object?: string | null;
+    } | null;
   };
 };
 
@@ -963,7 +991,11 @@ export type GetChannelQuery = {
       description?: string | null;
       creationTimestamp?: string | null;
     }> | null;
-    members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
+    members?: Array<{
+      __typename?: 'SpecMember';
+      name?: string | null;
+      joinedAt?: string | null;
+    }> | null;
     peers?: Array<{
       __typename?: 'SpecPeer';
       name?: string | null;
@@ -972,6 +1004,7 @@ export type GetChannelQuery = {
     chaincode?: Array<{
       __typename?: 'Chaincode';
       name: string;
+      displayName?: string | null;
       version?: string | null;
       phase?: ChaincodePhase | null;
     }> | null;
@@ -1018,6 +1051,16 @@ export type UpdateChannelMutation = {
       namespace?: string | null;
     }> | null;
   };
+};
+
+export type UpdateMemberChannelMutationVariables = Exact<{
+  name: Scalars['String'];
+  members: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+export type UpdateMemberChannelMutation = {
+  __typename?: 'Mutation';
+  channelMemberUpdate: boolean;
 };
 
 export type GetChannelProfileQueryVariables = Exact<{
@@ -1376,12 +1419,14 @@ export type GetNetworkQuery = {
       members?: Array<{
         __typename?: 'SpecMember';
         name?: string | null;
+        joinedAt?: string | null;
       }> | null;
       peers?: Array<{
         __typename?: 'SpecPeer';
         name?: string | null;
         namespace?: string | null;
       }> | null;
+      chaincode?: Array<{ __typename?: 'Chaincode'; name: string }> | null;
     }> | null;
   };
 };
@@ -1685,6 +1730,7 @@ export const GetChaincodebuildsDocument = gql`
       creationTimestamp
       version
       status
+      pipelineImageUrl
       network
       initiator
       ibppeers {
@@ -1704,6 +1750,7 @@ export const GetChaincodebuildDocument = gql`
       creationTimestamp
       version
       status
+      pipelineImageUrl
       network
       initiator
       organizations {
@@ -1719,6 +1766,10 @@ export const GetChaincodebuildDocument = gql`
           name
           value
         }
+      }
+      minio {
+        bucket
+        object
       }
     }
   }
@@ -1774,6 +1825,7 @@ export const GetChannelDocument = gql`
       }
       members {
         name
+        joinedAt
       }
       peers {
         name
@@ -1781,6 +1833,7 @@ export const GetChannelDocument = gql`
       }
       chaincode {
         name
+        displayName
         version
         phase
       }
@@ -1817,6 +1870,11 @@ export const UpdateChannelDocument = gql`
       creationTimestamp
       status
     }
+  }
+`;
+export const UpdateMemberChannelDocument = gql`
+  mutation updateMemberChannel($name: String!, $members: [String!]!) {
+    channelMemberUpdate(name: $name, members: $members)
   }
 `;
 export const GetChannelProfileDocument = gql`
@@ -2082,10 +2140,14 @@ export const GetNetworkDocument = gql`
         name
         members {
           name
+          joinedAt
         }
         peers {
           name
           namespace
+        }
+        chaincode {
+          name
         }
         creationTimestamp
         status
@@ -2422,6 +2484,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
             ...wrappedRequestHeaders,
           }),
         'updateChannel',
+        'mutation'
+      );
+    },
+    updateMemberChannel(
+      variables: UpdateMemberChannelMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<UpdateMemberChannelMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<UpdateMemberChannelMutation>(UpdateMemberChannelDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'updateMemberChannel',
         'mutation'
       );
     },

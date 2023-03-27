@@ -425,16 +425,15 @@ class Federation$$Page extends React.Component {
                 'x-validator': [
                   {
                     message:
-                      this.i18n('i18n-wprl86g5wy') /* 字符长度为 3 ~ 20 */,
-                    pattern: '^[a-zA-Z0-9-\\u4e00-\\u9fa5]{3,20}$',
+                      this.i18n('i18n-o3gly28f') /* 长度为 3- 20 个字符 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_LENGTH_REG),
                   },
                   {
                     message:
                       this.i18n(
-                        'i18n-neccml35hvq'
-                      ) /* 大小写字母, 数字, 中划线组成，开头和结尾只能是字母或数字 */,
-                    pattern:
-                      '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$',
+                        'i18n-36661y2t'
+                      ) /* 由小写字母、数字、“-”组成，开头和结尾只能是字母或数字 */,
+                    pattern: __$$eval(() => this?.constants?.NAME_K8S_REG),
                   },
                   {
                     children: '未知',

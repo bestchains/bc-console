@@ -360,6 +360,29 @@ class NetworkChannelDetail$$Page extends React.Component {
                           {
                             dataIndex: 'name',
                             key: 'name',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      `${record?.displayName || '-'}(${
+                                        record?.name
+                                      })`
+                                  )}
+                                </Typography.Text>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-9e87qfos') /* 名称 */,
                           },
                           {
