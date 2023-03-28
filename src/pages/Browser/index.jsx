@@ -16,11 +16,16 @@ import {
   Table,
   Button,
   DatePicker,
+  Select,
   Input,
 } from '@tenx-ui/materials';
 
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
+
+import { createFetchHandler as __$$createFetchRequestHandler } from '@alilc/lowcode-datasource-fetch-handler';
+
+import { create as __$$createDataSourceEngine } from '@alilc/lowcode-datasource-engine/runtime';
 
 import utils, { RefsManager } from '../../utils';
 
@@ -32,6 +37,20 @@ import './index.css';
 
 class Browser$$Page extends React.Component {
   _context = this;
+
+  _dataSourceConfig = this._defineDataSourceConfig();
+  _dataSourceEngine = __$$createDataSourceEngine(this._dataSourceConfig, this, {
+    runtimeConfig: true,
+    requestHandlersMap: { fetch: __$$createFetchRequestHandler() },
+  });
+
+  get dataSourceMap() {
+    return this._dataSourceEngine.dataSourceMap || {};
+  }
+
+  reloadDataSource = async () => {
+    await this._dataSourceEngine.reloadDataSource();
+  };
 
   get constants() {
     return __$$constants || {};
@@ -50,23 +69,30 @@ class Browser$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      block: {
-        time: [undefined, undefined],
-        size: 10,
-        current: 1,
-        record: {},
-      },
-      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
-      overview: {},
-      searchKey: 'name',
+      filter: 'ALL',
       searchValue: undefined,
-      transaction: {
-        time: [undefined, undefined],
+      searchKey: 'name',
+      network: '',
+      tab: 'overview',
+      myChannels: [],
+      overview: {},
+      block: {
+        time: null,
         size: 10,
         current: 1,
         record: {},
+        list: [],
+        loading: false,
+      },
+      transaction: {
+        time: null,
+        size: 10,
+        current: 1,
+        record: {},
+        list: [],
+        loading: false,
       },
     };
   }
@@ -79,8 +105,124 @@ class Browser$$Page extends React.Component {
     return this._refsManager.getAll(refName);
   };
 
-  componentWillUnmount() {
-    console.log('will unmount');
+  _defineDataSourceConfig() {
+    const _this = this;
+    return {
+      list: [
+        {
+          id: 'getBrowserBlocks',
+          isInit: function () {
+            return false;
+          },
+          options: function () {
+            return {
+              headers: {},
+              isCors: true,
+              method: 'GET',
+              params: {
+                blockHash: _this.state.block.blockHash,
+                blockNumber: _this.state.searchValue,
+                endTime: _this.formatTimeParams(_this.state.block.time?.[1]),
+                from: (_this.state.block.current - 1) * 10,
+                size: _this.state.block.size,
+                startTime: _this.formatTimeParams(_this.state.block.time?.[0]),
+              },
+              timeout: 5000,
+              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/blocks`,
+            };
+          },
+          type: 'fetch',
+        },
+        {
+          id: 'getBrowserTransactions',
+          isInit: function () {
+            return false;
+          },
+          options: function () {
+            return {
+              headers: {},
+              isCors: true,
+              method: 'GET',
+              params: {
+                blockNumber: _this.state.searchValue,
+                endTime: _this.formatTimeParams(
+                  _this.state.transaction.time?.[1]
+                ),
+                from: (_this.state.transaction.current - 1) * 10,
+                size: _this.state.transaction.size,
+                startTime: _this.formatTimeParams(
+                  _this.state.transaction.time?.[0]
+                ),
+              },
+              timeout: 5000,
+              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/transactions`,
+            };
+          },
+          type: 'fetch',
+        },
+        {
+          id: 'getOverview',
+          isInit: function () {
+            return false;
+          },
+          options: function () {
+            return {
+              headers: {},
+              isCors: true,
+              method: 'GET',
+              params: {},
+              timeout: 5000,
+              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/overview`,
+            };
+          },
+          type: 'fetch',
+        },
+      ],
+    };
+  }
+
+  componentWillUnmount() {}
+
+  formatTimeParams(v) {
+    return v ? parseInt(new Date(v).getTime() / 1000) : undefined;
+  }
+
+  async getMyChannels() {
+    try {
+      var _ref, _ref$concat, _myChannels$;
+      const res = await this.props.appHelper.utils.bff.getMyChannels();
+      const myChannels =
+        ((_ref = [
+          {
+            network: 'blkexp',
+            name: 'blkexp6',
+          },
+        ]) === null || _ref === void 0
+          ? void 0
+          : (_ref$concat = _ref.concat(
+              res === null || res === void 0 ? void 0 : res.channels
+            )) === null || _ref$concat === void 0
+          ? void 0
+          : _ref$concat.map((item) => ({
+              value: `${item.network}_${item.name}`,
+              label: `${item.network}_${item.name}`,
+            }))) || [];
+      this.setState(
+        {
+          myChannels,
+          network:
+            myChannels === null || myChannels === void 0
+              ? void 0
+              : (_myChannels$ = myChannels[0]) === null ||
+                _myChannels$ === void 0
+              ? void 0
+              : _myChannels$.value,
+        },
+        () => {
+          this.loadData();
+        }
+      );
+    } catch (error) {}
   }
 
   closeModal() {
@@ -89,106 +231,161 @@ class Browser$$Page extends React.Component {
     });
   }
 
-  handleBlockPaginationChange(c, s) {
-    this.setState({
-      block: {
-        ...this.state.block,
-        size: s,
-        current: c,
-      },
-    });
+  paginationShowTotal(a, b) {
+    return this.utils.paginationShowTotal(a, b, this);
   }
 
-  handleBlockReset() {
-    // edit
+  getBrowserBlocks() {
     this.setState({
       block: {
         ...this.state.block,
-        time: [undefined, undefined],
+        loading: true,
+      },
+    });
+    this.dataSourceMap.getBrowserBlocks
+      .load({})
+      .then((res) => {
+        this.setState({
+          block: {
+            ...this.state.block,
+            total: res === null || res === void 0 ? void 0 : res.count,
+            list: res === null || res === void 0 ? void 0 : res.data,
+            loading: false,
+          },
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          block: {
+            ...this.state.block,
+            total: 0,
+            list: [],
+            loading: false,
+          },
+        });
+      });
+  }
+
+  getBrowserTransactions() {
+    this.setState({
+      transaction: {
+        ...this.state.transaction,
+        loading: true,
+      },
+    });
+    this.dataSourceMap.getBrowserTransactions
+      .load({})
+      .then((res) => {
+        this.setState({
+          transaction: {
+            ...this.state.transaction,
+            total: res === null || res === void 0 ? void 0 : res.count,
+            list: res === null || res === void 0 ? void 0 : res.data,
+            loading: false,
+          },
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          transaction: {
+            ...this.state.transaction,
+            total: 0,
+            list: [],
+            loading: false,
+          },
+        });
+      });
+  }
+
+  getOverview() {
+    this.setState({
+      overview: {
+        ...this.state.overview,
+        loading: true,
+      },
+    });
+    this.dataSourceMap.getOverview
+      .load({})
+      .then((res) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            data: res || {},
+            loading: false,
+          },
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            data: {},
+            loading: false,
+          },
+        });
+      });
+  }
+
+  loadData() {
+    if (this.state.tab === 'overview') {
+      this.getOverview();
+      this.setState(
+        {
+          time: null,
+          current: 1,
+        },
+        this.getBrowserBlocks
+      );
+      this.setState(
+        {
+          time: null,
+          current: 1,
+        },
+        this.getBrowserTransactions
+      );
+    }
+    if (!this.state.network) return;
+    if (this.state.tab === 'block') {
+      this.getBrowserBlocks();
+    }
+    if (this.state.tab === 'transaction') {
+      this.getBrowserTransactions();
+    }
+  }
+
+  handleNetworkChannelChange(v) {
+    this.setState(
+      {
+        network: v,
         current: 1,
       },
+      this.loadData
+    );
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
     });
   }
 
-  handleBlockSearch() {
-    // edit
-    this.setState({
-      block: {
-        ...this.state.block,
+  handleSearch(value, event) {
+    this.setState(
+      {
         current: 1,
       },
-    });
+      this.loadData
+    );
   }
 
-  handleBlockTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      block: {
-        ...this.state.block,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  handleBlockTimeChange(v) {
-    this.setState({
-      block: {
-        ...this.state.block,
-        time: v,
-      },
-    });
-  }
-
-  handleTransactionPaginationChange(c, s) {
-    this.setState({
-      transaction: {
-        ...this.state.transaction,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleTransactionReset() {
-    // edit
-    this.setState({
-      transaction: {
-        ...this.state.transaction,
-        time: [undefined, undefined],
+  handleTabChange(v) {
+    this.setState(
+      {
+        tab: v,
         current: 1,
       },
-    });
-  }
-
-  handleTransactionSearch() {
-    // edit
-    this.setState({
-      transaction: {
-        ...this.state.transaction,
-        current: 1,
-      },
-    });
-  }
-
-  handleTransactionTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      transaction: {
-        ...this.state.transaction,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  handleTransactionTimeChange(v) {
-    this.setState({
-      transaction: {
-        ...this.state.transaction,
-        time: v,
-      },
-    });
+      this.loadData
+    );
   }
 
   openBlockDetailModal(e, { record }) {
@@ -206,6 +403,109 @@ class Browser$$Page extends React.Component {
     });
   }
 
+  handleBlockPaginationChange(c, s) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          size: s,
+          current: c,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          pagination,
+          filters,
+          sorter,
+          size: pagination.pageSize,
+          current: pagination.current,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockSearch() {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockReset() {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          time: null,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockTimeChange(v) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          time: v,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionSearch() {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionReset() {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          time: null,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionTimeChange(v) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          time: v,
+        },
+      },
+      this.loadData
+    );
+  }
+
   openTransactionDetailModal(e, { record }) {
     this.setState({
       isOpenModal: true,
@@ -217,12 +517,39 @@ class Browser$$Page extends React.Component {
     });
   }
 
-  paginationShowTotal(a, b) {
-    return this.utils.paginationShowTotal(a, b, this);
+  handleTransactionPaginationChange(c, s) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          size: s,
+          current: c,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          pagination,
+          filters,
+          sorter,
+          size: pagination.pageSize,
+          current: pagination.current,
+        },
+      },
+      this.loadData
+    );
   }
 
   componentDidMount() {
-    console.log('did mount');
+    this._dataSourceEngine.reloadDataSource();
+
+    this.getMyChannels();
   }
 
   render() {
@@ -300,7 +627,10 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () =>
+                        this.state.transaction?.record?.Network?.split(
+                          '-'
+                        )?.[1] || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -318,7 +648,7 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.BlockNumber || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -332,7 +662,9 @@ class Browser$$Page extends React.Component {
                     __component_name="Typography.Time"
                     format=""
                     relativeTime={false}
-                    time={__$$eval(() => this.state.transaction?.record?.name)}
+                    time={__$$eval(
+                      () => this.state.transaction?.record?.CreatedAt * 1000
+                    )}
                   />
                 ),
                 key: 'ns3ahlga1n',
@@ -349,7 +681,7 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.TxCount || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -364,10 +696,10 @@ class Browser$$Page extends React.Component {
                     disabled={false}
                     ellipsis={true}
                     strong={false}
-                    style={{ fontSize: '' }}
+                    style={{ fontSize: '', width: '330px' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.BlockHash || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -385,7 +717,7 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.DataHash || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -403,7 +735,8 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () =>
+                        this.state.transaction?.record?.PreviousBlockHash || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -431,7 +764,10 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(
+                    () =>
+                      this.state.block?.record?.Network?.split('_')?.[1] || '-'
+                  )}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -448,7 +784,7 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(() => this.state.block?.record?.BlockNumber || '-')}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -462,7 +798,9 @@ class Browser$$Page extends React.Component {
                   __component_name="Typography.Time"
                   format=""
                   relativeTime={false}
-                  time={__$$eval(() => this.state.transaction?.record?.name)}
+                  time={__$$eval(
+                    () => this.state.block?.record?.CreatedAt * 1000
+                  )}
                 />
               }
             </Descriptions.Item>
@@ -479,7 +817,7 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(() => this.state.block?.record?.TxCount || '-')}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -494,9 +832,9 @@ class Browser$$Page extends React.Component {
                   disabled={false}
                   ellipsis={true}
                   strong={false}
-                  style={{ fontSize: '' }}
+                  style={{ fontSize: '', width: '330px' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(() => this.state.block?.record?.BlockHash || '-')}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -511,9 +849,9 @@ class Browser$$Page extends React.Component {
                   disabled={false}
                   ellipsis={true}
                   strong={false}
-                  style={{ fontSize: '' }}
+                  style={{ fontSize: '', width: '330px' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(() => this.state.block?.record?.DataHash || '-')}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -528,9 +866,11 @@ class Browser$$Page extends React.Component {
                   disabled={false}
                   ellipsis={true}
                   strong={false}
-                  style={{ fontSize: '' }}
+                  style={{ fontSize: '', width: '330px' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(
+                    () => this.state.block?.record?.PrevioudBlockHash || '-'
+                  )}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -604,11 +944,9 @@ class Browser$$Page extends React.Component {
                     disabled={false}
                     ellipsis={true}
                     strong={false}
-                    style={{ fontSize: '' }}
+                    style={{ fontSize: '', width: '290px' }}
                   >
-                    {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
-                    )}
+                    {__$$eval(() => this.state.transaction?.record?.ID || '-')}
                   </Typography.Text>
                 ),
                 key: 'h495bbtwdkj',
@@ -625,7 +963,9 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () =>
+                        this.state.transaction?.record?.ValidationCode + '' ||
+                        '-'
                     )}
                   </Typography.Text>
                 ),
@@ -637,13 +977,25 @@ class Browser$$Page extends React.Component {
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
+                    copyable={{
+                      _unsafe_MixedSetter_text_select: 'VariableSetter',
+                      text: __$$eval(
+                        () =>
+                          this.utils.decodeBase64(
+                            this.state.transaction?.record?.Payload || ''
+                          ) || '-'
+                      ),
+                    }}
                     disabled={false}
                     ellipsis={true}
                     strong={false}
-                    style={{ fontSize: '' }}
+                    style={{ fontSize: '', width: '290px' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () =>
+                        this.utils.decodeBase64(
+                          this.state.transaction?.record?.Payload || ''
+                        ) || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -661,25 +1013,7 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
-                    )}
-                  </Typography.Text>
-                ),
-                key: 'ktjd25sp5ae',
-                label: this.i18n('i18n-1pf627eu') /* 交易数 */,
-                span: 1,
-              },
-              {
-                children: (
-                  <Typography.Text
-                    __component_name="Typography.Text"
-                    disabled={false}
-                    ellipsis={true}
-                    strong={false}
-                    style={{ fontSize: '' }}
-                  >
-                    {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.Creator || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -697,25 +1031,7 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
-                    )}
-                  </Typography.Text>
-                ),
-                key: 'p7lbf52pjyn',
-                label: this.i18n('i18n-hnd99uip') /* 背书节点 */,
-                span: 1,
-              },
-              {
-                children: (
-                  <Typography.Text
-                    __component_name="Typography.Text"
-                    disabled={false}
-                    ellipsis={true}
-                    strong={false}
-                    style={{ fontSize: '' }}
-                  >
-                    {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.ChaincodeID || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -733,7 +1049,7 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.Type || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -746,8 +1062,13 @@ class Browser$$Page extends React.Component {
                   <Typography.Time
                     __component_name="Typography.Time"
                     format=""
+                    ref={this._refsManager.linkRef('typography.time-a1872598')}
                     relativeTime={false}
-                    time={__$$eval(() => this.state.transaction?.record?.name)}
+                    time={__$$eval(
+                      () =>
+                        this.state.transaction?.record?.CreatedAt &&
+                        this.state.transaction.record.CreatedAt * 1000
+                    )}
                   />
                 ),
                 key: 'ns3ahlga1n',
@@ -790,9 +1111,9 @@ class Browser$$Page extends React.Component {
                   disabled={false}
                   ellipsis={true}
                   strong={false}
-                  style={{ fontSize: '' }}
+                  style={{ fontSize: '', width: '290px' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(() => this.state.transaction?.record?.ID || '-')}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -809,7 +1130,10 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(
+                    () =>
+                      this.state.transaction?.record?.ValidationCode + '' || '-'
+                  )}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -821,29 +1145,26 @@ class Browser$$Page extends React.Component {
               {
                 <Typography.Text
                   __component_name="Typography.Text"
+                  copyable={{
+                    _unsafe_MixedSetter_text_select: 'VariableSetter',
+                    text: __$$eval(
+                      () =>
+                        this.utils.decodeBase64(
+                          this.state.transaction?.record?.Payload || ''
+                        ) || '-'
+                    ),
+                  }}
                   disabled={false}
                   ellipsis={true}
                   strong={false}
-                  style={{ fontSize: '' }}
+                  style={{ fontSize: '', width: '290px' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
-                </Typography.Text>
-              }
-            </Descriptions.Item>
-            <Descriptions.Item
-              key="ktjd25sp5ae"
-              label={this.i18n('i18n-1pf627eu') /* 交易数 */}
-              span={1}
-            >
-              {
-                <Typography.Text
-                  __component_name="Typography.Text"
-                  disabled={false}
-                  ellipsis={true}
-                  strong={false}
-                  style={{ fontSize: '' }}
-                >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(
+                    () =>
+                      this.utils.decodeBase64(
+                        this.state.transaction?.record?.Payload || ''
+                      ) || '-'
+                  )}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -860,24 +1181,9 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
-                </Typography.Text>
-              }
-            </Descriptions.Item>
-            <Descriptions.Item
-              key="p7lbf52pjyn"
-              label={this.i18n('i18n-hnd99uip') /* 背书节点 */}
-              span={1}
-            >
-              {
-                <Typography.Text
-                  __component_name="Typography.Text"
-                  disabled={false}
-                  ellipsis={true}
-                  strong={false}
-                  style={{ fontSize: '' }}
-                >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(
+                    () => this.state.transaction?.record?.Creator || '-'
+                  )}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -894,7 +1200,9 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(
+                    () => this.state.transaction?.record?.ChaincodeID || '-'
+                  )}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -911,7 +1219,7 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(() => this.state.transaction?.record?.Type || '-')}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -924,8 +1232,13 @@ class Browser$$Page extends React.Component {
                 <Typography.Time
                   __component_name="Typography.Time"
                   format=""
+                  ref={this._refsManager.linkRef('typography.time-a1872598')}
                   relativeTime={false}
-                  time={__$$eval(() => this.state.transaction?.record?.name)}
+                  time={__$$eval(
+                    () =>
+                      this.state.transaction?.record?.CreatedAt &&
+                      this.state.transaction.record.CreatedAt * 1000
+                  )}
                 />
               }
             </Descriptions.Item>
@@ -962,6 +1275,41 @@ class Browser$$Page extends React.Component {
           </Col>
           <Col __component_name="Col" span={24}>
             <Tabs
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onChange',
+                    relatedEventName: 'handleTabChange',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onChange',
+                    template:
+                      "onChange(activeKey,${extParams}){\n// 切换面板的回调\nconsole.log('onChange',activeKey);}",
+                  },
+                  {
+                    disabled: false,
+                    name: 'onEdit',
+                    template:
+                      "onEdit(targetKey,action,${extParams}){\n// 新增和删除页签的回调\nconsole.log('onEdit',targetKey,action);}",
+                  },
+                  {
+                    disabled: false,
+                    name: 'onTabClick',
+                    template:
+                      "onTabClick(key,event,${extParams}){\n// tab 被点击的回调\nconsole.log('onTabClick',key,event);}",
+                  },
+                  {
+                    disabled: false,
+                    name: 'onTabScroll',
+                    template:
+                      "onTabScroll({direction},${extParams}){\n// tab 滚动时触\nconsole.log('onTabScroll',direction);}",
+                  },
+                ],
+              }}
               destroyInactiveTabPane="true"
               items={[
                 {
@@ -1348,8 +1696,8 @@ class Browser$$Page extends React.Component {
                                         __component_name="Table"
                                         columns={[
                                           {
-                                            dataIndex: 'name',
-                                            key: 'name',
+                                            dataIndex: 'BlockNumber',
+                                            key: 'BlockNumber',
                                             render: (text, record, index) =>
                                               ((__$$context) => (
                                                 <Button
@@ -1394,7 +1742,8 @@ class Browser$$Page extends React.Component {
                                                   type="link"
                                                 >
                                                   {__$$eval(
-                                                    () => record?.name || '-'
+                                                    () =>
+                                                      record?.BlockNumber || '-'
                                                   )}
                                                 </Button>
                                               ))(
@@ -1409,24 +1758,47 @@ class Browser$$Page extends React.Component {
                                               ) /* 区块高度 */,
                                           },
                                           {
-                                            dataIndex: 'name',
-                                            key: 'name',
+                                            dataIndex: 'BlockHash',
+                                            key: 'BlockHash',
                                             title:
                                               this.i18n(
                                                 'i18n-9a9nh7iu'
                                               ) /* 区块哈希 */,
+                                            render: (text, record, index) =>
+                                              ((__$$context) => (
+                                                <Typography.Text
+                                                  __component_name="Typography.Text"
+                                                  ellipsis={true}
+                                                  style={{
+                                                    fontSize: '',
+                                                    width: '100px',
+                                                  }}
+                                                  disabled={false}
+                                                  strong={false}
+                                                >
+                                                  {__$$eval(
+                                                    () =>
+                                                      record?.BlockHash || '-'
+                                                  )}
+                                                </Typography.Text>
+                                              ))(
+                                                __$$createChildContext(
+                                                  __$$context,
+                                                  { text, record, index }
+                                                )
+                                              ),
                                           },
                                           {
-                                            dataIndex: 'name',
-                                            key: 'name',
+                                            dataIndex: 'TxCount',
+                                            key: 'TxCount',
                                             title:
                                               this.i18n(
                                                 'i18n-1pf627eu'
                                               ) /* 交易数 */,
                                           },
                                           {
-                                            dataIndex: 'name',
-                                            key: 'name',
+                                            dataIndex: 'CreatedAt',
+                                            key: 'CreatedAt',
                                             render: (text, record, index) =>
                                               ((__$$context) => (
                                                 <Typography.Time
@@ -1434,7 +1806,9 @@ class Browser$$Page extends React.Component {
                                                   format=""
                                                   relativeTime={false}
                                                   time={__$$eval(
-                                                    () => record?.name
+                                                    () =>
+                                                      record?.CreatedAt &&
+                                                      record?.CreatedAt * 1000
                                                   )}
                                                 />
                                               ))(
@@ -1449,18 +1823,23 @@ class Browser$$Page extends React.Component {
                                               ) /* 出块时间 */,
                                           },
                                         ]}
-                                        dataSource={__$$eval(() => [
-                                          {
-                                            name: '111',
-                                          },
-                                        ])}
+                                        dataSource={__$$eval(
+                                          () =>
+                                            this.state.block?.list?.slice(
+                                              0,
+                                              5
+                                            ) || []
+                                        )}
                                         pagination={false}
-                                        rowKey="id"
+                                        rowKey="BlockNumber"
                                         scroll={{
                                           scrollToFirstRowOnChange: true,
                                         }}
                                         showHeader={true}
                                         size="small"
+                                        loading={__$$eval(
+                                          () => this.state.block?.loading
+                                        )}
                                       />
                                     </Col>
                                   </Row>
@@ -1503,10 +1882,32 @@ class Browser$$Page extends React.Component {
                                               this.i18n(
                                                 'i18n-dnzjf5qx'
                                               ) /* 交易哈希 */,
+                                            render: (text, record, index) =>
+                                              ((__$$context) => (
+                                                <Typography.Text
+                                                  __component_name="Typography.Text"
+                                                  ellipsis={true}
+                                                  style={{
+                                                    fontSize: '',
+                                                    width: '100px',
+                                                  }}
+                                                  disabled={false}
+                                                  strong={false}
+                                                >
+                                                  {__$$eval(
+                                                    () => record?.ID || '-'
+                                                  )}
+                                                </Typography.Text>
+                                              ))(
+                                                __$$createChildContext(
+                                                  __$$context,
+                                                  { text, record, index }
+                                                )
+                                              ),
                                           },
                                           {
-                                            dataIndex: 'name',
-                                            key: 'name',
+                                            dataIndex: 'BlockNumber',
+                                            key: 'BlockNumber',
                                             title:
                                               this.i18n(
                                                 'i18n-4dh77hfc'
@@ -1522,7 +1923,9 @@ class Browser$$Page extends React.Component {
                                                   format=""
                                                   relativeTime={false}
                                                   time={__$$eval(
-                                                    () => record?.name
+                                                    () =>
+                                                      record?.CreatedAt &&
+                                                      record?.CreatedAt * 1000
                                                   )}
                                                 />
                                               ))(
@@ -1537,18 +1940,23 @@ class Browser$$Page extends React.Component {
                                               ) /* 交易时间 */,
                                           },
                                         ]}
-                                        dataSource={__$$eval(() => [
-                                          {
-                                            name: '111',
-                                          },
-                                        ])}
+                                        dataSource={__$$eval(
+                                          () =>
+                                            this.state.transaction?.list?.slice(
+                                              0,
+                                              5
+                                            ) || []
+                                        )}
                                         pagination={false}
-                                        rowKey="id"
+                                        rowKey="ID"
                                         scroll={{
                                           scrollToFirstRowOnChange: true,
                                         }}
                                         showHeader={true}
                                         size="small"
+                                        loading={__$$eval(
+                                          () => this.state.transaction?.loading
+                                        )}
                                       />
                                     </Col>
                                   </Row>
@@ -1588,8 +1996,7 @@ class Browser$$Page extends React.Component {
                                 eventDataList: [
                                   {
                                     name: 'onChange',
-                                    relatedEventName:
-                                      'handleTransactionTimeChange',
+                                    relatedEventName: 'handleBlockTimeChange',
                                     type: 'componentEvent',
                                   },
                                 ],
@@ -1617,7 +2024,7 @@ class Browser$$Page extends React.Component {
                               allowClear={true}
                               disabled={false}
                               onChange={function () {
-                                return this.handleTransactionTimeChange.apply(
+                                return this.handleBlockTimeChange.apply(
                                   this,
                                   Array.prototype.slice
                                     .call(arguments)
@@ -1761,31 +2168,53 @@ class Browser$$Page extends React.Component {
                         }}
                         columns={[
                           {
-                            dataIndex: 'name',
-                            key: 'name',
+                            dataIndex: 'BlockNumber',
+                            key: 'blockNumber',
                             title: this.i18n('i18n-o4hf8a4q') /* 区块号 */,
                           },
                           {
-                            dataIndex: 'name',
-                            key: 'age',
+                            dataIndex: 'Network',
+                            key: 'network',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      record?.Network?.split('_')?.[1] || '-'
+                                  )}
+                                </Typography.Text>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-6oadzcxin7k') /* 通道名称 */,
                           },
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'TxCount',
+                            key: 'txCount',
                             title: this.i18n('i18n-1pf627eu') /* 交易数 */,
                           },
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'BlockHash',
                             render: (text, record, index) =>
                               ((__$$context) => (
-                                <Button
-                                  __component_name="Button"
+                                <Typography.Text
+                                  __component_name="Typography.Text"
                                   __events={{
                                     eventDataList: [
                                       {
                                         name: 'onClick',
                                         paramStr:
-                                          '{\n\t"record":this.record\n}',
+                                          '{\n \t "record":this.record \n}',
                                         relatedEventName:
                                           'openBlockDetailModal',
                                         type: 'componentEvent',
@@ -1796,14 +2225,30 @@ class Browser$$Page extends React.Component {
                                         disabled: true,
                                         name: 'onClick',
                                         template:
-                                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          "onClick(event, ${extParams}){\n// \t点击 Text 时的回调\nconsole.log('onCopy');}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'copyable.onCopy',
+                                        template:
+                                          "onCopy(${extParams}){\n// 拷贝成功的回调函数\nconsole.log('onCopy');}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'ellipsis.onEllipsis',
+                                        template:
+                                          "onEllipsis(ellipsis,${extParams}){\n// 触发省略时的回调\nconsole.log('onEllipsis', ellipsis);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'ellipsis.onExpand',
+                                        template:
+                                          "onExpand(event,${extParams}){\n// 点击展开时的回调\nconsole.log('onExpand', event);}",
                                       },
                                     ],
                                   }}
-                                  block={false}
-                                  danger={false}
                                   disabled={false}
-                                  ghost={false}
+                                  ellipsis={true}
                                   onClick={function () {
                                     return this.openBlockDetailModal.apply(
                                       this,
@@ -1816,11 +2261,11 @@ class Browser$$Page extends React.Component {
                                         ])
                                     );
                                   }.bind(__$$context)}
-                                  shape="default"
-                                  type="link"
+                                  strong={false}
+                                  style={{ color: '#FE8F35', fontSize: '' }}
                                 >
-                                  {__$$eval(() => record?.name)}
-                                </Button>
+                                  {__$$eval(() => record?.BlockHash || '-')}
+                                </Typography.Text>
                               ))(
                                 __$$createChildContext(__$$context, {
                                   text,
@@ -1831,17 +2276,25 @@ class Browser$$Page extends React.Component {
                             title: this.i18n('i18n-1rb6qm57') /* 区块 hash */,
                           },
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'PrevioudBlockHash',
+                            ellipsis: { showTitle: true },
+                            key: 'preBlockHash',
                             title: this.i18n('i18n-nk62m3xg') /* 上一个 hash */,
                           },
                           {
+                            dataIndex: 'CreatedAt',
+                            key: 'createdAt',
                             render: (text, record, index) =>
                               ((__$$context) => (
                                 <Typography.Time
                                   __component_name="Typography.Time"
                                   format=""
                                   relativeTime={false}
-                                  time={__$$eval(() => record?.name)}
+                                  time={__$$eval(
+                                    () =>
+                                      record?.CreatedAt &&
+                                      record?.CreatedAt * 1000
+                                  )}
                                 />
                               ))(
                                 __$$createChildContext(__$$context, {
@@ -1853,15 +2306,35 @@ class Browser$$Page extends React.Component {
                             title: this.i18n('i18n-cs2mt1k7') /* 出块时间 */,
                           },
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'BlockSize',
+                            key: 'BlockSize',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(() =>
+                                    parseInt((record?.BlockSize || 0) / 1024)
+                                  )}
+                                </Typography.Text>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-etm3zsud') /* 大小（KB） */,
                           },
                         ]}
-                        dataSource={__$$eval(() => [
-                          {
-                            name: 'name111',
-                          },
-                        ])}
+                        dataSource={__$$eval(
+                          () => this.state.block?.list || []
+                        )}
+                        loading={__$$eval(() => this.state.block?.loading)}
                         onChange={function () {
                           return this.handleBlockTableChange.apply(
                             this,
@@ -1869,7 +2342,9 @@ class Browser$$Page extends React.Component {
                           );
                         }.bind(this)}
                         pagination={{
-                          current: 1,
+                          current: __$$eval(
+                            () => this.state.block?.current || 0
+                          ),
                           onChange: function () {
                             return this.handleBlockPaginationChange.apply(
                               this,
@@ -1882,7 +2357,7 @@ class Browser$$Page extends React.Component {
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this),
-                          pageSize: 10,
+                          pageSize: __$$eval(() => this.state.block?.size || 0),
                           showQuickJumper: false,
                           showSizeChanger: false,
                           showTotal: function () {
@@ -1893,10 +2368,10 @@ class Browser$$Page extends React.Component {
                           }.bind(this),
                           simple: false,
                           size: 'default',
-                          total: 15,
+                          total: __$$eval(() => this.state.block?.total || 0),
                         }}
                         ref={this._refsManager.linkRef('table-d32c6baa')}
-                        rowKey="name"
+                        rowKey="BlockNumber"
                         scroll={{ scrollToFirstRowOnChange: true }}
                         showHeader={true}
                         size="default"
@@ -2108,21 +2583,42 @@ class Browser$$Page extends React.Component {
                         }}
                         columns={[
                           {
-                            dataIndex: 'name',
-                            key: 'name',
+                            dataIndex: 'Creator',
+                            key: 'Creator',
                             title: this.i18n('i18n-wctt13ld2x') /* 发起者 */,
                           },
                           {
-                            dataIndex: 'name',
-                            key: 'age',
+                            dataIndex: 'Network',
+                            key: 'Network',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Text
+                                  __component_name="Typography.Text"
+                                  disabled={false}
+                                  ellipsis={true}
+                                  strong={false}
+                                  style={{ fontSize: '' }}
+                                >
+                                  {__$$eval(
+                                    () =>
+                                      record?.Network?.split('_')?.[1] || '-'
+                                  )}
+                                </Typography.Text>
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-6oadzcxin7k') /* 通道名称 */,
                           },
                           {
                             dataIndex: 'name',
                             render: (text, record, index) =>
                               ((__$$context) => (
-                                <Button
-                                  __component_name="Button"
+                                <Typography.Text
+                                  __component_name="Typography.Text"
                                   __events={{
                                     eventDataList: [
                                       {
@@ -2139,14 +2635,30 @@ class Browser$$Page extends React.Component {
                                         disabled: true,
                                         name: 'onClick',
                                         template:
-                                          "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                          "onClick(event, ${extParams}){\n// \t点击 Text 时的回调\nconsole.log('onCopy');}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'copyable.onCopy',
+                                        template:
+                                          "onCopy(${extParams}){\n// 拷贝成功的回调函数\nconsole.log('onCopy');}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'ellipsis.onEllipsis',
+                                        template:
+                                          "onEllipsis(ellipsis,${extParams}){\n// 触发省略时的回调\nconsole.log('onEllipsis', ellipsis);}",
+                                      },
+                                      {
+                                        disabled: false,
+                                        name: 'ellipsis.onExpand',
+                                        template:
+                                          "onExpand(event,${extParams}){\n// 点击展开时的回调\nconsole.log('onExpand', event);}",
                                       },
                                     ],
                                   }}
-                                  block={false}
-                                  danger={false}
                                   disabled={false}
-                                  ghost={false}
+                                  ellipsis={true}
                                   onClick={function () {
                                     return this.openTransactionDetailModal.apply(
                                       this,
@@ -2159,11 +2671,14 @@ class Browser$$Page extends React.Component {
                                         ])
                                     );
                                   }.bind(__$$context)}
-                                  shape="default"
-                                  type="link"
+                                  ref={this._refsManager.linkRef(
+                                    'typography.text-d27fa9ed'
+                                  )}
+                                  strong={false}
+                                  style={{ color: '#FE8F35', fontSize: '' }}
                                 >
-                                  {__$$eval(() => record?.name || '-')}
-                                </Button>
+                                  {__$$eval(() => record?.ID || '-')}
+                                </Typography.Text>
                               ))(
                                 __$$createChildContext(__$$context, {
                                   text,
@@ -2174,23 +2689,49 @@ class Browser$$Page extends React.Component {
                             title: this.i18n('i18n-wawjkqrp') /* 交易 */,
                           },
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'Type',
+                            key: 'Type',
                             title: this.i18n('i18n-9yrquy3v2y7') /* 类型 */,
                           },
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'ChaincodeID',
+                            key: 'ChaincodeID',
                             title: this.i18n('i18n-5rnqqm9p') /* 合约 */,
                           },
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'CreatedAt',
+                            key: 'CreatedAt',
+                            render: (text, record, index) =>
+                              ((__$$context) => (
+                                <Typography.Time
+                                  __component_name="Typography.Time"
+                                  format=""
+                                  ref={this._refsManager.linkRef(
+                                    'typography.time-b513b216'
+                                  )}
+                                  relativeTime={false}
+                                  time={__$$eval(
+                                    () =>
+                                      record?.CreatedAt &&
+                                      record?.CreatedAt * 1000
+                                  )}
+                                />
+                              ))(
+                                __$$createChildContext(__$$context, {
+                                  text,
+                                  record,
+                                  index,
+                                })
+                              ),
                             title: this.i18n('i18n-2scieorh') /* 时间戳 */,
                           },
                         ]}
-                        dataSource={__$$eval(() => [
-                          {
-                            name: 'name',
-                          },
-                        ])}
+                        dataSource={__$$eval(
+                          () => this.state.transaction?.list || []
+                        )}
+                        loading={__$$eval(
+                          () => this.state.transaction?.loading
+                        )}
                         onChange={function () {
                           return this.handleTransactionTableChange.apply(
                             this,
@@ -2198,7 +2739,9 @@ class Browser$$Page extends React.Component {
                           );
                         }.bind(this)}
                         pagination={{
-                          current: 1,
+                          current: __$$eval(
+                            () => this.state.transaction?.current || 0
+                          ),
                           onChange: function () {
                             return this.handleTransactionPaginationChange.apply(
                               this,
@@ -2211,7 +2754,9 @@ class Browser$$Page extends React.Component {
                               Array.prototype.slice.call(arguments).concat([])
                             );
                           }.bind(this),
-                          pageSize: 10,
+                          pageSize: __$$eval(
+                            () => this.state.transaction?.size || 0
+                          ),
                           showQuickJumper: false,
                           showSizeChanger: false,
                           showTotal: function () {
@@ -2222,10 +2767,12 @@ class Browser$$Page extends React.Component {
                           }.bind(this),
                           simple: false,
                           size: 'default',
-                          total: 15,
+                          total: __$$eval(
+                            () => this.state.transaction?.total || 0
+                          ),
                         }}
                         ref={this._refsManager.linkRef('table-d32c6baa')}
-                        rowKey="name"
+                        rowKey="ID"
                         scroll={{ scrollToFirstRowOnChange: true }}
                         showHeader={true}
                         size="default"
@@ -2236,6 +2783,13 @@ class Browser$$Page extends React.Component {
                   label: this.i18n('i18n-wawjkqrp') /* 交易 */,
                 },
               ]}
+              onChange={function () {
+                return this.handleTabChange.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
+              ref={this._refsManager.linkRef('tabs-d2b4008e')}
               size="large"
               style={{ paddingLeft: '20px' }}
               tabBarExtraContent={
@@ -2249,6 +2803,47 @@ class Browser$$Page extends React.Component {
                   >
                     {this.i18n('i18n-4wgfgnn6') /* 通道 */}
                   </Typography.Text>
+                  <Select
+                    __component_name="Select"
+                    __events={{
+                      eventDataList: [
+                        {
+                          name: 'onChange',
+                          relatedEventName: 'handleNetworkChannelChange',
+                          type: 'componentEvent',
+                        },
+                      ],
+                      eventList: [
+                        {
+                          disabled: true,
+                          name: 'onChange',
+                          template:
+                            "onChange(value,option,${extParams}){\n// 选中 option，或 input 的 value 变化时，调用此函数\nconsole.log('onChange',value,option);}",
+                        },
+                        {
+                          disabled: false,
+                          name: 'onSearch',
+                          template:
+                            "onSearch(value,${extParams}){\n// 文本框值变化时回调\nconsole.log('onSearch',value);}",
+                        },
+                      ],
+                    }}
+                    allowClear={false}
+                    disabled={false}
+                    maxTagCount={0}
+                    maxTagTextLength={0}
+                    onChange={function () {
+                      return this.handleNetworkChannelChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    options={__$$eval(() => this.state.myChannels)}
+                    placeholder="请选择"
+                    showSearch={true}
+                    style={{ width: 200 }}
+                    value={__$$eval(() => this.state.network)}
+                  />
                   <Input.Search
                     __component_name="Input.Search"
                     __events={{
@@ -2256,6 +2851,11 @@ class Browser$$Page extends React.Component {
                         {
                           name: 'onChange',
                           relatedEventName: 'handleSearchValueChange',
+                          type: 'componentEvent',
+                        },
+                        {
+                          name: 'onSearch',
+                          relatedEventName: 'handleSearch',
                           type: 'componentEvent',
                         },
                       ],
@@ -2273,7 +2873,7 @@ class Browser$$Page extends React.Component {
                             "onPressEnter(event,${extParams}){\n// 按下回车的回调\nconsole.log('onPressEnter',event);}",
                         },
                         {
-                          disabled: false,
+                          disabled: true,
                           name: 'onSearch',
                           template:
                             "onSearch(value,event,${extParams}){\n// 点击搜索图标、清除图标，或按下回车键时的回调\nconsole.log('onSearch',value,event);}",
@@ -2311,15 +2911,22 @@ class Browser$$Page extends React.Component {
                       ],
                     }}
                     onChange={function () {
-                      this.handleSearchValueChange.apply(
+                      return this.handleSearchValueChange.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    onSearch={function () {
+                      return this.handleSearch.apply(
                         this,
                         Array.prototype.slice.call(arguments).concat([])
                       );
                     }.bind(this)}
                     placeholder={
-                      this.i18n('i18n-06oayifb') /* 请输入区块高度、交易 hash */
+                      this.i18n('i18n-06oayifb') /* 请输入区块号搜索 */
                     }
                     style={{ width: '220px' }}
+                    value={__$$eval(() => this.state.searchValue)}
                   />
                 </Space>
               }

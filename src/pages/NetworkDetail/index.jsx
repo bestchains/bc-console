@@ -4878,6 +4878,36 @@ class NetworkDetail$$Page extends React.Component {
                                         id: 'Deployed',
                                         type: 'success',
                                       },
+                                      {
+                                        _unsafe_MixedSetter_tooltip_select:
+                                          'VariableSetter',
+                                        children:
+                                          this.i18n(
+                                            'i18n-xtno2l9qqog'
+                                          ) /* 异常 */,
+                                        icon: 'CloseCircleFilled',
+                                        id: 'Error',
+                                        tooltip: __$$eval(() => record.reason),
+                                        type: 'error',
+                                      },
+                                      {
+                                        children:
+                                          this.i18n(
+                                            'i18n-5bhot42b'
+                                          ) /* 部署中 */,
+                                        icon: 'ClockCircleFilled',
+                                        id: 'Deploying',
+                                        type: 'warning',
+                                      },
+                                      {
+                                        children:
+                                          this.i18n(
+                                            'i18n-1vangoko4yf'
+                                          ) /* 正常 */,
+                                        icon: 'CheckCircleFilled',
+                                        id: 'Created',
+                                        type: 'success',
+                                      },
                                     ]}
                                   />
                                 ))(

@@ -1,7 +1,7 @@
 const i18nConfig = {
   'en-US': {
     'i18n-03e0p0acqmaf': 'Network name',
-    'i18n-06oayifb': 'Please enter the block height, transaction hash',
+    'i18n-06oayifb': 'Please enter the block number to search',
     'i18n-08rsz7n9sruo': 'Deleting a federation succeeded',
     'i18n-0bo5igd908x': 'Select member',
     'i18n-0imredkn': 'The channel name already exists',
@@ -496,7 +496,7 @@ const i18nConfig = {
   },
   'zh-CN': {
     'i18n-03e0p0acqmaf': '网络名称',
-    'i18n-06oayifb': '请输入区块高度、交易 hash',
+    'i18n-06oayifb': '请输入区块号搜索',
     'i18n-08rsz7n9sruo': '删除联盟成功',
     'i18n-0bo5igd908x': '选择成员',
     'i18n-0imredkn': '通道名称已存在',

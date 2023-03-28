@@ -5,7 +5,7 @@ import BaasOrganization from "@tenx-ui/icon/lib/BaasOrganization.js";
 import BaasFederation from "@tenx-ui/icon/lib/BaasFederation.js";
 import BaasProposal from "@tenx-ui/icon/lib/BaasProposal.js";
 import BaasNetwork from "@tenx-ui/icon/lib/BaasNetwork.js";
-
+import {ChromeFilled} from  '@ant-design/icons'
 export const User = 'User'
 export const TENANT_ADMIN = 'TenantAdmin'
 export const PlatformAdmin = 'PlatformAdmin' // 3
@@ -55,6 +55,14 @@ const data = [
             textEn: 'Network',
             icon: BaasNetwork,
             pathname: '/network',
+            tenant: false,
+          },
+          {
+            id: 'baas-browser',
+            text: '区块链浏览器',
+            textEn: 'Browser',
+            icon: ChromeFilled,
+            pathname: '/browser',
             tenant: false,
           },
         ]

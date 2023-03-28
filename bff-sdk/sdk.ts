@@ -101,6 +101,8 @@ export type Channel = {
   members?: Maybe<Array<SpecMember>>;
   /** name */
   name: Scalars['ID'];
+  /** 网络 */
+  network?: Maybe<Scalars['String']>;
   /** 我的节点 */
   peers?: Maybe<Array<SpecPeer>>;
   /** 通道连接文件（profile.json） */
@@ -651,6 +653,8 @@ export type Query = {
   chaincodebuilds: Array<Chaincodebuild>;
   /** 通道详情 */
   channel: Channel;
+  /** 我参与的通道(区块链浏览器) */
+  channels: Array<Channel>;
   /** 创建策略时，可选的通道 */
   channelsForCreateEpolicy: Array<Channel>;
   /** 策略列表 */
@@ -1074,6 +1078,17 @@ export type GetChannelProfileQuery = {
     name: string;
     profileJson?: string | null;
   };
+};
+
+export type GetMyChannelsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetMyChannelsQuery = {
+  __typename?: 'Query';
+  channels: Array<{
+    __typename?: 'Channel';
+    name: string;
+    network?: string | null;
+  }>;
 };
 
 export type GetEpoliciesQueryVariables = Exact<{
@@ -1885,6 +1900,14 @@ export const GetChannelProfileDocument = gql`
     }
   }
 `;
+export const GetMyChannelsDocument = gql`
+  query getMyChannels {
+    channels {
+      name
+      network
+    }
+  }
+`;
 export const GetEpoliciesDocument = gql`
   query getEpolicies($network: String) {
     epolicies(network: $network) {
@@ -2515,6 +2538,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
         'query'
       );
     },
+    getMyChannels(
+      variables?: GetMyChannelsQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetMyChannelsQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetMyChannelsQuery>(GetMyChannelsDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getMyChannels',
+        'query'
+      );
+    },
     getEpolicies(
       variables?: GetEpoliciesQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -2953,6 +2990,16 @@ export function getSdkWithHooks(
       return useSWR<GetChannelProfileQuery, ClientError>(
         genKey<GetChannelProfileQueryVariables>('GetChannelProfile', variables),
         () => sdk.getChannelProfile(variables),
+        config
+      );
+    },
+    useGetMyChannels(
+      variables?: GetMyChannelsQueryVariables,
+      config?: SWRConfigInterface<GetMyChannelsQuery, ClientError>
+    ) {
+      return useSWR<GetMyChannelsQuery, ClientError>(
+        genKey<GetMyChannelsQueryVariables>('GetMyChannels', variables),
+        () => sdk.getMyChannels(variables),
         config
       );
     },
