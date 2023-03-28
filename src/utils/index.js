@@ -90,6 +90,12 @@ export const downloadFile = (
   a.dispatchEvent(e);
 };
 
+export const getLengthReg = (min = 0, max = 200) => `^.{${min},${max}}$`;
+
+export const decodeBase64 = (str) => decodeURIComponent(atob(str));
+
+export const encodeBase64 = (str) => btoa(encodeURIComponent(str));
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -158,4 +164,10 @@ export default {
   formatCpu,
 
   downloadFile,
+
+  getLengthReg,
+
+  decodeBase64,
+
+  encodeBase64,
 };

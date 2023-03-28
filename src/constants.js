@@ -1,4 +1,5 @@
 export const BC_CONSOLE_API_URL = '/bc-apis';
+export const BC_EXPLORER_API_PREFIX = '/bc-explorer';
 export const DESCRIPTION_LENGTH_REG = '^.{0,200}$';
 export const IS_PROD = process.env.NODE_ENV === 'production';
 export const IS_QIAN_KUN = window.__POWERED_BY_QIANKUN__;
@@ -10,6 +11,7 @@ export const downloadMinioUrl = '/bc-apis/minio/download';
 
 export default {
   BC_CONSOLE_API_URL,
+  BC_EXPLORER_API_PREFIX,
   DESCRIPTION_LENGTH_REG,
   IS_PROD,
   IS_QIAN_KUN,
