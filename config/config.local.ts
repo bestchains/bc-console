@@ -19,5 +19,10 @@ export default defineConfig({
       changeOrigin: true,
       secure: false,
     },
+    '/bc-explorer': {
+      target: 'https://portal.172.22.96.209.nip.io/bc-explorer',
+      changeOrigin: true,
+      secure: false,
+    },
   },
 });

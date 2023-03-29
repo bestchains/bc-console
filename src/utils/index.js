@@ -96,6 +96,25 @@ export const decodeBase64 = (str) => decodeURIComponent(atob(str));
 
 export const encodeBase64 = (str) => btoa(encodeURIComponent(str));
 
+export const getAuthorization = () => {
+  const AUTH_DATA = 'authData';
+  const getAuthData = () => {
+    try {
+      const authData = JSON.parse(
+        window.localStorage.getItem(AUTH_DATA) || '{}'
+      );
+      return authData;
+    } catch (error) {
+      console.warn('getAuthData failed', error);
+      return {};
+    }
+  };
+  const authData = getAuthData();
+  const { token_type, id_token } = authData.token || {};
+  const Authorization = token_type && id_token && `${token_type} ${id_token}`;
+  return Authorization;
+};
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -170,4 +189,6 @@ export default {
   decodeBase64,
 
   encodeBase64,
+
+  getAuthorization,
 };

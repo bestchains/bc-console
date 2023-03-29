@@ -5,7 +5,7 @@ import BaasOrganization from "@tenx-ui/icon/lib/BaasOrganization.js";
 import BaasFederation from "@tenx-ui/icon/lib/BaasFederation.js";
 import BaasProposal from "@tenx-ui/icon/lib/BaasProposal.js";
 import BaasNetwork from "@tenx-ui/icon/lib/BaasNetwork.js";
-import {ChromeFilled} from  '@ant-design/icons'
+import ChromeFilled from "@tenx-ui/icon/lib/BaasNetwork.js";
 export const User = 'User'
 export const TENANT_ADMIN = 'TenantAdmin'
 export const PlatformAdmin = 'PlatformAdmin' // 3

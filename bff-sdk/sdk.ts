@@ -31,6 +31,8 @@ export type Chaincode = {
   __typename?: 'Chaincode';
   /** 通道 */
   channel?: Maybe<Scalars['String']>;
+  /** 我创建的 */
+  createdByMe?: Maybe<Scalars['Boolean']>;
   /** 名称(chaincodebuild.spec.id) */
   displayName?: Maybe<Scalars['String']>;
   /** 策略 */
@@ -77,7 +79,7 @@ export type Chaincodebuild = {
   organizations?: Maybe<Array<Organization>>;
   /** Pipeline Results */
   pipelineImageUrl?: Maybe<Scalars['String']>;
-  /** 状态（为Created且pipelineImageUrl有值时，才能部署升级） */
+  /** 状态（为Created，显示「正常」才能部署升级，为Deploying，显示「准备中」） */
   status?: Maybe<CrdStatusType>;
   /** 版本 */
   version?: Maybe<Scalars['String']>;
@@ -390,6 +392,8 @@ export type MutationVoteUpdateArgs = {
 /** 网络 */
 export type Network = {
   __typename?: 'Network';
+  /** 智能合约 */
+  chaincode?: Maybe<Array<Chaincode>>;
   /** 通道列表 */
   channels?: Maybe<Array<Channel>>;
   /** 我的节点数 */
@@ -654,7 +658,7 @@ export type Query = {
   /** 通道详情 */
   channel: Channel;
   /** 我参与的通道(区块链浏览器) */
-  channels: Array<Channel>;
+  channels?: Maybe<Array<Channel>>;
   /** 创建策略时，可选的通道 */
   channelsForCreateEpolicy: Array<Channel>;
   /** 策略列表 */
@@ -1084,11 +1088,17 @@ export type GetMyChannelsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetMyChannelsQuery = {
   __typename?: 'Query';
-  channels: Array<{
+  channels?: Array<{
     __typename?: 'Channel';
     name: string;
     network?: string | null;
-  }>;
+    peers?: Array<{
+      __typename?: 'SpecPeer';
+      name?: string | null;
+      namespace?: string | null;
+    }> | null;
+    chaincode?: Array<{ __typename?: 'Chaincode'; name: string }> | null;
+  }> | null;
 };
 
 export type GetEpoliciesQueryVariables = Exact<{
@@ -1442,6 +1452,11 @@ export type GetNetworkQuery = {
         namespace?: string | null;
       }> | null;
       chaincode?: Array<{ __typename?: 'Chaincode'; name: string }> | null;
+    }> | null;
+    chaincode?: Array<{
+      __typename?: 'Chaincode';
+      name: string;
+      createdByMe?: boolean | null;
     }> | null;
   };
 };
@@ -1905,6 +1920,13 @@ export const GetMyChannelsDocument = gql`
     channels {
       name
       network
+      peers {
+        name
+        namespace
+      }
+      chaincode {
+        name
+      }
     }
   }
 `;
@@ -2176,6 +2198,10 @@ export const GetNetworkDocument = gql`
         status
         createdByMe
         iamInvolved
+      }
+      chaincode {
+        name
+        createdByMe
       }
     }
   }
