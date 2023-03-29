@@ -3734,7 +3734,12 @@ class NetworkDetail$$Page extends React.Component {
                                             style={{ fontSize: '34px' }}
                                             type="default"
                                           >
-                                            0
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.chaincode?.filter(
+                                                  (item) => item.createdByMe
+                                                )?.length || '0'
+                                            )}
                                           </Typography.Text>
                                           <Typography.Text
                                             disabled={false}
@@ -3776,7 +3781,12 @@ class NetworkDetail$$Page extends React.Component {
                                             style={{ fontSize: '' }}
                                             type="secondary"
                                           >
-                                            text
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.chaincode?.filter(
+                                                  (item) => item.createdByMe
+                                                )?.length || '0'
+                                            )}
                                           </Typography.Text>
                                         </Space>
                                       </Col>
@@ -3805,7 +3815,12 @@ class NetworkDetail$$Page extends React.Component {
                                             style={{ fontSize: '' }}
                                             type="secondary"
                                           >
-                                            text
+                                            {__$$eval(
+                                              () =>
+                                                this.props.useGetNetwork?.data?.network?.chaincode?.filter(
+                                                  (item) => !item.createdByMe
+                                                )?.length || '0'
+                                            )}
                                           </Typography.Text>
                                         </Space>
                                       </Col>
