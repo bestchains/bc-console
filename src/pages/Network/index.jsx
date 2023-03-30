@@ -848,6 +848,8 @@ class Network$$Page extends React.Component {
                       <Descriptions
                         __component_name="Descriptions"
                         bordered={false}
+                        borderedBottom={false}
+                        borderedBottomDashed={false}
                         colon={true}
                         column={1}
                         items={[
@@ -872,26 +874,44 @@ class Network$$Page extends React.Component {
                                     __component_name="Typography.Time"
                                     format=""
                                     relativeTime={false}
-                                    time="2023-01-30"
+                                    time={__$$eval(() => item?.expiredTime)}
                                   />
                                 </Col>
-                                <Col __component_name="Col" span={24}>
-                                  <Typography.Time
-                                    __component_name="Typography.Time"
-                                    format=""
-                                    relativeTime={true}
-                                    time="2023-01-30"
-                                  />
-                                  <Typography.Text
-                                    __component_name="Typography.Text"
-                                    disabled={false}
-                                    ellipsis={true}
-                                    strong={false}
-                                    style={{ fontSize: '' }}
+                                {!!__$$eval(() => item?.expiredTime) && (
+                                  <Col
+                                    __component_name="Col"
+                                    ref={this._refsManager.linkRef(
+                                      'col-03e47256'
+                                    )}
                                   >
-                                    {this.i18n('i18n-9v1fm4itv3m') /* 过期 */}
-                                  </Typography.Text>
-                                </Col>
+                                    <Typography.Time
+                                      __component_name="Typography.Time"
+                                      format=""
+                                      relativeTime={true}
+                                      time={__$$eval(
+                                        () => item?.expiredTime || ''
+                                      )}
+                                    />
+                                    {!!__$$eval(() => item?.expiredTime) && (
+                                      <Typography.Text
+                                        __component_name="Typography.Text"
+                                        disabled={false}
+                                        ellipsis={true}
+                                        ref={this._refsManager.linkRef(
+                                          'typography.text-e6fedf4d'
+                                        )}
+                                        strong={false}
+                                        style={{ fontSize: '' }}
+                                      >
+                                        {
+                                          this.i18n(
+                                            'i18n-9v1fm4itv3m'
+                                          ) /* 过期 */
+                                        }
+                                      </Typography.Text>
+                                    )}
+                                  </Col>
+                                )}
                               </Row>
                             ),
                             key: '13vdlxyakn3',
@@ -902,15 +922,21 @@ class Network$$Page extends React.Component {
                         labelStyle={{ width: 100 }}
                         layout="horizontal"
                         size="default"
+                        style={{ display: 'inline' }}
                         title={
                           <Row
                             __component_name="Row"
                             gutter={[0, 0]}
                             h-gutter={0}
+                            style={{}}
                             v-gutter={0}
                             wrap={false}
                           >
-                            <Col __component_name="Col" flex="auto">
+                            <Col
+                              __component_name="Col"
+                              flex="auto"
+                              style={{ textAlign: 'left' }}
+                            >
                               <Typography.Text
                                 __component_name="Typography.Text"
                                 disabled={false}
@@ -1008,7 +1034,6 @@ class Network$$Page extends React.Component {
                                   ref={this._refsManager.linkRef(
                                     'col-03e47256'
                                   )}
-                                  span=""
                                 >
                                   <Typography.Time
                                     __component_name="Typography.Time"
