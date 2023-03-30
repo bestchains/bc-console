@@ -65,6 +65,52 @@ class NetworkContractDetail$$Page extends React.Component {
     );
   }
 
+  download() {
+    var _this$constants,
+      _this$props$useGetCha,
+      _this$props$useGetCha2,
+      _this$props$useGetCha3,
+      _this$props$useGetCha4,
+      _this$props$useGetCha5,
+      _this$props$useGetCha6,
+      _this$props$useGetCha7,
+      _this$props$useGetCha8;
+    const link =
+      ((_this$constants = this.constants) === null || _this$constants === void 0
+        ? void 0
+        : _this$constants.downloadMinioUrl) +
+      `?bucket=${
+        (_this$props$useGetCha = this.props.useGetChaincodebuild) === null ||
+        _this$props$useGetCha === void 0
+          ? void 0
+          : (_this$props$useGetCha2 = _this$props$useGetCha.data) === null ||
+            _this$props$useGetCha2 === void 0
+          ? void 0
+          : (_this$props$useGetCha3 = _this$props$useGetCha2.chaincodebuild) ===
+              null || _this$props$useGetCha3 === void 0
+          ? void 0
+          : (_this$props$useGetCha4 = _this$props$useGetCha3.minio) === null ||
+            _this$props$useGetCha4 === void 0
+          ? void 0
+          : _this$props$useGetCha4.bucket
+      }&object=${
+        (_this$props$useGetCha5 = this.props.useGetChaincodebuild) === null ||
+        _this$props$useGetCha5 === void 0
+          ? void 0
+          : (_this$props$useGetCha6 = _this$props$useGetCha5.data) === null ||
+            _this$props$useGetCha6 === void 0
+          ? void 0
+          : (_this$props$useGetCha7 = _this$props$useGetCha6.chaincodebuild) ===
+              null || _this$props$useGetCha7 === void 0
+          ? void 0
+          : (_this$props$useGetCha8 = _this$props$useGetCha7.minio) === null ||
+            _this$props$useGetCha8 === void 0
+          ? void 0
+          : _this$props$useGetCha8.object
+      }`;
+    window.open(link);
+  }
+
   componentDidMount() {
     console.log(this);
     console.log('did mount');
@@ -345,18 +391,44 @@ class NetworkContractDetail$$Page extends React.Component {
                           span={1}
                         >
                           {
-                            <UnifiedLink
-                              __component_name="UnifiedLink"
-                              target="_blank"
-                              to={__$$eval(
-                                () =>
-                                  this.props.appHelper?.constants
-                                    ?.downloadMinioUrl +
-                                  `?bucket=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.bucket}&object=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.object}`
-                              )}
+                            <Button
+                              __component_name="Button"
+                              type="link"
+                              icon=""
+                              danger={false}
+                              ghost={false}
+                              shape="default"
+                              block={false}
+                              disabled={false}
+                              style={{ marginTop: '-6px', marginLeft: '-18px' }}
+                              __events={{
+                                eventDataList: [
+                                  {
+                                    type: 'componentEvent',
+                                    name: 'onClick',
+                                    relatedEventName: 'download',
+                                  },
+                                ],
+                                eventList: [
+                                  {
+                                    name: 'onClick',
+                                    template:
+                                      "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    disabled: true,
+                                  },
+                                ],
+                              }}
+                              onClick={function () {
+                                return this.download.apply(
+                                  this,
+                                  Array.prototype.slice
+                                    .call(arguments)
+                                    .concat([])
+                                );
+                              }.bind(this)}
                             >
                               {this.i18n('i18n-r1gt8gfi') /* 下载 */}
-                            </UnifiedLink>
+                            </Button>
                           }
                         </Descriptions.Item>
                       </Descriptions>

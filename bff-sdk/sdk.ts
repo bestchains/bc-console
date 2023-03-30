@@ -431,14 +431,14 @@ export type Network = {
 export type NewChaincode = {
   /** 通道 */
   channel: Scalars['String'];
+  /** 合约名称 */
+  displayName: Scalars['String'];
   /** 背书策略 */
   epolicy: Scalars['String'];
   /** 安装节点（暂不支持） */
   ibppeer?: InputMaybe<Scalars['String']>;
   /** 合约name */
   name: Scalars['String'];
-  /** 合约版本号 */
-  version: Scalars['String'];
 };
 
 export type NewChaincodebuild = {
