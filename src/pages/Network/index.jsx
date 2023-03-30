@@ -979,10 +979,10 @@ class Network$$Page extends React.Component {
                                   },
                                   {
                                     children:
-                                      this.i18n('i18n-1vangoko4yf') /* 正常 */,
-                                    icon: 'CheckCircleFilled',
+                                      this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                                    icon: 'ClockCircleFilled',
                                     id: 'Created',
-                                    type: 'success',
+                                    type: 'warning',
                                   },
                                   {
                                     children:

@@ -729,7 +729,7 @@ class NetworkDetail$$Page extends React.Component {
             : _JSON$parse.name,
         epolicy: v.epolicy,
         name: v.name,
-        version: v.version,
+        displayName: v.displayName,
         // edit
         // ibppeer: v.ibppeer
       };
@@ -873,11 +873,13 @@ class NetworkDetail$$Page extends React.Component {
                 : _this$state$sorter.order) !== 'ascend'
             ) {
               return (
-                new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime()
+                new Date(b.creationTimestamp).getTime() -
+                new Date(a.creationTimestamp).getTime()
               );
             }
             return (
-              new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime()
+              new Date(a.creationTimestamp).getTime() -
+              new Date(b.creationTimestamp).getTime()
             );
           });
     const result = {};
@@ -4398,11 +4400,11 @@ class NetworkDetail$$Page extends React.Component {
                                               {
                                                 children:
                                                   this.i18n(
-                                                    'i18n-1vangoko4yf'
-                                                  ) /* 正常 */,
-                                                icon: 'CheckCircleFilled',
+                                                    'i18n-7xnyzmr7'
+                                                  ) /* 创建中 */,
+                                                icon: 'ClockCircleFilled',
                                                 id: 'Created',
-                                                type: 'success',
+                                                type: 'warning',
                                               },
                                               {
                                                 children:
