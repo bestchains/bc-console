@@ -248,7 +248,7 @@ export type Mutation = {
   /** 创建合约 */
   chaincodebuildCreate: Chaincodebuild;
   /** 删除合约 */
-  chaincodebuildDelete: Array<K8sV1Status>;
+  chaincodebuildDelete: K8sV1Status;
   /** 升级合约 */
   chaincodebuildUpgrade: Chaincodebuild;
   /** 创建通道 */
@@ -298,8 +298,7 @@ export type MutationChaincodebuildCreateArgs = {
 };
 
 export type MutationChaincodebuildDeleteArgs = {
-  displayName: Scalars['String'];
-  network: Scalars['String'];
+  name: Scalars['String'];
 };
 
 export type MutationChaincodebuildUpgradeArgs = {
@@ -946,18 +945,17 @@ export type GetChaincodebuildQuery = {
 };
 
 export type DeleteChaincodebuildMutationVariables = Exact<{
-  displayName: Scalars['String'];
-  network: Scalars['String'];
+  name: Scalars['String'];
 }>;
 
 export type DeleteChaincodebuildMutation = {
   __typename?: 'Mutation';
-  chaincodebuildDelete: Array<{
+  chaincodebuildDelete: {
     __typename?: 'K8sV1Status';
     code?: number | null;
     status?: string | null;
     reason?: string | null;
-  }>;
+  };
 };
 
 export type UpgradeChaincodebuildMutationVariables = Exact<{
@@ -1805,8 +1803,8 @@ export const GetChaincodebuildDocument = gql`
   }
 `;
 export const DeleteChaincodebuildDocument = gql`
-  mutation deleteChaincodebuild($displayName: String!, $network: String!) {
-    chaincodebuildDelete(displayName: $displayName, network: $network) {
+  mutation deleteChaincodebuild($name: String!) {
+    chaincodebuildDelete(name: $name) {
       code
       status
       reason
