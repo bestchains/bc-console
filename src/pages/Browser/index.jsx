@@ -13,12 +13,16 @@ import {
   Tabs,
   Card,
   Image,
+  Spin,
+  Empty,
   Table,
   DatePicker,
   Button,
   Select,
   Input,
 } from '@tenx-ui/materials';
+
+import { PieChart, LineChart } from '@tenx-ui/charts';
 
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -183,6 +187,44 @@ class Browser$$Page extends React.Component {
           },
           type: 'fetch',
         },
+        {
+          id: 'getTransactionsCount',
+          isInit: function () {
+            return false;
+          },
+          options: function () {
+            return {
+              headers: {
+                Authorization: 'this.utils.getAuthorization()',
+              },
+              isCors: true,
+              method: 'GET',
+              params: {},
+              timeout: 5000,
+              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/transactionsCount`,
+            };
+          },
+          type: 'fetch',
+        },
+        {
+          id: 'getQueryBySeg',
+          isInit: function () {
+            return false;
+          },
+          options: function () {
+            return {
+              headers: {
+                Authorization: 'this.utils.getAuthorization()',
+              },
+              isCors: true,
+              method: 'GET',
+              params: {},
+              timeout: 5000,
+              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/overview/query-by-seg`,
+            };
+          },
+          type: 'fetch',
+        },
       ],
     };
   }
@@ -197,6 +239,85 @@ class Browser$$Page extends React.Component {
 
   formatTimeParams(v) {
     return v ? parseInt(new Date(v).getTime() / 1000) : undefined;
+  }
+
+  formateTransactionsCount(text, item, index) {
+    var _parseFloat, _item$data, _this$state$overview;
+    const percent =
+      ((_parseFloat = parseFloat(
+        ((_item$data = item.data) === null || _item$data === void 0
+          ? void 0
+          : _item$data.angleField) /
+          ((_this$state$overview = this.state.overview) === null ||
+          _this$state$overview === void 0
+            ? void 0
+            : _this$state$overview.transactionsCountTotal)
+      )) === null || _parseFloat === void 0
+        ? void 0
+        : _parseFloat.toFixed(2)) * 100;
+    return /*#__PURE__*/ React.createElement(
+      'span',
+      null,
+      /*#__PURE__*/ React.createElement(
+        'span',
+        {
+          style: {
+            display: 'inline-block',
+            width: '100px',
+          },
+        },
+        text
+      ),
+      /*#__PURE__*/ React.createElement(
+        'span',
+        {
+          style: {
+            float: 'right',
+          },
+        },
+        percent,
+        ' %'
+      )
+    );
+  }
+
+  getAllQueryBySeg() {
+    this.getQueryBySeg({
+      type: 'blockH',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
+        interval: 3600,
+        number: 24,
+        type: 'blocks',
+      },
+    });
+    this.getQueryBySeg({
+      type: 'transactionH',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
+        interval: 3600,
+        number: 24,
+        type: 'transactions',
+      },
+    });
+    this.getQueryBySeg({
+      type: 'blockM',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
+        interval: 60,
+        number: 60,
+        type: 'blocks',
+      },
+    });
+    this.getQueryBySeg({
+      type: 'transactionM',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
+        interval: 60,
+        number: 60,
+        type: 'transactions',
+      },
+    });
   }
 
   getBrowserBlocks() {
@@ -318,6 +439,92 @@ class Browser$$Page extends React.Component {
           overview: {
             ...this.state.overview,
             data: {},
+            loading: false,
+          },
+        });
+      });
+  }
+
+  getQueryBySeg({ type, query }) {
+    this.setState({
+      overview: {
+        ...this.state.overview,
+        loading: true,
+      },
+    });
+    this.dataSourceMap.getQueryBySeg
+      .load(query)
+      .then((res) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            [type]:
+              res === null || res === void 0
+                ? void 0
+                : res.map((item) => ({
+                    seriesField: 'seriesField',
+                    xField: item.end * 1000,
+                    yField: item.count,
+                  })),
+            loading: false,
+          },
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            [type]: [],
+            loading: false,
+          },
+        });
+      });
+  }
+
+  getTransactionsCount() {
+    this.setState({
+      overview: {
+        ...this.state.overview,
+        loading: true,
+      },
+    });
+    this.dataSourceMap.getTransactionsCount
+      .load({})
+      .then((res) => {
+        var _res$data, _res$data2;
+        console.log(res === null || res === void 0 ? void 0 : res.data);
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            transactionsCount:
+              (res === null || res === void 0
+                ? void 0
+                : (_res$data = res.data) === null || _res$data === void 0
+                ? void 0
+                : _res$data.map((item) => ({
+                    angleField: item.count || 0,
+                    seriesField: item.creator || '-',
+                  }))) || [],
+            transactionsCountTotal:
+              res === null || res === void 0
+                ? void 0
+                : (_res$data2 = res.data) === null || _res$data2 === void 0
+                ? void 0
+                : _res$data2.reduce((prev, cur, index, arr) => {
+                    return (
+                      prev +
+                      (cur === null || cur === void 0 ? void 0 : cur.count)
+                    );
+                  }, 0),
+            loading: false,
+          },
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            transactionsCount: [],
             loading: false,
           },
         });
@@ -495,6 +702,8 @@ class Browser$$Page extends React.Component {
     if (!this.state.network) return;
     if (this.state.tab === 'overview') {
       this.getOverview();
+      this.getTransactionsCount();
+      this.getAllQueryBySeg();
       this.setState(
         {
           time: null,
@@ -1673,11 +1882,85 @@ class Browser$$Page extends React.Component {
                                         ellipsis={true}
                                         level={1}
                                       >
-                                        Transactions by Organization
+                                        {
+                                          this.i18n(
+                                            'i18n-fdpwjf9q'
+                                          ) /* 组织交易占比 */
+                                        }
                                       </Typography.Title>
                                     </Col>
-                                    <Col __component_name="Col" span={24} />
+                                    <Col __component_name="Col" span={24}>
+                                      {!!__$$eval(
+                                        () =>
+                                          this.state.overview?.transactionsCount
+                                            ?.length > 0
+                                      ) && (
+                                        <Spin
+                                          __component_name="Spin"
+                                          spinning={__$$eval(
+                                            () => this.state.overview.loading
+                                          )}
+                                          ref={this._refsManager.linkRef(
+                                            'spin-1473bf67'
+                                          )}
+                                        >
+                                          <PieChart
+                                            __component_name="PieChart"
+                                            angleField="angleField"
+                                            customerLegend={{
+                                              formatter: function () {
+                                                return this.formateTransactionsCount.apply(
+                                                  this,
+                                                  Array.prototype.slice
+                                                    .call(arguments)
+                                                    .concat([])
+                                                );
+                                              }.bind(this),
+                                              max: 5,
+                                              popoverWidth: '160px',
+                                              width: '160px',
+                                            }}
+                                            data={__$$eval(
+                                              () =>
+                                                this.state.overview
+                                                  ?.transactionsCount || []
+                                            )}
+                                            height={250}
+                                            seriesField="seriesField"
+                                            title=" "
+                                            tools={[]}
+                                            ref={this._refsManager.linkRef(
+                                              'piechart-18ab37f8'
+                                            )}
+                                          />
+                                        </Spin>
+                                      )}
+                                    </Col>
                                   </Row>
+                                  {!!__$$eval(
+                                    () =>
+                                      !(
+                                        this.state.overview?.transactionsCount
+                                          ?.length > 0
+                                      )
+                                  ) && (
+                                    <Spin
+                                      __component_name="Spin"
+                                      spinning={__$$eval(
+                                        () => this.state.overview.loading
+                                      )}
+                                      ref={this._refsManager.linkRef(
+                                        'spin-ea6d42ab'
+                                      )}
+                                    >
+                                      <Empty
+                                        __component_name="Empty"
+                                        ref={this._refsManager.linkRef(
+                                          'empty-6d3c2fb4'
+                                        )}
+                                      />
+                                    </Spin>
+                                  )}
                                 </Card>
                               </Col>
                               <Col __component_name="Col" span={12}>
@@ -1690,20 +1973,149 @@ class Browser$$Page extends React.Component {
                                   size="default"
                                   type="default"
                                 >
-                                  <Row __component_name="Row" wrap={true}>
-                                    <Col __component_name="Col" span={24}>
-                                      <Typography.Title
-                                        __component_name="Typography.Title"
-                                        bold={true}
-                                        bordered={false}
-                                        ellipsis={true}
-                                        level={1}
-                                      >
-                                        {this.i18n('i18n-u92msf8l') /* 数据 */}
-                                      </Typography.Title>
-                                    </Col>
-                                    <Col __component_name="Col" span={24} />
-                                  </Row>
+                                  <Tabs
+                                    __component_name="Tabs"
+                                    destroyInactiveTabPane="true"
+                                    items={[
+                                      {
+                                        children: (
+                                          <Spin
+                                            __component_name="Spin"
+                                            spinning={__$$eval(
+                                              () => this.state.overview.loading
+                                            )}
+                                          >
+                                            <LineChart
+                                              __component_name="LineChart"
+                                              data={__$$eval(
+                                                () =>
+                                                  this.state.overview?.blockH ||
+                                                  []
+                                              )}
+                                              height={232}
+                                              legend={{ visible: false }}
+                                              seriesField="seriesField"
+                                              slider={false}
+                                              title=" "
+                                              tools={[]}
+                                              xAxisLastTickVisible={false}
+                                              xField="xField"
+                                              xFieldTimeFormat="HH:mm"
+                                              yField="yField"
+                                            />
+                                          </Spin>
+                                        ),
+                                        key: 'tab-item-1',
+                                        label:
+                                          this.i18n(
+                                            'i18n-7uvsyqsq'
+                                          ) /* 区块/小时 */,
+                                      },
+                                      {
+                                        children: (
+                                          <Spin
+                                            __component_name="Spin"
+                                            spinning={__$$eval(
+                                              () => this.state.overview.loading
+                                            )}
+                                          >
+                                            <LineChart
+                                              __component_name="LineChart"
+                                              data={__$$eval(
+                                                () =>
+                                                  this.state.overview?.blockM ||
+                                                  []
+                                              )}
+                                              height={232}
+                                              legend={{ visible: false }}
+                                              seriesField="seriesField"
+                                              slider={false}
+                                              title=" "
+                                              tools={[]}
+                                              xField="xField"
+                                              xFieldTimeFormat="HH:mm"
+                                              yField="yField"
+                                            />
+                                          </Spin>
+                                        ),
+                                        key: 'tab-item-2',
+                                        label:
+                                          this.i18n(
+                                            'i18n-ivlw5o59'
+                                          ) /* 区块/分钟 */,
+                                      },
+                                      {
+                                        children: (
+                                          <Spin
+                                            __component_name="Spin"
+                                            spinning={__$$eval(
+                                              () => this.state.overview.loading
+                                            )}
+                                          >
+                                            <LineChart
+                                              __component_name="LineChart"
+                                              data={__$$eval(
+                                                () =>
+                                                  this.state.overview
+                                                    ?.transactionH || []
+                                              )}
+                                              height={232}
+                                              legend={{ visible: false }}
+                                              seriesField="seriesField"
+                                              slider={false}
+                                              tools={[]}
+                                              xField="xField"
+                                              xFieldTimeFormat="HH:mm"
+                                              yField="yField"
+                                            />
+                                          </Spin>
+                                        ),
+                                        key: 'lz1hkbje8t',
+                                        label:
+                                          this.i18n(
+                                            'i18n-09e7coyp'
+                                          ) /* 交易/小时 */,
+                                      },
+                                      {
+                                        children: (
+                                          <Spin
+                                            __component_name="Spin"
+                                            spinning={__$$eval(
+                                              () => this.state.overview.loading
+                                            )}
+                                          >
+                                            <LineChart
+                                              __component_name="LineChart"
+                                              data={__$$eval(
+                                                () =>
+                                                  this.state.overview
+                                                    ?.transactionM || []
+                                              )}
+                                              height={232}
+                                              legend={{ visible: false }}
+                                              seriesField="seriesField"
+                                              slider={false}
+                                              title=" "
+                                              tools={[]}
+                                              xField="xField"
+                                              xFieldTimeFormat="HH:mm"
+                                              yField="yField"
+                                            />
+                                          </Spin>
+                                        ),
+                                        key: 'fnsk5omcp4',
+                                        label:
+                                          this.i18n(
+                                            'i18n-sv4oi1v8'
+                                          ) /* 交易/分钟 */,
+                                      },
+                                    ]}
+                                    size="large"
+                                    style={{ marginTop: '-12px' }}
+                                    tabBarGutter={14}
+                                    tabPosition="top"
+                                    type="line"
+                                  />
                                 </Card>
                               </Col>
                             </Row>
@@ -2422,7 +2834,7 @@ class Browser$$Page extends React.Component {
                                       _unsafe_MixedSetter_title_select:
                                         'VariableSetter',
                                       title: __$$eval(
-                                        () => record?.previoudBlockHash || '-'
+                                        () => record?.preBlockHash || '-'
                                       ),
                                     },
                                   }}
@@ -2445,9 +2857,7 @@ class Browser$$Page extends React.Component {
                                     width: '100px',
                                   }}
                                 >
-                                  {__$$eval(
-                                    () => record?.previoudBlockHash || '-'
-                                  )}
+                                  {__$$eval(() => record?.preBlockHash || '-')}
                                 </Typography.Text>
                               ))(
                                 __$$createChildContext(__$$context, {
