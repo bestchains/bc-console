@@ -1233,7 +1233,12 @@ class OrganizationDetail$$Page extends React.Component {
                                         }}
                                         block={false}
                                         danger={false}
-                                        disabled={false}
+                                        disabled={__$$eval(
+                                          () =>
+                                            __$$context.props.useGetOrganization
+                                              ?.data?.organization?.status !==
+                                            'Deployed'
+                                        )}
                                         ghost={false}
                                         icon=""
                                         onClick={function () {
@@ -1455,7 +1460,11 @@ class OrganizationDetail$$Page extends React.Component {
                             }}
                             block={false}
                             danger={false}
-                            disabled={false}
+                            disabled={__$$eval(
+                              () =>
+                                this.props.useGetOrganization?.data
+                                  ?.organization?.status !== 'Deployed'
+                            )}
                             ghost={false}
                             icon={
                               <Icon

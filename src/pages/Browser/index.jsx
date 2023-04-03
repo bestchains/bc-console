@@ -462,7 +462,7 @@ class Browser$$Page extends React.Component {
               res === null || res === void 0
                 ? void 0
                 : res.map((item) => ({
-                    seriesField: 'seriesField',
+                    seriesField: this.i18n('i18n-1pf627eu'),
                     xField: item.end * 1000,
                     yField: item.count,
                   })),
@@ -1871,6 +1871,7 @@ class Browser$$Page extends React.Component {
                                   hoverable={false}
                                   loading={false}
                                   size="default"
+                                  style={{ height: '339px' }}
                                   type="default"
                                 >
                                   <Row __component_name="Row" wrap={true}>
@@ -1897,11 +1898,11 @@ class Browser$$Page extends React.Component {
                                       ) && (
                                         <Spin
                                           __component_name="Spin"
-                                          spinning={__$$eval(
-                                            () => this.state.overview.loading
-                                          )}
                                           ref={this._refsManager.linkRef(
                                             'spin-1473bf67'
+                                          )}
+                                          spinning={__$$eval(
+                                            () => this.state.overview.loading
                                           )}
                                         >
                                           <PieChart
@@ -1926,12 +1927,12 @@ class Browser$$Page extends React.Component {
                                                   ?.transactionsCount || []
                                             )}
                                             height={250}
-                                            seriesField="seriesField"
-                                            title=" "
-                                            tools={[]}
                                             ref={this._refsManager.linkRef(
                                               'piechart-18ab37f8'
                                             )}
+                                            seriesField="seriesField"
+                                            title=" "
+                                            tools={[]}
                                           />
                                         </Spin>
                                       )}
@@ -1946,11 +1947,11 @@ class Browser$$Page extends React.Component {
                                   ) && (
                                     <Spin
                                       __component_name="Spin"
-                                      spinning={__$$eval(
-                                        () => this.state.overview.loading
-                                      )}
                                       ref={this._refsManager.linkRef(
                                         'spin-ea6d42ab'
+                                      )}
+                                      spinning={__$$eval(
+                                        () => this.state.overview.loading
                                       )}
                                     >
                                       <Empty
@@ -1958,6 +1959,7 @@ class Browser$$Page extends React.Component {
                                         ref={this._refsManager.linkRef(
                                           'empty-6d3c2fb4'
                                         )}
+                                        style={{ marginTop: '40px' }}
                                       />
                                     </Spin>
                                   )}
@@ -1971,6 +1973,7 @@ class Browser$$Page extends React.Component {
                                   hoverable={false}
                                   loading={false}
                                   size="default"
+                                  style={{ height: '339px' }}
                                   type="default"
                                 >
                                   <Tabs
