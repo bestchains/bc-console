@@ -106,6 +106,7 @@ class NetworkDetail$$Page extends React.Component {
       peers: [],
       channelPeers: [],
       allPeers: [],
+      contractUpgradeLoading: false,
     };
   }
 
@@ -1179,6 +1180,9 @@ class NetworkDetail$$Page extends React.Component {
 
   confirmUpgradeContractModal(e, payload) {
     var _this$$, _this$$$formRef, _this$$$formRef$curre;
+    this.setState({
+      contractUpgradeLoading: true,
+    });
     const form =
       (_this$$ = this.$('formily_contract_upgrade')) === null ||
       _this$$ === void 0
@@ -1236,8 +1240,14 @@ class NetworkDetail$$Page extends React.Component {
         });
         // this.openAddChannelSuccessModal()
         this.props.useGetChaincodebuilds.mutate();
+        this.setState({
+          contractUpgradeLoading: false,
+        });
       } catch (error) {
         var _error$response;
+        this.setState({
+          contractUpgradeLoading: false,
+        });
         this.utils.notification.warnings({
           message: this.i18n('i18n-7fxj402s'),
           errors:
@@ -2026,7 +2036,7 @@ class NetworkDetail$$Page extends React.Component {
             ],
           }}
           centered={false}
-          confirmLoading={false}
+          confirmLoading={__$$eval(() => this.state.contractUpgradeLoading)}
           destroyOnClose={true}
           forceRender={false}
           keyboard={true}
@@ -2050,6 +2060,7 @@ class NetworkDetail$$Page extends React.Component {
               this.state.modalType === 'upgradecontract'
           )}
           title={this.i18n('i18n-nihrz6ys') /* 合约升级 */}
+          okButtonProps={{}}
         >
           <FormilyForm
             __component_name="FormilyForm"
@@ -6115,7 +6126,7 @@ class NetworkDetail$$Page extends React.Component {
                                           children:
                                             this.i18n(
                                               'i18n-5bhot42b'
-                                            ) /* 部署中 */,
+                                            ) /* 构建中 */,
                                           icon: 'ClockCircleFilled',
                                           id: 'Deploying',
                                           type: 'info',
