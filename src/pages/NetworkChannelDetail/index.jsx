@@ -16,7 +16,7 @@ import {
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 
-import utils from '../../utils';
+import utils from '../../utils/index';
 
 import * as __$$i18n from '../../i18n';
 
@@ -54,40 +54,14 @@ class NetworkChannelDetail$$Page extends React.Component {
 
   async downLoadFile() {
     try {
-      var _this$props$appHelper, _this$match, _this$match$params, _res$channel;
-      const res = await ((_this$props$appHelper =
-        this.props.appHelper.utils.bff) === null ||
-      _this$props$appHelper === void 0
-        ? void 0
-        : _this$props$appHelper.getChannelProfile({
-            name:
-              this === null || this === void 0
-                ? void 0
-                : (_this$match = this.match) === null || _this$match === void 0
-                ? void 0
-                : (_this$match$params = _this$match.params) === null ||
-                  _this$match$params === void 0
-                ? void 0
-                : _this$match$params.channelId,
-          }));
-      this.utils.downloadFile(
-        res === null || res === void 0
-          ? void 0
-          : (_res$channel = res.channel) === null || _res$channel === void 0
-          ? void 0
-          : _res$channel.profileJson
-      );
+      const res = await this.props.appHelper.utils.bff?.getChannelProfile({
+        name: this?.match?.params?.channelId,
+      });
+      this.utils.downloadFile(res?.channel?.profileJson);
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-62p13m1r'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
@@ -232,7 +206,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                               {__$$eval(
                                 () =>
                                   this.props.useGetChannel?.data?.channel
-                                    ?.name || '-'
+                                    ?.displayName || '-'
                               )}
                             </Typography.Text>
                           }

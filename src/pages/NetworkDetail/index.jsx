@@ -5,16 +5,16 @@ import React from 'react';
 import {
   Page,
   Modal,
-  Descriptions,
-  Typography,
-  Row,
-  Col,
   FormilyForm,
   FormilyInput,
   FormilyTextArea,
   FormilySelect,
   FormilyFormItem,
   FormilyArrayCards,
+  Descriptions,
+  Typography,
+  Row,
+  Col,
   FormilyUpload,
   Button,
   Icon,
@@ -36,7 +36,7 @@ import {
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/index';
 
 import * as __$$i18n from '../../i18n';
 
@@ -121,170 +121,84 @@ class NetworkDetail$$Page extends React.Component {
   componentWillUnmount() {}
 
   async getChannelsForCreateEpolicy(callback) {
-    var _this$match,
-      _this$match$params,
-      _res$channelsForCreat,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre,
-      _res$channelsForCreat2;
     const res =
       await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
-        network:
-          (_this$match = this.match) === null || _this$match === void 0
-            ? void 0
-            : (_this$match$params = _this$match.params) === null ||
-              _this$match$params === void 0
-            ? void 0
-            : _this$match$params.id,
+        network: this.match?.params?.id,
       });
     this.setState(
       {
         strategy: {
           ...this.state.strategy,
           channels:
-            (res === null || res === void 0
-              ? void 0
-              : (_res$channelsForCreat = res.channelsForCreateEpolicy) ===
-                  null || _res$channelsForCreat === void 0
-              ? void 0
-              : _res$channelsForCreat.map((item) => ({
-                  value: JSON.stringify(item),
-                  label: item.name,
-                }))) || [],
+            res?.channelsForCreateEpolicy?.map((item) => ({
+              value: JSON.stringify(item),
+              label: item.name,
+            })) || [],
         },
       },
       callback
     );
-    const form =
-      (_this$$ = this.$('formily_create_strategy')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_create_strategy')?.formRef?.current?.form;
     form.setFieldState('channel', {
       dataSource:
-        (res === null || res === void 0
-          ? void 0
-          : (_res$channelsForCreat2 = res.channelsForCreateEpolicy) === null ||
-            _res$channelsForCreat2 === void 0
-          ? void 0
-          : _res$channelsForCreat2.map((item) => ({
-              value: JSON.stringify(item),
-              label: item.name,
-            }))) || [],
+        res?.channelsForCreateEpolicy?.map((item) => ({
+          value: JSON.stringify(item),
+          label: item.name,
+        })) || [],
     });
   }
 
   async getEpolicies() {
-    var _this$match, _this$match$params;
     const res = await this.props.appHelper.utils.bff.getEpolicies({
-      network:
-        (_this$match = this.match) === null || _this$match === void 0
-          ? void 0
-          : (_this$match$params = _this$match.params) === null ||
-            _this$match$params === void 0
-          ? void 0
-          : _this$match$params.id,
+      network: this.match?.params?.id,
     });
     this.setState({
       strategy: {
         ...this.state.strategy,
-        list: (res === null || res === void 0 ? void 0 : res.epolicies) || [],
+        list: res?.epolicies || [],
       },
     });
   }
 
   async getPeers(v, callback, usedPeers) {
-    var _ref,
-      _res$ibppeersForCreat,
-      _res$ibppeersForCreat2,
-      _res$ibppeersForCreat3;
     const { initiator, organizations } = v;
     const res =
       await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
-        members:
-          (_ref = [initiator, ...(organizations || [])]) === null ||
-          _ref === void 0
-            ? void 0
-            : _ref.filter((item) => item),
+        members: [initiator, ...(organizations || [])]?.filter((item) => item),
       });
     const allPeers = [];
-    res === null || res === void 0
-      ? void 0
-      : (_res$ibppeersForCreat = res.ibppeersForCreateChannel) === null ||
-        _res$ibppeersForCreat === void 0
-      ? void 0
-      : _res$ibppeersForCreat.forEach((item) => {
-          var _item$ibppeers;
-          (_item$ibppeers = item.ibppeers) === null || _item$ibppeers === void 0
-            ? void 0
-            : _item$ibppeers.forEach((peer) => {
-                allPeers.push({
-                  name: peer.name,
-                  namespace: item.name,
-                  key: item.name + peer.name,
-                });
-              });
+    res?.ibppeersForCreateChannel?.forEach((item) => {
+      item.ibppeers?.forEach((peer) => {
+        allPeers.push({
+          name: peer.name,
+          namespace: item.name,
+          key: item.name + peer.name,
         });
+      });
+    });
     const peers =
-      (res === null || res === void 0
-        ? void 0
-        : (_res$ibppeersForCreat2 = res.ibppeersForCreateChannel) === null ||
-          _res$ibppeersForCreat2 === void 0
-        ? void 0
-        : (_res$ibppeersForCreat3 = _res$ibppeersForCreat2.map((item) => {
-            var _item$ibppeers2, _item$ibppeers2$filte, _item$ibppeers2$filte2;
-            return {
-              key: item.name,
-              title: item.name,
-              children:
-                (_item$ibppeers2 = item.ibppeers) === null ||
-                _item$ibppeers2 === void 0
-                  ? void 0
-                  : (_item$ibppeers2$filte = _item$ibppeers2.filter(
-                      (item) => item.status === 'Deployed'
-                    )) === null || _item$ibppeers2$filte === void 0
-                  ? void 0
-                  : (_item$ibppeers2$filte2 = _item$ibppeers2$filte.map(
-                      (peer) => ({
-                        key: item.name + peer.name,
-                        title: peer.name,
-                      })
-                    )) === null || _item$ibppeers2$filte2 === void 0
-                  ? void 0
-                  : _item$ibppeers2$filte2.filter((peer) => {
-                      return usedPeers !== null &&
-                        usedPeers !== void 0 &&
-                        usedPeers.length
-                        ? usedPeers.every(
-                            (used) =>
-                              !(
-                                used.name === peer.title &&
-                                used.namespace === item.name
-                              )
-                          )
-                        : true;
-                    }),
-            };
-          })) === null || _res$ibppeersForCreat3 === void 0
-        ? void 0
-        : _res$ibppeersForCreat3.filter((item) => {
-            var _item$children;
-            return (
-              (item === null || item === void 0
-                ? void 0
-                : (_item$children = item.children) === null ||
-                  _item$children === void 0
-                ? void 0
-                : _item$children.length) > 0
-            );
-          })) || [];
+      res?.ibppeersForCreateChannel
+        ?.map((item) => ({
+          key: item.name,
+          title: item.name,
+          children: item.ibppeers
+            ?.filter((item) => item.status === 'Deployed')
+            ?.map((peer) => ({
+              key: item.name + peer.name,
+              title: peer.name,
+            }))
+            ?.filter((peer) => {
+              return usedPeers?.length
+                ? usedPeers.every(
+                    (used) =>
+                      !(
+                        used.name === peer.title && used.namespace === item.name
+                      )
+                  )
+                : true;
+            }),
+        }))
+        ?.filter((item) => item?.children?.length > 0) || [];
     this.setState(
       {
         peers,
@@ -294,53 +208,25 @@ class NetworkDetail$$Page extends React.Component {
     );
   }
 
-  formatContract() {
-    var _ref,
-      _ref$filter,
-      _this$props$useGetCha,
-      _this$props$useGetCha2,
-      _Object$keys,
-      _Object$keys2,
-      _Object$keys3;
-    const list =
-      (_ref =
-        ((_this$props$useGetCha = this.props.useGetChaincodebuilds) === null ||
-        _this$props$useGetCha === void 0
-          ? void 0
-          : (_this$props$useGetCha2 = _this$props$useGetCha.data) === null ||
-            _this$props$useGetCha2 === void 0
-          ? void 0
-          : _this$props$useGetCha2.chaincodebuilds) || []) === null ||
-      _ref === void 0
-        ? void 0
-        : (_ref$filter = _ref.filter((item) => {
-            var _item$displayName;
-            return this.state.contract.searchValue
-              ? (_item$displayName = item.displayName) === null ||
-                _item$displayName === void 0
-                ? void 0
-                : _item$displayName.includes(this.state.contract.searchValue)
-              : true;
-          })) === null || _ref$filter === void 0
-        ? void 0
-        : _ref$filter.sort((a, b) => {
-            var _this$state$sorter;
-            if (
-              ((_this$state$sorter = this.state.sorter) === null ||
-              _this$state$sorter === void 0
-                ? void 0
-                : _this$state$sorter.order) !== 'ascend'
-            ) {
-              return (
-                new Date(b.creationTimestamp).getTime() -
-                new Date(a.creationTimestamp).getTime()
-              );
-            }
-            return (
-              new Date(a.creationTimestamp).getTime() -
-              new Date(b.creationTimestamp).getTime()
-            );
-          });
+  formatContract(e, payload) {
+    const list = (this.props.useGetChaincodebuilds?.data?.chaincodebuilds || [])
+      ?.filter((item) => {
+        return this.state.contract.searchValue
+          ? item.displayName?.includes(this.state.contract.searchValue)
+          : true;
+      })
+      ?.sort((a, b) => {
+        if (this.state.sorter?.order !== 'ascend') {
+          return (
+            new Date(b.creationTimestamp).getTime() -
+            new Date(a.creationTimestamp).getTime()
+          );
+        }
+        return (
+          new Date(a.creationTimestamp).getTime() -
+          new Date(b.creationTimestamp).getTime()
+        );
+      });
     const result = {};
     const initVersions = {};
     list.forEach((item) => {
@@ -351,56 +237,30 @@ class NetworkDetail$$Page extends React.Component {
         result[item.displayName][item.name] = item;
       }
     });
-    const formatList =
-      (_Object$keys = Object.keys(result)) === null || _Object$keys === void 0
-        ? void 0
-        : _Object$keys.map((displayName) => {
-            var _versions$, _Object$values;
-            const versions = Object.values(result[displayName]);
-            initVersions[displayName] =
-              versions === null || versions === void 0
-                ? void 0
-                : (_versions$ = versions[0]) === null || _versions$ === void 0
-                ? void 0
-                : _versions$.name;
-            const record =
-              (versions === null || versions === void 0
-                ? void 0
-                : versions.find((item) => {
-                    var _this$state$initVersi;
-                    return (
-                      item.name ===
-                      ((_this$state$initVersi = this.state.initVersions) ===
-                        null || _this$state$initVersi === void 0
-                        ? void 0
-                        : _this$state$initVersi[displayName])
-                    );
-                  })) ||
-              (versions === null || versions === void 0 ? void 0 : versions[0]);
-            return {
-              displayName,
-              ...record,
-              versions:
-                (_Object$values = Object.values(result[displayName])) ===
-                  null || _Object$values === void 0
-                  ? void 0
-                  : _Object$values.map((item) => ({
-                      ...item,
-                      label: item.version,
-                      key: item.name,
-                    })),
-            };
-          });
+    const formatList = Object.keys(result)?.map((displayName) => {
+      const versions = Object.values(result[displayName])?.sort((a, b) =>
+        a.version.localeCompare(b.version)
+      );
+      initVersions[displayName] = versions?.[0]?.name;
+      const record =
+        versions?.find(
+          (item) => item.name === this.state.initVersions?.[displayName]
+        ) || versions?.[0];
+      return {
+        displayName,
+        ...record,
+        versions: versions?.map((item) => ({
+          ...item,
+          label: item.version,
+          key: item.name,
+        })),
+      };
+    });
     if (
       !this.state.initVersions ||
-      ((_Object$keys2 = Object.keys(this.state.initVersions || {})) === null ||
-      _Object$keys2 === void 0
-        ? void 0
-        : _Object$keys2.length) !==
-        ((_Object$keys3 = Object.keys(result || {})) === null ||
-        _Object$keys3 === void 0
-          ? void 0
-          : _Object$keys3.length)
+      Object.keys(this.state.initVersions || {})?.length !==
+        Object.keys(result || {})?.length ||
+      payload?.initVersions
     ) {
       this.setState({
         initVersions,
@@ -410,43 +270,19 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   getContractVersion(record) {
-    var _this$state$initVersi, _record$versions, _record$versions$find;
-    const name =
-      (_this$state$initVersi = this.state.initVersions) === null ||
-      _this$state$initVersi === void 0
-        ? void 0
-        : _this$state$initVersi[
-            record === null || record === void 0 ? void 0 : record.displayName
-          ];
-    return record === null || record === void 0
-      ? void 0
-      : (_record$versions = record.versions) === null ||
-        _record$versions === void 0
-      ? void 0
-      : (_record$versions$find = _record$versions.find(
-          (item) => item.name === name
-        )) === null || _record$versions$find === void 0
-      ? void 0
-      : _record$versions$find.version;
+    const name = this.state.initVersions?.[record?.displayName];
+    return record?.versions?.find((item) => item.name === name)?.version;
   }
 
   getContractVersions(record) {
-    return (
-      (record === null || record === void 0 ? void 0 : record.versions) || []
-    );
+    return record?.versions || [];
   }
 
   changeContractVersion(e, payload) {
-    var _payload$record;
     this.setState({
       initVersions: {
         ...this.state.initVersions,
-        [payload === null || payload === void 0
-          ? void 0
-          : (_payload$record = payload.record) === null ||
-            _payload$record === void 0
-          ? void 0
-          : _payload$record.displayName]: e.key,
+        [payload?.record?.displayName]: e.key,
       },
     });
   }
@@ -514,25 +350,9 @@ class NetworkDetail$$Page extends React.Component {
 
   async validatorChannelName(value) {
     try {
-      var _this$props,
-        _this$props$appHelper,
-        _this$props$appHelper2,
-        _this$props$appHelper3;
-      const res = await ((_this$props = this.props) === null ||
-      _this$props === void 0
-        ? void 0
-        : (_this$props$appHelper = _this$props.appHelper) === null ||
-          _this$props$appHelper === void 0
-        ? void 0
-        : (_this$props$appHelper2 = _this$props$appHelper.utils) === null ||
-          _this$props$appHelper2 === void 0
-        ? void 0
-        : (_this$props$appHelper3 = _this$props$appHelper2.bff) === null ||
-          _this$props$appHelper3 === void 0
-        ? void 0
-        : _this$props$appHelper3.getChannel({
-            name: value,
-          }));
+      const res = await this.props?.appHelper?.utils?.bff?.getChannel({
+        name: value,
+      });
       return this.i18n('i18n-0imredkn');
     } catch (error) {}
   }
@@ -600,7 +420,6 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   openAddChannelPeerModal(e, payload) {
-    var _payload$record, _payload$record$membe;
     this.setState({
       channel: {
         ...this.state.channel,
@@ -612,16 +431,7 @@ class NetworkDetail$$Page extends React.Component {
     });
     this.getPeers(
       {
-        organizations:
-          (payload === null || payload === void 0
-            ? void 0
-            : (_payload$record = payload.record) === null ||
-              _payload$record === void 0
-            ? void 0
-            : (_payload$record$membe = _payload$record.members) === null ||
-              _payload$record$membe === void 0
-            ? void 0
-            : _payload$record$membe.map((item) => item.name)) || [],
+        organizations: payload?.record?.members?.map((item) => item.name) || [],
       },
       () => {},
       payload.record.peers || []
@@ -629,18 +439,7 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   channelAddModalNext() {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_create_channel')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_create_channel')?.formRef?.current?.form;
     form.submit(async (v) => {
       this.setState({
         channel: {
@@ -662,82 +461,29 @@ class NetworkDetail$$Page extends React.Component {
         },
       },
       () => {
-        var _this$$, _this$$$formRef, _this$$$formRef$curre;
-        const form =
-          (_this$$ = this.$('formily_create_channel')) === null ||
-          _this$$ === void 0
-            ? void 0
-            : (_this$$$formRef = _this$$.formRef) === null ||
-              _this$$$formRef === void 0
-            ? void 0
-            : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-              _this$$$formRef$curre === void 0
-            ? void 0
-            : _this$$$formRef$curre.form;
+        const form = this.$('formily_create_channel')?.formRef?.current?.form;
         form.setValues(this.state.channel.addData);
       }
     );
   }
 
   async channelAddModalConfirm(e, payload) {
-    var _this$props$useGetNet, _this$props$useGetNet2;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
+    const network = this.props.useGetNetwork?.data?.network || {};
     try {
-      var _this$state,
-        _this$state$channel,
-        _this$state$channelPe,
-        _this$state2,
-        _this$state2$channel,
-        _this$state2$channel$,
-        _this$state2$channel$2;
       const res = await this.props.appHelper.utils.bff.createChannel({
-        network: network === null || network === void 0 ? void 0 : network.name,
+        network: network?.name,
         channel: {
-          ...(((_this$state = this.state) === null || _this$state === void 0
-            ? void 0
-            : (_this$state$channel = _this$state.channel) === null ||
-              _this$state$channel === void 0
-            ? void 0
-            : _this$state$channel.addData) || {}),
-          peers:
-            (_this$state$channelPe = this.state.channelPeers) === null ||
-            _this$state$channelPe === void 0
-              ? void 0
-              : _this$state$channelPe.map((key) => {
-                  var _this$state$allPeers;
-                  const item =
-                    (_this$state$allPeers = this.state.allPeers) === null ||
-                    _this$state$allPeers === void 0
-                      ? void 0
-                      : _this$state$allPeers.find((item) => item.key === key);
-                  return {
-                    name: item.name,
-                    namespace: item.namespace,
-                  };
-                }),
+          ...(this.state?.channel?.addData || {}),
+          peers: this.state.channelPeers?.map((key) => {
+            const item = this.state.allPeers?.find((item) => item.key === key);
+            return {
+              name: item.name,
+              namespace: item.namespace,
+            };
+          }),
         },
       });
-      if (
-        ((_this$state2 = this.state) === null || _this$state2 === void 0
-          ? void 0
-          : (_this$state2$channel = _this$state2.channel) === null ||
-            _this$state2$channel === void 0
-          ? void 0
-          : (_this$state2$channel$ = _this$state2$channel.addData) === null ||
-            _this$state2$channel$ === void 0
-          ? void 0
-          : (_this$state2$channel$2 = _this$state2$channel$.organizations) ===
-              null || _this$state2$channel$2 === void 0
-          ? void 0
-          : _this$state2$channel$2.length) > 0
-      ) {
+      if (this.state?.channel?.addData?.organizations?.length > 0) {
         this.openAddChannelSuccessModal();
       } else {
         this.closeModal();
@@ -749,45 +495,20 @@ class NetworkDetail$$Page extends React.Component {
         this.props.useGetNetwork.mutate();
       }, 200);
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-85kkwp67i5u'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
 
   channelAddOrganizationModalConfirm(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_create_channel_organization')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_create_channel_organization')?.formRef?.current
+      ?.form;
     form.submit(async (v) => {
       try {
-        var _this$state$channel, _this$state$channel$r;
         const res = await this.props.appHelper.utils.bff.updateMemberChannel({
-          name:
-            (_this$state$channel = this.state.channel) === null ||
-            _this$state$channel === void 0
-              ? void 0
-              : (_this$state$channel$r = _this$state$channel.record) === null ||
-                _this$state$channel$r === void 0
-              ? void 0
-              : _this$state$channel$r.name,
+          name: this.state.channel?.record?.name,
           members: v.members,
         });
         // this.closeModal()
@@ -797,69 +518,32 @@ class NetworkDetail$$Page extends React.Component {
         this.openAddChannelOrganizationSuccessModal();
         this.props.useGetNetwork.mutate();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-2hz9pwzp'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
   }
 
   async channelAddPeerModalConfirm(e, payload) {
-    var _this$props$useGetNet, _this$props$useGetNet2, _this$state$channelPe;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    if (
-      ((_this$state$channelPe = this.state.channelPeers) === null ||
-      _this$state$channelPe === void 0
-        ? void 0
-        : _this$state$channelPe.length) < 1
-    ) {
+    const network = this.props.useGetNetwork?.data?.network || {};
+    if (this.state.channelPeers?.length < 1) {
       return;
     }
     try {
-      var _this$state$channel, _this$state$channel$r, _this$state$channelPe2;
       const res = await this.props.appHelper.utils.bff.updateChannel({
-        name:
-          (_this$state$channel = this.state.channel) === null ||
-          _this$state$channel === void 0
-            ? void 0
-            : (_this$state$channel$r = _this$state$channel.record) === null ||
-              _this$state$channel$r === void 0
-            ? void 0
-            : _this$state$channel$r.name,
+        name: this.state.channel?.record?.name,
         channel: {
           operate: 'add',
           // remove
-          peers:
-            (_this$state$channelPe2 = this.state.channelPeers) === null ||
-            _this$state$channelPe2 === void 0
-              ? void 0
-              : _this$state$channelPe2.map((key) => {
-                  var _this$state$allPeers;
-                  const item =
-                    (_this$state$allPeers = this.state.allPeers) === null ||
-                    _this$state$allPeers === void 0
-                      ? void 0
-                      : _this$state$allPeers.find((item) => item.key === key);
-                  return {
-                    name: item.name,
-                    namespace: item.namespace,
-                  };
-                }),
+          peers: this.state.channelPeers?.map((key) => {
+            const item = this.state.allPeers?.find((item) => item.key === key);
+            return {
+              name: item.name,
+              namespace: item.namespace,
+            };
+          }),
         },
       });
       this.closeModal();
@@ -869,16 +553,9 @@ class NetworkDetail$$Page extends React.Component {
       // this.openAddChannelSuccessModal()
       this.props.useGetNetwork.mutate();
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-sunw6qwy'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
@@ -895,8 +572,7 @@ class NetworkDetail$$Page extends React.Component {
       modalType: 'delete',
       channel: {
         ...this.state.channel,
-        record:
-          payload === null || payload === void 0 ? void 0 : payload.record,
+        record: payload?.record,
       },
     });
   }
@@ -920,6 +596,24 @@ class NetworkDetail$$Page extends React.Component {
     //     errors: error?.response?.errors
     //   })
     // }
+  }
+
+  async validatorContractRepeat(value) {
+    const form = this.$('formily_create_contract')?.formRef?.current?.form;
+    const displayName =
+      this.state.modalType === 'addcontract'
+        ? form.getValuesIn('displayName')
+        : this.state.contract?.record?.displayName;
+    try {
+      const res = await this.props?.appHelper?.utils?.bff?.getChaincodebuilds({
+        network: this.match?.params?.id,
+        version: value,
+        displayName,
+      });
+      if (res?.chaincodebuilds?.length > 0) {
+        return this.i18n('i18n-wc70jk7n');
+      }
+    } catch (error) {}
   }
 
   handleContractSearchValueChange(e) {
@@ -971,40 +665,13 @@ class NetworkDetail$$Page extends React.Component {
       },
       () => {
         setTimeout(() => {
-          var _this$$,
-            _this$$$formRef,
-            _this$$$formRef$curre,
-            _payload$record,
-            _payload$record2,
-            _payload$record3;
-          const form =
-            (_this$$ = this.$('formily_contract_deploy')) === null ||
-            _this$$ === void 0
-              ? void 0
-              : (_this$$$formRef = _this$$.formRef) === null ||
-                _this$$$formRef === void 0
-              ? void 0
-              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-                _this$$$formRef$curre === void 0
-              ? void 0
-              : _this$$$formRef$curre.form;
+          const form = this.$('formily_contract_deploy')?.formRef?.current
+            ?.form;
           form.setValues({
-            displayName:
-              (_payload$record = payload.record) === null ||
-              _payload$record === void 0
-                ? void 0
-                : _payload$record.displayName,
+            displayName: payload.record?.displayName,
             // edit
-            version:
-              (_payload$record2 = payload.record) === null ||
-              _payload$record2 === void 0
-                ? void 0
-                : _payload$record2.version,
-            name:
-              (_payload$record3 = payload.record) === null ||
-              _payload$record3 === void 0
-                ? void 0
-                : _payload$record3.name,
+            version: payload.record?.version,
+            name: payload.record?.name,
           });
         }, 0);
       }
@@ -1030,34 +697,12 @@ class NetworkDetail$$Page extends React.Component {
       },
       () => {
         setTimeout(() => {
-          var _this$$,
-            _this$$$formRef,
-            _this$$$formRef$curre,
-            _payload$record,
-            _payload$record2;
-          const form =
-            (_this$$ = this.$('formily_contract_upgrade')) === null ||
-            _this$$ === void 0
-              ? void 0
-              : (_this$$$formRef = _this$$.formRef) === null ||
-                _this$$$formRef === void 0
-              ? void 0
-              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-                _this$$$formRef$curre === void 0
-              ? void 0
-              : _this$$$formRef$curre.form;
+          const form = this.$('formily_contract_upgrade')?.formRef?.current
+            ?.form;
           form.setValues({
-            displayName:
-              (_payload$record = payload.record) === null ||
-              _payload$record === void 0
-                ? void 0
-                : _payload$record.displayName,
+            displayName: payload.record?.displayName,
             // edit
-            version:
-              (_payload$record2 = payload.record) === null ||
-              _payload$record2 === void 0
-                ? void 0
-                : _payload$record2.version,
+            version: payload.record?.version,
           });
         }, 0);
       }
@@ -1076,30 +721,8 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   confirmAddContractModal(e, payload) {
-    var _this$props$useGetNet,
-      _this$props$useGetNet2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    const form =
-      (_this$$ = this.$('formily_create_contract')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const network = this.props.useGetNetwork?.data?.network || {};
+    const form = this.$('formily_create_contract')?.formRef?.current?.form;
     form.submit(async (v) => {
       this.setState({
         contract: {
@@ -1108,42 +731,18 @@ class NetworkDetail$$Page extends React.Component {
         },
       });
       try {
-        var _this$match,
-          _this$match$params,
-          _v$files,
-          _v$files$fileList,
-          _v$files2,
-          _v$files2$fileList;
         const res = await this.props.appHelper.utils.bff.createChaincodebuild({
           ...v,
-          network:
-            (_this$match = this.match) === null || _this$match === void 0
-              ? void 0
-              : (_this$match$params = _this$match.params) === null ||
-                _this$match$params === void 0
-              ? void 0
-              : _this$match$params.id,
+          network: this.match?.params?.id,
           // files: v.files?.fileList?.map(item => {
           //   const file = item.originFileObj
           //   return new File([file], file.webkitRelativePath, { type: file.type })
           // }),
-          files:
-            (_v$files = v.files) === null || _v$files === void 0
-              ? void 0
-              : (_v$files$fileList = _v$files.fileList) === null ||
-                _v$files$fileList === void 0
-              ? void 0
-              : _v$files$fileList.map((item) => item.originFileObj),
-          fileRelativePaths:
-            (_v$files2 = v.files) === null || _v$files2 === void 0
-              ? void 0
-              : (_v$files2$fileList = _v$files2.fileList) === null ||
-                _v$files2$fileList === void 0
-              ? void 0
-              : _v$files2$fileList.map((item) => {
-                  const file = item.originFileObj;
-                  return file.webkitRelativePath;
-                }),
+          files: v.files?.fileList?.map((item) => item.originFileObj),
+          fileRelativePaths: v.files?.fileList?.map((item) => {
+            const file = item.originFileObj;
+            return file.webkitRelativePath;
+          }),
         });
         this.closeModal();
         this.utils.notification.success({
@@ -1157,7 +756,6 @@ class NetworkDetail$$Page extends React.Component {
           },
         });
       } catch (error) {
-        var _error$response;
         this.setState({
           contract: {
             ...this.state.contract,
@@ -1166,73 +764,32 @@ class NetworkDetail$$Page extends React.Component {
         });
         this.utils.notification.warnings({
           message: this.i18n('i18n-rw4x2dt7'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
   }
 
   confirmUpgradeContractModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    this.setState({
-      contractUpgradeLoading: true,
-    });
-    const form =
-      (_this$$ = this.$('formily_contract_upgrade')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_contract_upgrade')?.formRef?.current?.form;
     form.submit(async (v) => {
+      this.setState({
+        contractUpgradeLoading: true,
+      });
       const { versoin, ...params } = v;
       try {
-        var _this$match,
-          _this$match$params,
-          _v$files,
-          _v$files$fileList,
-          _v$files2,
-          _v$files2$fileList;
         const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
           ...params,
-          network:
-            (_this$match = this.match) === null || _this$match === void 0
-              ? void 0
-              : (_this$match$params = _this$match.params) === null ||
-                _this$match$params === void 0
-              ? void 0
-              : _this$match$params.id,
+          network: this.match?.params?.id,
           // files: v.files?.fileList?.map(item => {
           //   const file = item.originFileObj
           //   return new File([file], file.webkitRelativePath, { type: file.type })
           // }),
-          files:
-            (_v$files = v.files) === null || _v$files === void 0
-              ? void 0
-              : (_v$files$fileList = _v$files.fileList) === null ||
-                _v$files$fileList === void 0
-              ? void 0
-              : _v$files$fileList.map((item) => item.originFileObj),
-          fileRelativePaths:
-            (_v$files2 = v.files) === null || _v$files2 === void 0
-              ? void 0
-              : (_v$files2$fileList = _v$files2.fileList) === null ||
-                _v$files2$fileList === void 0
-              ? void 0
-              : _v$files2$fileList.map((item) => {
-                  const file = item.originFileObj;
-                  return file.webkitRelativePath;
-                }),
+          files: v.files?.fileList?.map((item) => item.originFileObj),
+          fileRelativePaths: v.files?.fileList?.map((item) => {
+            const file = item.originFileObj;
+            return file.webkitRelativePath;
+          }),
         });
         this.closeModal();
         this.utils.notification.success({
@@ -1244,45 +801,22 @@ class NetworkDetail$$Page extends React.Component {
           contractUpgradeLoading: false,
         });
       } catch (error) {
-        var _error$response;
         this.setState({
           contractUpgradeLoading: false,
         });
         this.utils.notification.warnings({
           message: this.i18n('i18n-7fxj402s'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
   }
 
   confirmDeploymentContractModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_contract_deploy')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_contract_deploy')?.formRef?.current?.form;
     form.submit(async (v) => {
-      var _JSON$parse;
       const chaincode = {
-        channel:
-          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
-          _JSON$parse === void 0
-            ? void 0
-            : _JSON$parse.name,
+        channel: JSON.parse(v.channel || '{}')?.name,
         epolicy: v.epolicy,
         name: v.name,
         displayName: v.displayName,
@@ -1301,16 +835,9 @@ class NetworkDetail$$Page extends React.Component {
         this.openDeploymentContractSuccessModal();
         this.props.useGetChaincodebuilds.mutate();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-ekujezos'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
@@ -1318,33 +845,23 @@ class NetworkDetail$$Page extends React.Component {
 
   async confirmDeleteContractModal(e, payload) {
     try {
-      var _this$state$contract, _this$state$contract$;
       await this.props.appHelper.utils.bff.deleteChaincodebuild({
-        name:
-          (_this$state$contract = this.state.contract) === null ||
-          _this$state$contract === void 0
-            ? void 0
-            : (_this$state$contract$ = _this$state$contract.record) === null ||
-              _this$state$contract$ === void 0
-            ? void 0
-            : _this$state$contract$.name,
+        name: this.state.contract?.record?.name,
       });
       this.closeModal();
       this.utils.notification.success({
         message: this.i18n('i18n-5m5bdexs'),
       });
-      this.props.useGetChaincodebuilds.mutate();
+      await this.props.useGetChaincodebuilds.mutate();
+      setTimeout(() => {
+        this.formatContract(_, {
+          initVersions: true,
+        });
+      });
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-esbyfrwe'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
@@ -1373,16 +890,8 @@ class NetworkDetail$$Page extends React.Component {
 
   async confirmDeleteStrategyModal(e, payload) {
     try {
-      var _this$state$strategy, _this$state$strategy$;
       await this.props.appHelper.utils.bff.deleteEpolicy({
-        name:
-          (_this$state$strategy = this.state.strategy) === null ||
-          _this$state$strategy === void 0
-            ? void 0
-            : (_this$state$strategy$ = _this$state$strategy.record) === null ||
-              _this$state$strategy$ === void 0
-            ? void 0
-            : _this$state$strategy$.name,
+        name: this.state.strategy?.record?.name,
       });
       this.closeModal();
       this.utils.notification.success({
@@ -1390,16 +899,9 @@ class NetworkDetail$$Page extends React.Component {
       });
       this.getEpolicies();
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-ctwrr17g'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
@@ -1442,18 +944,8 @@ class NetworkDetail$$Page extends React.Component {
       },
       () => {
         setTimeout(() => {
-          var _this$$, _this$$$formRef, _this$$$formRef$curre;
-          const form =
-            (_this$$ = this.$('formily_create_strategy')) === null ||
-            _this$$ === void 0
-              ? void 0
-              : (_this$$$formRef = _this$$.formRef) === null ||
-                _this$$$formRef === void 0
-              ? void 0
-              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-                _this$$$formRef$curre === void 0
-              ? void 0
-              : _this$$$formRef$curre.form;
+          const form = this.$('formily_create_strategy')?.formRef?.current
+            ?.form;
           form &&
             form.setValues({
               content: {
@@ -1471,75 +963,30 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   confirmAddStrategyModal(e, payload) {
-    var _this$props$useGetNet,
-      _this$props$useGetNet2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
-    const network =
-      ((_this$props$useGetNet = this.props.useGetNetwork) === null ||
-      _this$props$useGetNet === void 0
-        ? void 0
-        : (_this$props$useGetNet2 = _this$props$useGetNet.data) === null ||
-          _this$props$useGetNet2 === void 0
-        ? void 0
-        : _this$props$useGetNet2.network) || {};
-    const form =
-      (_this$$ = this.$('formily_create_strategy')) === null ||
-      _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const network = this.props.useGetNetwork?.data?.network || {};
+    const form = this.$('formily_create_strategy')?.formRef?.current?.form;
     form.submit(async (v) => {
-      var _JSON$parse;
       const getValue = () => {
-        var _v$content, _v$content$value;
-        const values =
-          (_v$content = v.content) === null || _v$content === void 0
-            ? void 0
-            : (_v$content$value = _v$content.value) === null ||
-              _v$content$value === void 0
-            ? void 0
-            : _v$content$value.map((valueitem) => {
-                var _valueitem$item, _valueitem$item$map;
-                return (_valueitem$item = valueitem.item) === null ||
-                  _valueitem$item === void 0
-                  ? void 0
-                  : (_valueitem$item$map = _valueitem$item.map((item, i) => {
-                      item = `'${item}.member'`;
-                      if (i === 0) {
-                        item = 'AND(' + item;
-                      }
-                      if (i === valueitem.item.length - 1) {
-                        item = item + ')';
-                      }
-                      return item;
-                    })) === null || _valueitem$item$map === void 0
-                  ? void 0
-                  : _valueitem$item$map.join(',');
-              });
-        return (values === null || values === void 0 ? void 0 : values.length) >
-          1
-          ? 'OR(' +
-              (values === null || values === void 0
-                ? void 0
-                : values.join(',')) +
-              ')'
-          : values === null || values === void 0
-          ? void 0
-          : values.join(',');
+        const values = v.content?.value?.map((valueitem) =>
+          valueitem.item
+            ?.map((item, i) => {
+              item = `'${item}.member'`;
+              if (i === 0) {
+                item = 'AND(' + item;
+              }
+              if (i === valueitem.item.length - 1) {
+                item = item + ')';
+              }
+              return item;
+            })
+            ?.join(',')
+        );
+        return values?.length > 1
+          ? 'OR(' + values?.join(',') + ')'
+          : values?.join(',');
       };
       const epolicy = {
-        channel:
-          (_JSON$parse = JSON.parse(v.channel || '{}')) === null ||
-          _JSON$parse === void 0
-            ? void 0
-            : _JSON$parse.name,
+        channel: JSON.parse(v.channel || '{}')?.name,
         description: v.description,
         displayName: v.displayName,
         value: getValue(),
@@ -1555,16 +1002,9 @@ class NetworkDetail$$Page extends React.Component {
         this.props.useGetNetwork.mutate();
         this.getEpolicies();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-sivjo10j'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
@@ -1576,19 +1016,13 @@ class NetworkDetail$$Page extends React.Component {
 
   componentDidMount() {
     const getOrganizations = async () => {
-      var _res$organizations;
       const res = await this.props.appHelper.utils.bff.getOrganizations();
       this.setState({
         organizations:
-          (res === null || res === void 0
-            ? void 0
-            : (_res$organizations = res.organizations) === null ||
-              _res$organizations === void 0
-            ? void 0
-            : _res$organizations.map((item) => ({
-                value: item.name,
-                label: `${item.name}(${item.admin})`,
-              }))) || [],
+          res?.organizations?.map((item) => ({
+            value: item.name,
+            label: `${item.name}(${item.admin})`,
+          })) || [],
       });
     };
     getOrganizations();
@@ -1600,190 +1034,6 @@ class NetworkDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
-        <Modal
-          __component_name="Modal"
-          __events={{
-            eventDataList: [
-              {
-                name: 'onCancel',
-                relatedEventName: 'closeModal',
-                type: 'componentEvent',
-              },
-            ],
-            eventList: [
-              {
-                disabled: false,
-                name: 'afterClose',
-                templete:
-                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
-              },
-              {
-                disabled: true,
-                name: 'onCancel',
-                template:
-                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
-              },
-              {
-                disabled: true,
-                name: 'onOk',
-                template:
-                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
-              },
-            ],
-          }}
-          centered={false}
-          confirmLoading={false}
-          destroyOnClose={true}
-          footer={
-            <Row __component_name="Row" wrap={true}>
-              <Col __component_name="Col" span={6} />
-              <Col __component_name="Col" span={6} />
-              <Col __component_name="Col" span={6} />
-              <Col __component_name="Col" span={6} />
-            </Row>
-          }
-          forceRender={false}
-          keyboard={true}
-          mask={true}
-          maskClosable={false}
-          onCancel={function () {
-            return this.closeModal.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
-          }.bind(this)}
-          open={__$$eval(
-            () =>
-              this.state.isOpenModal &&
-              this.state.modalType === 'strategydetail'
-          )}
-          ref={this._refsManager.linkRef('modal-f48ee40c')}
-          title={this.i18n('i18n-5ruzwlr4') /* 背书策略详情 */}
-        >
-          <Descriptions
-            __component_name="Descriptions"
-            bordered={false}
-            colon={false}
-            column={1}
-            items={[
-              {
-                children: (
-                  <Typography.Text
-                    __component_name="Typography.Text"
-                    disabled={false}
-                    ellipsis={true}
-                    strong={false}
-                    style={{ fontSize: '' }}
-                  >
-                    {__$$eval(() => this.state.strategy?.record?.name || '-')}
-                  </Typography.Text>
-                ),
-                key: '2xnokcznohl',
-                label: this.i18n('i18n-87kp314f') /* 策略名称 */,
-                span: 1,
-              },
-              {
-                children: (
-                  <Typography.Text
-                    __component_name="Typography.Text"
-                    disabled={false}
-                    ellipsis={true}
-                    strong={false}
-                    style={{ fontSize: '' }}
-                  >
-                    {__$$eval(
-                      () => this.state.strategy?.record?.description || '-'
-                    )}
-                  </Typography.Text>
-                ),
-                key: '0h2dnnfyj23',
-                label: this.i18n('i18n-tcgbsroi') /* 策略内容 */,
-                span: 1,
-              },
-              {
-                children: (
-                  <Typography.Text
-                    __component_name="Typography.Text"
-                    disabled={false}
-                    ellipsis={true}
-                    strong={false}
-                    style={{ fontSize: '' }}
-                  >
-                    {__$$eval(
-                      () => this.state.strategy?.record?.content || '-'
-                    )}
-                  </Typography.Text>
-                ),
-                key: '3k9rb4ji034',
-                label: this.i18n('i18n-w3qy6omh') /* 策略描述 */,
-                span: 1,
-              },
-            ]}
-            labelStyle={{ width: 100 }}
-            layout="horizontal"
-            size="default"
-            title=" "
-          >
-            <Descriptions.Item
-              key="2xnokcznohl"
-              label={this.i18n('i18n-87kp314f') /* 策略名称 */}
-              span={1}
-            >
-              {
-                <Typography.Text
-                  __component_name="Typography.Text"
-                  disabled={false}
-                  ellipsis={true}
-                  strong={false}
-                  style={{ fontSize: '' }}
-                >
-                  {__$$eval(
-                    () =>
-                      `${this.state.strategy?.record?.displayName || '-'}(${
-                        this.state.strategy?.record?.name
-                      })`
-                  )}
-                </Typography.Text>
-              }
-            </Descriptions.Item>
-            <Descriptions.Item
-              key="0h2dnnfyj23"
-              label={this.i18n('i18n-tcgbsroi') /* 策略内容 */}
-              span={1}
-            >
-              {
-                <Typography.Text
-                  __component_name="Typography.Text"
-                  disabled={false}
-                  ellipsis={true}
-                  strong={false}
-                  style={{ fontSize: '' }}
-                >
-                  {__$$eval(
-                    () => this.state.strategy?.record?.description || '-'
-                  )}
-                </Typography.Text>
-              }
-            </Descriptions.Item>
-            <Descriptions.Item
-              key="3k9rb4ji034"
-              label={this.i18n('i18n-w3qy6omh') /* 策略描述 */}
-              span={1}
-            >
-              {
-                <Typography.Text
-                  __component_name="Typography.Text"
-                  disabled={false}
-                  ellipsis={true}
-                  strong={false}
-                  style={{ fontSize: '' }}
-                >
-                  {__$$eval(() => this.state.strategy?.record?.value || '-')}
-                </Typography.Text>
-              }
-            </Descriptions.Item>
-          </Descriptions>
-        </Modal>
         <Modal
           __component_name="Modal"
           __events={{
@@ -2008,6 +1258,190 @@ class NetworkDetail$$Page extends React.Component {
                 relatedEventName: 'closeModal',
                 type: 'componentEvent',
               },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Row __component_name="Row" wrap={true}>
+              <Col __component_name="Col" span={6} />
+              <Col __component_name="Col" span={6} />
+              <Col __component_name="Col" span={6} />
+              <Col __component_name="Col" span={6} />
+            </Row>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'strategydetail'
+          )}
+          ref={this._refsManager.linkRef('modal-f48ee40c')}
+          title={this.i18n('i18n-5ruzwlr4') /* 背书策略详情 */}
+        >
+          <Descriptions
+            __component_name="Descriptions"
+            bordered={false}
+            colon={false}
+            column={1}
+            items={[
+              {
+                children: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(() => this.state.strategy?.record?.name || '-')}
+                  </Typography.Text>
+                ),
+                key: '2xnokcznohl',
+                label: this.i18n('i18n-87kp314f') /* 策略名称 */,
+                span: 1,
+              },
+              {
+                children: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(
+                      () => this.state.strategy?.record?.description || '-'
+                    )}
+                  </Typography.Text>
+                ),
+                key: '0h2dnnfyj23',
+                label: this.i18n('i18n-tcgbsroi') /* 策略内容 */,
+                span: 1,
+              },
+              {
+                children: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(
+                      () => this.state.strategy?.record?.content || '-'
+                    )}
+                  </Typography.Text>
+                ),
+                key: '3k9rb4ji034',
+                label: this.i18n('i18n-w3qy6omh') /* 策略描述 */,
+                span: 1,
+              },
+            ]}
+            labelStyle={{ width: 100 }}
+            layout="horizontal"
+            size="default"
+            title=" "
+          >
+            <Descriptions.Item
+              key="2xnokcznohl"
+              label={this.i18n('i18n-87kp314f') /* 策略名称 */}
+              span={1}
+            >
+              {
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(
+                    () =>
+                      `${this.state.strategy?.record?.displayName || '-'}(${
+                        this.state.strategy?.record?.name
+                      })`
+                  )}
+                </Typography.Text>
+              }
+            </Descriptions.Item>
+            <Descriptions.Item
+              key="0h2dnnfyj23"
+              label={this.i18n('i18n-tcgbsroi') /* 策略内容 */}
+              span={1}
+            >
+              {
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(
+                    () => this.state.strategy?.record?.description || '-'
+                  )}
+                </Typography.Text>
+              }
+            </Descriptions.Item>
+            <Descriptions.Item
+              key="3k9rb4ji034"
+              label={this.i18n('i18n-w3qy6omh') /* 策略描述 */}
+              span={1}
+            >
+              {
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  disabled={false}
+                  ellipsis={true}
+                  strong={false}
+                  style={{ fontSize: '' }}
+                >
+                  {__$$eval(() => this.state.strategy?.record?.value || '-')}
+                </Typography.Text>
+              }
+            </Descriptions.Item>
+          </Descriptions>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
               {
                 name: 'onOk',
                 relatedEventName: 'confirmUpgradeContractModal',
@@ -2060,7 +1494,6 @@ class NetworkDetail$$Page extends React.Component {
               this.state.modalType === 'upgradecontract'
           )}
           title={this.i18n('i18n-nihrz6ys') /* 合约升级 */}
-          okButtonProps={{}}
         >
           <FormilyForm
             __component_name="FormilyForm"
@@ -2122,7 +1555,20 @@ class NetworkDetail$$Page extends React.Component {
                 name: 'newVersion',
                 required: true,
                 title: this.i18n('i18n-1qxjy0jv') /* 升级后版本号 */,
-                'x-validator': [],
+                'x-validator': [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validatorContractRepeat.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                  },
+                ],
               }}
             />
             <FormilyUpload
@@ -2139,11 +1585,21 @@ class NetworkDetail$$Page extends React.Component {
                 },
               }}
               fieldProps={{
+                enum: [],
                 name: 'files',
                 required: true,
                 title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
                 'x-component': 'FormilyUpload',
-                'x-validator': [],
+                'x-validator': [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    message: this.i18n('i18n-9nvgrvip') /* 请上传文件 */,
+                    type: 'disabled',
+                    whitespace: true,
+                  },
+                ],
               }}
             >
               <Button
@@ -3052,6 +2508,9 @@ class NetworkDetail$$Page extends React.Component {
           <Col __component_name="Col" span={24}>
             <Tabs
               __component_name="Tabs"
+              defaultActiveKey={__$$eval(
+                () => this.props?.location?.query?.tab || 'network'
+              )}
               destroyInactiveTabPane="true"
               items={[
                 {
@@ -3207,7 +2666,10 @@ class NetworkDetail$$Page extends React.Component {
                                       <Col span={24}>
                                         <UnifiedLink
                                           target="_blank"
-                                          to="/network/detail/${this.match?.params?.id}?tab=&#39;channel&#39;"
+                                          to={__$$eval(
+                                            () =>
+                                              `/network/detail/${this.match?.params?.id}?tab=channel`
+                                          )}
                                         >
                                           {
                                             this.i18n(
@@ -3312,7 +2774,10 @@ class NetworkDetail$$Page extends React.Component {
                                       <Col span={24}>
                                         <UnifiedLink
                                           target="_blank"
-                                          to="/network/detail/${this.match?.params?.id}?tab=&#39;contract&#39;"
+                                          to={__$$eval(
+                                            () =>
+                                              `/network/detail/${this.match?.params?.id}?tab=contract`
+                                          )}
                                         >
                                           {
                                             this.i18n(
@@ -3415,13 +2880,21 @@ class NetworkDetail$$Page extends React.Component {
                                         </Typography.Text>
                                       </Col>
                                       <Col span={24}>
-                                        <UnifiedLink target="_blank" to="/">
-                                          {
-                                            this.i18n(
-                                              'i18n-5ne2amb2'
-                                            ) /* API 指南 */
-                                          }
-                                        </UnifiedLink>
+                                        {!!false && (
+                                          <UnifiedLink
+                                            ref={this._refsManager.linkRef(
+                                              'unifiedlink-d8ba05f6'
+                                            )}
+                                            target="_blank"
+                                            to="/"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-5ne2amb2'
+                                              ) /* API 指南 */
+                                            }
+                                          </UnifiedLink>
+                                        )}
                                       </Col>
                                     </Row>
                                   </Col>
@@ -3517,7 +2990,10 @@ class NetworkDetail$$Page extends React.Component {
                                         </Typography.Text>
                                       </Col>
                                       <Col span={24}>
-                                        <UnifiedLink target="_blank" to="/">
+                                        <UnifiedLink
+                                          target="_blank"
+                                          to="/browser"
+                                        >
                                           {
                                             this.i18n(
                                               'i18n-gyh9gtql'
@@ -5273,7 +4749,9 @@ class NetworkDetail$$Page extends React.Component {
                                       shape="default"
                                       type="link"
                                     >
-                                      {__$$eval(() => record.name || '-')}
+                                      {__$$eval(
+                                        () => `${record.displayName || '-'}`
+                                      )}
                                     </Button>
                                   ))(
                                     __$$createChildContext(__$$context, {
@@ -7089,7 +6567,7 @@ class NetworkDetail$$Page extends React.Component {
                       },
                     }}
                     fieldProps={{
-                      name: 'name',
+                      name: 'displayName',
                       required: true,
                       title: this.i18n('i18n-9e87qfos') /* 名称 */,
                       'x-validator': [
@@ -7706,7 +7184,20 @@ class NetworkDetail$$Page extends React.Component {
                 name: 'version',
                 required: true,
                 title: this.i18n('i18n-6othsg2w') /* 合约版本号 */,
-                'x-validator': [],
+                'x-validator': [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validatorContractRepeat.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                  },
+                ],
               }}
             />
             <FormilyUpload

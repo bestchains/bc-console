@@ -95,6 +95,8 @@ export type Channel = {
   creationTimestamp?: Maybe<Scalars['String']>;
   /** 描述 */
   description?: Maybe<Scalars['String']>;
+  /** 名称 */
+  displayName?: Maybe<Scalars['String']>;
   /** 背书策略 */
   epolicy?: Maybe<Array<Epolicy>>;
   /** 我参与的 */
@@ -462,10 +464,10 @@ export type NewChaincodebuild = {
 export type NewChannel = {
   /** 描述 */
   description?: InputMaybe<Scalars['String']>;
+  /** 通道名称 */
+  displayName: Scalars['String'];
   /** 发起者（组织） */
   initiator: Scalars['String'];
-  /** 通道名称，规则：小写字母、数字、“-”，开头和结尾只能是字母或数字`（[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*）` */
-  name: Scalars['String'];
   /** 配置成员（组织） */
   organizations?: InputMaybe<Array<Scalars['String']>>;
   /** Peer节点，仅能选Deployed的（通过「getIbppeersForCreateChannel」API获取） */
@@ -689,7 +691,9 @@ export type QueryChaincodebuildArgs = {
 };
 
 export type QueryChaincodebuildsArgs = {
+  displayName?: InputMaybe<Scalars['String']>;
   network: Scalars['String'];
+  version?: InputMaybe<Scalars['String']>;
 };
 
 export type QueryChannelArgs = {
@@ -886,6 +890,8 @@ export type CreateChaincodebuildMutation = {
 
 export type GetChaincodebuildsQueryVariables = Exact<{
   network: Scalars['String'];
+  version?: InputMaybe<Scalars['String']>;
+  displayName?: InputMaybe<Scalars['String']>;
 }>;
 
 export type GetChaincodebuildsQuery = {
@@ -989,6 +995,7 @@ export type GetChannelQuery = {
   channel: {
     __typename?: 'Channel';
     name: string;
+    displayName?: string | null;
     description?: string | null;
     creationTimestamp?: string | null;
     epolicy?: Array<{
@@ -1027,6 +1034,7 @@ export type CreateChannelMutation = {
   channelCreate: {
     __typename?: 'Channel';
     name: string;
+    displayName?: string | null;
     creationTimestamp?: string | null;
     status?: CrdStatusType | null;
     members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
@@ -1048,6 +1056,7 @@ export type UpdateChannelMutation = {
   channelUpdate: {
     __typename?: 'Channel';
     name: string;
+    displayName?: string | null;
     creationTimestamp?: string | null;
     status?: CrdStatusType | null;
     members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
@@ -1089,6 +1098,7 @@ export type GetMyChannelsQuery = {
   channels?: Array<{
     __typename?: 'Channel';
     name: string;
+    displayName?: string | null;
     network?: string | null;
     peers?: Array<{
       __typename?: 'SpecPeer';
@@ -1435,6 +1445,7 @@ export type GetNetworkQuery = {
     channels?: Array<{
       __typename?: 'Channel';
       name: string;
+      displayName?: string | null;
       creationTimestamp?: string | null;
       status?: CrdStatusType | null;
       createdByMe?: boolean | null;
@@ -1751,8 +1762,8 @@ export const CreateChaincodebuildDocument = gql`
   }
 `;
 export const GetChaincodebuildsDocument = gql`
-  query getChaincodebuilds($network: String!) {
-    chaincodebuilds(network: $network) {
+  query getChaincodebuilds($network: String!, $version: String, $displayName: String) {
+    chaincodebuilds(network: $network, version: $version, displayName: $displayName) {
       name
       displayName
       creationTimestamp
@@ -1844,6 +1855,7 @@ export const GetChannelDocument = gql`
   query getChannel($name: String!) {
     channel(name: $name) {
       name
+      displayName
       description
       creationTimestamp
       epolicy {
@@ -1872,6 +1884,7 @@ export const CreateChannelDocument = gql`
   mutation createChannel($network: String!, $channel: NewChannel!) {
     channelCreate(network: $network, channel: $channel) {
       name
+      displayName
       members {
         name
       }
@@ -1888,6 +1901,7 @@ export const UpdateChannelDocument = gql`
   mutation updateChannel($channel: UpdateChannel!, $name: String!) {
     channelUpdate(channel: $channel, name: $name) {
       name
+      displayName
       members {
         name
       }
@@ -1917,6 +1931,7 @@ export const GetMyChannelsDocument = gql`
   query getMyChannels {
     channels {
       name
+      displayName
       network
       peers {
         name
@@ -2181,6 +2196,7 @@ export const GetNetworkDocument = gql`
       }
       channels {
         name
+        displayName
         members {
           name
           joinedAt

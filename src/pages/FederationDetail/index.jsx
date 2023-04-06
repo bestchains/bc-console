@@ -27,7 +27,7 @@ import {
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/index';
 
 import * as __$$i18n from '../../i18n';
 
@@ -86,37 +86,13 @@ class FederationDetail$$Page extends React.Component {
   }
 
   confirmAddUserModal(e, payload) {
-    var _this$props$useGetFed,
-      _this$props$useGetFed2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
-    const federation =
-      ((_this$props$useGetFed = this.props.useGetFederation) === null ||
-      _this$props$useGetFed === void 0
-        ? void 0
-        : (_this$props$useGetFed2 = _this$props$useGetFed.data) === null ||
-          _this$props$useGetFed2 === void 0
-        ? void 0
-        : _this$props$useGetFed2.federation) || {};
-    const form =
-      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const federation = this.props.useGetFederation?.data?.federation || {};
+    const form = this.$('formily_create')?.formRef?.current?.form;
     form.submit(async (v) => {
       try {
         const res =
           await this.props.appHelper.utils.bff.addOrganizationToFederation({
-            name:
-              federation === null || federation === void 0
-                ? void 0
-                : federation.name,
+            name: federation?.name,
             organizations: v.organizations,
           });
         // this.closeModal()
@@ -126,43 +102,20 @@ class FederationDetail$$Page extends React.Component {
         this.openAddUserSuccessModal();
         this.props.useGetFederation.mutate();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-43getajmxf3'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
   }
 
   async confirmDeleteUserModal(e, payload) {
-    var _this$props$useGetFed, _this$props$useGetFed2;
-    const federation =
-      ((_this$props$useGetFed = this.props.useGetFederation) === null ||
-      _this$props$useGetFed === void 0
-        ? void 0
-        : (_this$props$useGetFed2 = _this$props$useGetFed.data) === null ||
-          _this$props$useGetFed2 === void 0
-        ? void 0
-        : _this$props$useGetFed2.federation) || {};
+    const federation = this.props.useGetFederation?.data?.federation || {};
     try {
-      var _this$state$userRecor;
       await this.props.appHelper.utils.bff.removeOrganizationToFederation({
-        name:
-          federation === null || federation === void 0
-            ? void 0
-            : federation.name,
-        organization:
-          (_this$state$userRecor = this.state.userRecord) === null ||
-          _this$state$userRecor === void 0
-            ? void 0
-            : _this$state$userRecor.name,
+        name: federation?.name,
+        organization: this.state.userRecord?.name,
       });
       this.openDeleteUserSuccessModal();
       // this.closeModal()
@@ -171,16 +124,9 @@ class FederationDetail$$Page extends React.Component {
       // })
       this.props.useGetFederation.mutate();
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-p5gea1q7fem'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
@@ -245,8 +191,7 @@ class FederationDetail$$Page extends React.Component {
     this.setState({
       isOpenModal: true,
       modalType: 'delete',
-      userRecord:
-        payload === null || payload === void 0 ? void 0 : payload.record,
+      userRecord: payload?.record,
     });
   }
 
@@ -265,19 +210,13 @@ class FederationDetail$$Page extends React.Component {
 
   componentDidMount() {
     const getOrganizations = async () => {
-      var _res$organizations;
       const res = await this.props.appHelper.utils.bff.getOrganizations();
       this.setState({
         organizations:
-          (res === null || res === void 0
-            ? void 0
-            : (_res$organizations = res.organizations) === null ||
-              _res$organizations === void 0
-            ? void 0
-            : _res$organizations.map((item) => ({
-                value: item.name,
-                label: `${item.name}(${item.admin})`,
-              }))) || [],
+          res?.organizations?.map((item) => ({
+            value: item.name,
+            label: `${item.name}(${item.admin})`,
+          })) || [],
       });
     };
     getOrganizations();
@@ -1444,7 +1383,13 @@ class FederationDetail$$Page extends React.Component {
               decoratorProps={{ 'x-decorator-props': { asterisk: true } }}
               fieldProps={{
                 _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
-                enum: __$$eval(() => this.state.organizations),
+                enum: __$$eval(() =>
+                  this.state.organizations?.filter((item) =>
+                    this.props.useGetFederation?.data?.federation?.organizations?.every(
+                      (o) => o.name !== item.value
+                    )
+                  )
+                ),
                 name: 'organizations',
                 title: this.i18n('i18n-gmx7l7tolvj') /* 成员组织 */,
                 'x-validator': [],
