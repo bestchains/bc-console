@@ -14,7 +14,7 @@ specifiers:
   '@formily/react': ^2.1.4
   '@tenx-ui/charts': 1.1.2
   '@tenx-ui/icon': ^2.4.17
-  '@tenx-ui/materials': 1.0.24
+  '@tenx-ui/materials': 1.1.4
   '@tenx-ui/utils': ^2.3.0
   '@testing-library/jest-dom': ^5.16.4
   '@testing-library/react': ^13
@@ -75,7 +75,7 @@ dependencies:
   '@formily/react': 2.2.16_imsf4monu2ro3jsq722crax7fe
   '@tenx-ui/charts': 1.1.2_uxg2dbmuxi6z4lw5feefx5zea4
   '@tenx-ui/icon': 2.4.17_4wymetwju2f67kkws2jsebarle
-  '@tenx-ui/materials': 1.0.24_uxg2dbmuxi6z4lw5feefx5zea4
+  '@tenx-ui/materials': 1.1.4_uxg2dbmuxi6z4lw5feefx5zea4
   '@tenx-ui/utils': 2.3.0_v2m5e27vhdewzwhryxwfaorcca
   '@umijs/max': 4.0.44_dubak3sm6kr32wj4hxzec2jvdy
   antd: 5.3.0_biqbaboplfbrettd7655fr4n2y
@@ -4037,8 +4037,8 @@ packages:
     resolution: {integrity: sha512-KRr4cj9qOubriyB9mqLT86qceHj+3bj3f4YAhV27lBcwN023Zzc5643g0IMuChzm4MDoJJSmDL6v34hOefNtfA==}
     dev: false
 
-  /@tenx-ui/materials/1.0.24_uxg2dbmuxi6z4lw5feefx5zea4:
-    resolution: {integrity: sha512-/QwGuxGuZOmEkrT2Ui9Bflz2zspUGshKFPSJMQgJkoQJIsXznT+RdbG+0QxthLkFvpP0CZ82UVwcMM6rdQv0YQ==}
+  /@tenx-ui/materials/1.1.4_uxg2dbmuxi6z4lw5feefx5zea4:
+    resolution: {integrity: sha512-4cDwqTFqN9k4kmL3OKj46Qup1SPxtV0OtR4Y0dY6BM+nOW8HeDrDBvFowUipiOxo78/yVoA2DXpMZYwIkvt6Lw==}
     peerDependencies:
       antd: ^5.1.5
     dependencies:

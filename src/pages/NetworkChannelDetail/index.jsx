@@ -97,7 +97,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                   hoverable={false}
                   loading={__$$eval(() => this.props.useGetChannel?.loading)}
                   size="default"
-                  style={{}}
+                  style={{ width: '100%' }}
                   type="default"
                 >
                   <Row __component_name="Row" wrap={true}>

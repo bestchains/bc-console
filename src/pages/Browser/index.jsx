@@ -31,7 +31,7 @@ import { createFetchHandler as __$$createFetchRequestHandler } from '@alilc/lowc
 
 import { create as __$$createDataSourceEngine } from '@alilc/lowcode-datasource-engine/runtime';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/index';
 
 import * as __$$i18n from '../../i18n';
 
@@ -117,33 +117,33 @@ class Browser$$Page extends React.Component {
           id: 'getBrowserBlocks',
           isInit: function () {
             return false;
-          },
+          }.bind(_this),
           options: function () {
             return {
               headers: {
-                Authorization: _this.utils.getAuthorization(),
+                Authorization: this.utils.getAuthorization(),
               },
               isCors: true,
               method: 'GET',
               params: {
-                blockHash: _this.state.block.blockHash,
-                blockNumber: _this.state.searchValue,
-                endTime: _this.formatTimeParams(_this.state.block.time?.[1]),
-                from: (_this.state.block.current - 1) * 10,
-                size: _this.state.block.size,
-                startTime: _this.formatTimeParams(_this.state.block.time?.[0]),
+                blockHash: this.state.block.blockHash,
+                blockNumber: this.state.searchValue,
+                endTime: this.formatTimeParams(this.state.block.time?.[1]),
+                from: (this.state.block.current - 1) * 10,
+                size: this.state.block.size,
+                startTime: this.formatTimeParams(this.state.block.time?.[0]),
               },
               timeout: 5000,
-              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/blocks`,
+              uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/blocks`,
             };
-          },
+          }.bind(_this),
           type: 'fetch',
         },
         {
           id: 'getBrowserTransactions',
           isInit: function () {
             return false;
-          },
+          }.bind(_this),
           options: function () {
             return {
               headers: {
@@ -152,27 +152,27 @@ class Browser$$Page extends React.Component {
               isCors: true,
               method: 'GET',
               params: {
-                blockNumber: _this.state.searchValue,
-                endTime: _this.formatTimeParams(
-                  _this.state.transaction.time?.[1]
+                blockNumber: this.state.searchValue,
+                endTime: this.formatTimeParams(
+                  this.state.transaction.time?.[1]
                 ),
-                from: (_this.state.transaction.current - 1) * 10,
-                size: _this.state.transaction.size,
-                startTime: _this.formatTimeParams(
-                  _this.state.transaction.time?.[0]
+                from: (this.state.transaction.current - 1) * 10,
+                size: this.state.transaction.size,
+                startTime: this.formatTimeParams(
+                  this.state.transaction.time?.[0]
                 ),
               },
               timeout: 5000,
-              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/transactions`,
+              uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/transactions`,
             };
-          },
+          }.bind(_this),
           type: 'fetch',
         },
         {
           id: 'getOverviewSummary',
           isInit: function () {
             return false;
-          },
+          }.bind(_this),
           options: function () {
             return {
               headers: {
@@ -182,16 +182,16 @@ class Browser$$Page extends React.Component {
               method: 'GET',
               params: {},
               timeout: 5000,
-              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/overview/summary`,
+              uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/overview/summary`,
             };
-          },
+          }.bind(_this),
           type: 'fetch',
         },
         {
           id: 'getTransactionsCount',
           isInit: function () {
             return false;
-          },
+          }.bind(_this),
           options: function () {
             return {
               headers: {
@@ -201,16 +201,16 @@ class Browser$$Page extends React.Component {
               method: 'GET',
               params: {},
               timeout: 5000,
-              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/transactionsCount`,
+              uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/transactionsCount`,
             };
-          },
+          }.bind(_this),
           type: 'fetch',
         },
         {
           id: 'getQueryBySeg',
           isInit: function () {
             return false;
-          },
+          }.bind(_this),
           options: function () {
             return {
               headers: {
@@ -220,9 +220,9 @@ class Browser$$Page extends React.Component {
               method: 'GET',
               params: {},
               timeout: 5000,
-              uri: `${_this.constants?.BC_EXPLORER_API_PREFIX}/networks/${_this.state.network}/overview/query-by-seg`,
+              uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/overview/query-by-seg`,
             };
-          },
+          }.bind(_this),
           type: 'fetch',
         },
       ],
@@ -242,42 +242,28 @@ class Browser$$Page extends React.Component {
   }
 
   formateTransactionsCount(text, item, index) {
-    var _parseFloat, _item$data, _this$state$overview;
     const percent =
-      ((_parseFloat = parseFloat(
-        ((_item$data = item.data) === null || _item$data === void 0
-          ? void 0
-          : _item$data.angleField) /
-          ((_this$state$overview = this.state.overview) === null ||
-          _this$state$overview === void 0
-            ? void 0
-            : _this$state$overview.transactionsCountTotal)
-      )) === null || _parseFloat === void 0
-        ? void 0
-        : _parseFloat.toFixed(2)) * 100;
-    return /*#__PURE__*/ React.createElement(
-      'span',
-      null,
-      /*#__PURE__*/ React.createElement(
-        'span',
-        {
-          style: {
+      parseFloat(
+        item.data?.angleField / this.state.overview?.transactionsCountTotal
+      )?.toFixed(2) * 100;
+    return (
+      <span>
+        <span
+          style={{
             display: 'inline-block',
             width: '100px',
-          },
-        },
-        text
-      ),
-      /*#__PURE__*/ React.createElement(
-        'span',
-        {
-          style: {
+          }}
+        >
+          {text}
+        </span>
+        <span
+          style={{
             float: 'right',
-          },
-        },
-        percent,
-        ' %'
-      )
+          }}
+        >
+          {percent} %
+        </span>
+      </span>
     );
   }
 
@@ -333,8 +319,8 @@ class Browser$$Page extends React.Component {
         this.setState({
           block: {
             ...this.state.block,
-            total: res === null || res === void 0 ? void 0 : res.count,
-            list: res === null || res === void 0 ? void 0 : res.data,
+            total: res?.count,
+            list: res?.data,
             loading: false,
           },
         });
@@ -364,8 +350,8 @@ class Browser$$Page extends React.Component {
         this.setState({
           transaction: {
             ...this.state.transaction,
-            total: res === null || res === void 0 ? void 0 : res.count,
-            list: res === null || res === void 0 ? void 0 : res.data,
+            total: res?.count,
+            list: res?.data,
             loading: false,
           },
         });
@@ -384,30 +370,17 @@ class Browser$$Page extends React.Component {
 
   async getMyChannels() {
     try {
-      var _ref, _ref$concat, _myChannels$;
       const res = await this.props.appHelper.utils.bff.getMyChannels();
       const myChannels =
-        ((_ref = []) === null || _ref === void 0
-          ? void 0
-          : (_ref$concat = _ref.concat(
-              res === null || res === void 0 ? void 0 : res.channels
-            )) === null || _ref$concat === void 0
-          ? void 0
-          : _ref$concat.map((item) => ({
-              ...item,
-              value: `${item.network}_${item.name}`,
-              label: `${item.network}_${item.name}`,
-            }))) || [];
+        []?.concat(res?.channels)?.map((item) => ({
+          ...item,
+          value: `${item.network}_${item.name}`,
+          label: `${item.network}_${item.name}`,
+        })) || [];
       this.setState(
         {
           myChannels,
-          network:
-            myChannels === null || myChannels === void 0
-              ? void 0
-              : (_myChannels$ = myChannels[0]) === null ||
-                _myChannels$ === void 0
-              ? void 0
-              : _myChannels$.value,
+          network: myChannels?.[0]?.value,
         },
         () => {
           this.loadData();
@@ -458,14 +431,11 @@ class Browser$$Page extends React.Component {
         this.setState({
           overview: {
             ...this.state.overview,
-            [type]:
-              res === null || res === void 0
-                ? void 0
-                : res.map((item) => ({
-                    seriesField: this.i18n('i18n-1pf627eu'),
-                    xField: item.end * 1000,
-                    yField: item.count,
-                  })),
+            [type]: res?.map((item) => ({
+              seriesField: this.i18n('i18n-1pf627eu'),
+              xField: item.end * 1000,
+              yField: item.count,
+            })),
             loading: false,
           },
         });
@@ -491,31 +461,21 @@ class Browser$$Page extends React.Component {
     this.dataSourceMap.getTransactionsCount
       .load({})
       .then((res) => {
-        var _res$data, _res$data2;
-        console.log(res === null || res === void 0 ? void 0 : res.data);
+        console.log(res?.data);
         this.setState({
           overview: {
             ...this.state.overview,
             transactionsCount:
-              (res === null || res === void 0
-                ? void 0
-                : (_res$data = res.data) === null || _res$data === void 0
-                ? void 0
-                : _res$data.map((item) => ({
-                    angleField: item.count || 0,
-                    seriesField: item.creator || '-',
-                  }))) || [],
-            transactionsCountTotal:
-              res === null || res === void 0
-                ? void 0
-                : (_res$data2 = res.data) === null || _res$data2 === void 0
-                ? void 0
-                : _res$data2.reduce((prev, cur, index, arr) => {
-                    return (
-                      prev +
-                      (cur === null || cur === void 0 ? void 0 : cur.count)
-                    );
-                  }, 0),
+              res?.data?.map((item) => ({
+                angleField: item.count || 0,
+                seriesField: item.creator || '-',
+              })) || [],
+            transactionsCountTotal: res?.data?.reduce(
+              (prev, cur, index, arr) => {
+                return prev + cur?.count;
+              },
+              0
+            ),
             loading: false,
           },
         });
@@ -839,7 +799,7 @@ class Browser$$Page extends React.Component {
                   >
                     {__$$eval(
                       () =>
-                        this.state.block?.record?.Network?.split('_')?.[1] ||
+                        this.state.block?.record?.network?.split('_')?.[1] ||
                         '-'
                     )}
                   </Typography.Text>
@@ -858,7 +818,7 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.block?.record?.BlockNumber || '-'
+                      () => this.state.block?.record?.blockNumber || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -873,7 +833,7 @@ class Browser$$Page extends React.Component {
                     format=""
                     relativeTime={false}
                     time={__$$eval(
-                      () => this.state.block?.record?.CreatedAt * 1000
+                      () => this.state.block?.record?.createdAt * 1000
                     )}
                   />
                 ),
@@ -890,7 +850,7 @@ class Browser$$Page extends React.Component {
                     strong={false}
                     style={{ fontSize: '' }}
                   >
-                    {__$$eval(() => this.state.block?.record?.TxCount || '-')}
+                    {__$$eval(() => this.state.block?.record?.txCount || '-')}
                   </Typography.Text>
                 ),
                 key: 'k2dbheu2dj',
@@ -902,11 +862,18 @@ class Browser$$Page extends React.Component {
                   <Typography.Text
                     __component_name="Typography.Text"
                     disabled={false}
-                    ellipsis={true}
+                    ellipsis={{
+                      tooltip: {
+                        _unsafe_MixedSetter_title_select: 'VariableSetter',
+                        title: __$$eval(
+                          () => this.state.block?.record?.blockHash || '-'
+                        ),
+                      },
+                    }}
                     strong={false}
                     style={{ fontSize: '', width: '300px' }}
                   >
-                    {__$$eval(() => this.state.block?.record?.BlockHash || '-')}
+                    {__$$eval(() => this.state.block?.record?.blockHash || '-')}
                   </Typography.Text>
                 ),
                 key: 'ktjd25sp5ae',
@@ -918,11 +885,18 @@ class Browser$$Page extends React.Component {
                   <Typography.Text
                     __component_name="Typography.Text"
                     disabled={false}
-                    ellipsis={true}
+                    ellipsis={{
+                      tooltip: {
+                        _unsafe_MixedSetter_title_select: 'VariableSetter',
+                        title: __$$eval(
+                          () => this.state.block?.record?.dataHash || '-'
+                        ),
+                      },
+                    }}
                     strong={false}
                     style={{ fontSize: '', width: '300px' }}
                   >
-                    {__$$eval(() => this.state.block?.record?.DataHash || '-')}
+                    {__$$eval(() => this.state.block?.record?.dataHash || '-')}
                   </Typography.Text>
                 ),
                 key: 'xydm638gnyc',
@@ -934,12 +908,19 @@ class Browser$$Page extends React.Component {
                   <Typography.Text
                     __component_name="Typography.Text"
                     disabled={false}
-                    ellipsis={true}
+                    ellipsis={{
+                      tooltip: {
+                        _unsafe_MixedSetter_title_select: 'VariableSetter',
+                        title: __$$eval(
+                          () => this.state.block?.record?.preBlockHash || '-'
+                        ),
+                      },
+                    }}
                     strong={false}
                     style={{ fontSize: '', width: '300px' }}
                   >
                     {__$$eval(
-                      () => this.state.block?.record?.PrevioudBlockHash || '-'
+                      () => this.state.block?.record?.preBlockHash || '-'
                     )}
                   </Typography.Text>
                 ),
@@ -967,10 +948,7 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(
-                    () =>
-                      this.state.block?.record?.network?.split('_')?.[1] || '-'
-                  )}
+                  {__$$eval(() => this.state.block?.record?.network || '-')}
                 </Typography.Text>
               }
             </Descriptions.Item>
@@ -1542,6 +1520,8 @@ class Browser$$Page extends React.Component {
                   },
                 ],
               }}
+              activeKey={null}
+              defaultActiveKey="overview"
               destroyInactiveTabPane="true"
               items={[
                 {
@@ -1951,7 +1931,8 @@ class Browser$$Page extends React.Component {
                                         'spin-ea6d42ab'
                                       )}
                                       spinning={__$$eval(
-                                        () => this.state.overview.loading
+                                        () =>
+                                          this.state.overview.loading || false
                                       )}
                                     >
                                       <Empty
@@ -1985,7 +1966,9 @@ class Browser$$Page extends React.Component {
                                           <Spin
                                             __component_name="Spin"
                                             spinning={__$$eval(
-                                              () => this.state.overview.loading
+                                              () =>
+                                                this.state.overview.loading ||
+                                                false
                                             )}
                                           >
                                             <LineChart
@@ -2682,10 +2665,7 @@ class Browser$$Page extends React.Component {
                                   strong={false}
                                   style={{ fontSize: '' }}
                                 >
-                                  {__$$eval(
-                                    () =>
-                                      record?.network?.split('_')?.[1] || '-'
-                                  )}
+                                  {__$$eval(() => record?.network || '-')}
                                 </Typography.Text>
                               ))(
                                 __$$createChildContext(__$$context, {
@@ -3192,10 +3172,7 @@ class Browser$$Page extends React.Component {
                                   strong={false}
                                   style={{ fontSize: '' }}
                                 >
-                                  {__$$eval(
-                                    () =>
-                                      record?.network?.split('_')?.[1] || '-'
-                                  )}
+                                  {__$$eval(() => record?.network || '-')}
                                 </Typography.Text>
                               ))(
                                 __$$createChildContext(__$$context, {
