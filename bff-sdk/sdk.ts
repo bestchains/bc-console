@@ -161,6 +161,8 @@ export type Epolicy = {
   __typename?: 'Epolicy';
   /** 所在通道 */
   channel: Scalars['String'];
+  /** 所在通道名称(displayName) */
+  channelDisplayName?: Maybe<Scalars['String']>;
   /** 创建时间 */
   creationTimestamp?: Maybe<Scalars['String']>;
   /** 描述 */
@@ -212,6 +214,8 @@ export type Ibppeer = {
   name: Scalars['ID'];
   /** 加入的网络 */
   networks?: Maybe<Array<Scalars['String']>>;
+  /** 获取节点实时日志所需要的信息 */
+  pod: Pod;
   /** 运行状态 */
   status?: Maybe<CrdStatusType>;
 };
@@ -577,6 +581,17 @@ export type Organization = {
   users?: Maybe<Array<User>>;
 };
 
+/** pod 信息 */
+export type Pod = {
+  __typename?: 'Pod';
+  /** 容器 */
+  containers: Array<Scalars['String']>;
+  /** name */
+  name: Scalars['ID'];
+  /** namespace */
+  namespace: Scalars['String'];
+};
+
 export type Proposal = {
   __typename?: 'Proposal';
   /** 创建时间 */
@@ -907,7 +922,11 @@ export type GetChaincodebuildsQuery = {
     network?: string | null;
     initiator?: string | null;
     ibppeers?: Array<{ __typename?: 'SpecPeer'; name?: string | null }> | null;
-    channels?: Array<{ __typename?: 'Channel'; name: string }> | null;
+    channels?: Array<{
+      __typename?: 'Channel';
+      name: string;
+      displayName?: string | null;
+    }> | null;
   }>;
 };
 
@@ -936,6 +955,7 @@ export type GetChaincodebuildQuery = {
     channels?: Array<{
       __typename?: 'Channel';
       name: string;
+      displayName?: string | null;
       epolicy?: Array<{
         __typename?: 'Epolicy';
         name: string;
@@ -1121,6 +1141,7 @@ export type GetEpoliciesQuery = {
     displayName?: string | null;
     description?: string | null;
     channel: string;
+    channelDisplayName?: string | null;
     value: string;
     creationTimestamp?: string | null;
     lastHeartbeatTime?: string | null;
@@ -1166,6 +1187,7 @@ export type GetChannelsForCreateEpolicyQuery = {
   channelsForCreateEpolicy: Array<{
     __typename?: 'Channel';
     name: string;
+    displayName?: string | null;
     members?: Array<{ __typename?: 'SpecMember'; name?: string | null }> | null;
   }>;
 };
@@ -1336,6 +1358,12 @@ export type GetIbppeersQuery = {
       cpu: string;
       memory: string;
     } | null;
+    pod: {
+      __typename?: 'Pod';
+      name: string;
+      namespace: string;
+      containers: Array<string>;
+    };
   }>;
 };
 
@@ -1777,6 +1805,7 @@ export const GetChaincodebuildsDocument = gql`
       }
       channels {
         name
+        displayName
       }
     }
   }
@@ -1801,6 +1830,7 @@ export const GetChaincodebuildDocument = gql`
       }
       channels {
         name
+        displayName
         epolicy {
           name
           value
@@ -1950,6 +1980,7 @@ export const GetEpoliciesDocument = gql`
       displayName
       description
       channel
+      channelDisplayName
       value
       creationTimestamp
       lastHeartbeatTime
@@ -1980,6 +2011,7 @@ export const GetChannelsForCreateEpolicyDocument = gql`
   query getChannelsForCreateEpolicy($network: String!) {
     channelsForCreateEpolicy(network: $network) {
       name
+      displayName
       members {
         name
       }
@@ -2109,6 +2141,11 @@ export const GetIbppeersDocument = gql`
       }
       channels
       networks
+      pod {
+        name
+        namespace
+        containers
+      }
     }
   }
 `;

@@ -7,17 +7,17 @@ import {
   Modal,
   FormilyForm,
   FormilyInput,
-  FormilyTextArea,
   FormilySelect,
+  FormilyUpload,
+  Button,
+  Icon,
+  FormilyTextArea,
   FormilyFormItem,
   FormilyArrayCards,
   Descriptions,
   Typography,
   Row,
   Col,
-  FormilyUpload,
-  Button,
-  Icon,
   Alert,
   Space,
   UnifiedLink,
@@ -107,6 +107,7 @@ class NetworkDetail$$Page extends React.Component {
       channelPeers: [],
       allPeers: [],
       contractUpgradeLoading: false,
+      activeKey: 'network',
     };
   }
 
@@ -132,7 +133,7 @@ class NetworkDetail$$Page extends React.Component {
           channels:
             res?.channelsForCreateEpolicy?.map((item) => ({
               value: JSON.stringify(item),
-              label: item.name,
+              label: item.displayName || '-',
             })) || [],
         },
       },
@@ -143,7 +144,7 @@ class NetworkDetail$$Page extends React.Component {
       dataSource:
         res?.channelsForCreateEpolicy?.map((item) => ({
           value: JSON.stringify(item),
-          label: item.name,
+          label: item.displayName || '-',
         })) || [],
     });
   }
@@ -239,7 +240,7 @@ class NetworkDetail$$Page extends React.Component {
     });
     const formatList = Object.keys(result)?.map((displayName) => {
       const versions = Object.values(result[displayName])?.sort((a, b) =>
-        a.version.localeCompare(b.version)
+        b.version.localeCompare(a.version)
       );
       initVersions[displayName] = versions?.[0]?.name;
       const record =
@@ -483,14 +484,14 @@ class NetworkDetail$$Page extends React.Component {
           }),
         },
       });
-      if (this.state?.channel?.addData?.organizations?.length > 0) {
-        this.openAddChannelSuccessModal();
-      } else {
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-l8fybssesij'),
-        });
-      }
+      // if (this.state?.channel?.addData?.organizations?.length > 0) {
+      //   this.openAddChannelSuccessModal()
+      // } else {
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-l8fybssesij'),
+      });
+      // }
       setTimeout(() => {
         this.props.useGetNetwork.mutate();
       }, 200);
@@ -730,20 +731,24 @@ class NetworkDetail$$Page extends React.Component {
           createLoading: true,
         },
       });
-      try {
-        const res = await this.props.appHelper.utils.bff.createChaincodebuild({
-          ...v,
-          network: this.match?.params?.id,
-          // files: v.files?.fileList?.map(item => {
-          //   const file = item.originFileObj
-          //   return new File([file], file.webkitRelativePath, { type: file.type })
-          // }),
-          files: v.files?.fileList?.map((item) => item.originFileObj),
-          fileRelativePaths: v.files?.fileList?.map((item) => {
-            const file = item.originFileObj;
-            return file.webkitRelativePath;
-          }),
+      const { format, files, ...params } = v;
+      const query = {
+        ...params,
+        network: this.match?.params?.id,
+      };
+      if (format === 'zip') {
+        query.file = v.files?.fileList?.[0]?.originFileObj;
+      } else {
+        query.files = v.files?.fileList?.map((item) => item.originFileObj);
+        query.fileRelativePaths = v.files?.fileList?.map((item) => {
+          const file = item.originFileObj;
+          return file.webkitRelativePath;
         });
+      }
+      try {
+        const res = await this.props.appHelper.utils.bff.createChaincodebuild(
+          query
+        );
         this.closeModal();
         this.utils.notification.success({
           message: this.i18n('i18n-5eg2znpg'),
@@ -776,21 +781,24 @@ class NetworkDetail$$Page extends React.Component {
       this.setState({
         contractUpgradeLoading: true,
       });
-      const { versoin, ...params } = v;
+      const { versoin, format, files, ...params } = v;
       try {
-        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild({
+        const query = {
           ...params,
           network: this.match?.params?.id,
-          // files: v.files?.fileList?.map(item => {
-          //   const file = item.originFileObj
-          //   return new File([file], file.webkitRelativePath, { type: file.type })
-          // }),
-          files: v.files?.fileList?.map((item) => item.originFileObj),
-          fileRelativePaths: v.files?.fileList?.map((item) => {
+        };
+        if (format === 'zip') {
+          query.file = v.files?.fileList?.[0]?.originFileObj;
+        } else {
+          query.files = v.files?.fileList?.map((item) => item.originFileObj);
+          query.fileRelativePaths = v.files?.fileList?.map((item) => {
             const file = item.originFileObj;
             return file.webkitRelativePath;
-          }),
-        });
+          });
+        }
+        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild(
+          query
+        );
         this.closeModal();
         this.utils.notification.success({
           message: this.i18n('i18n-a4rcftyd'),
@@ -1014,6 +1022,50 @@ class NetworkDetail$$Page extends React.Component {
     return false;
   }
 
+  onTabsChange(activeKey) {
+    this.history?.replace(
+      this?.history?.location?.pathname + '?tab=' + activeKey
+    );
+    this.setState({
+      activeKey,
+    });
+  }
+
+  onFilesChange(files, payload) {
+    const bcignore = files.fileList?.find((item) => item.name === '.bcignore');
+    const readFile = async (file, callback) => {
+      if (!file?.originFileObj) {
+        return callback();
+      }
+      const reader = new FileReader();
+      reader.readAsText(file?.originFileObj, 'UTF-8');
+      reader.onload = (evt) => {
+        callback(evt.target.result);
+      };
+    };
+    readFile(bcignore, (v) => {
+      const showList = files.fileList?.filter(
+        (item) =>
+          item.name !== '.bcignore' &&
+          !v
+            ?.split('\r\n')
+            ?.some((path) =>
+              item?.originFileObj.webkitRelativePath?.includes('/' + path + '/')
+            )
+      );
+      const form = this.$(
+        payload?.type === 'upgrade'
+          ? 'formily_contract_upgrade'
+          : 'formily_create_contract'
+      )?.formRef?.current?.form;
+      form.setValues({
+        files: {
+          fileList: showList,
+        },
+      });
+    });
+  }
+
   componentDidMount() {
     const getOrganizations = async () => {
       const res = await this.props.appHelper.utils.bff.getOrganizations();
@@ -1027,6 +1079,17 @@ class NetworkDetail$$Page extends React.Component {
     };
     getOrganizations();
     this.getEpolicies();
+    const tab = this?.location?.search
+      ?.slice(1)
+      ?.split('&')
+      ?.map((item) => ({
+        key: item?.split('=')?.[0],
+        value: item?.split('=')?.[1],
+      }))
+      ?.find((item) => item.key === 'tab')?.value;
+    this.setState({
+      activeKey: tab || 'network',
+    });
   }
 
   render() {
@@ -1034,6 +1097,291 @@ class NetworkDetail$$Page extends React.Component {
     const { state } = __$$context;
     return (
       <Page>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onOk',
+                relatedEventName: 'confirmUpgradeContractModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.contractUpgradeLoading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.confirmUpgradeContractModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal &&
+              this.state.modalType === 'upgradecontract'
+          )}
+          title={this.i18n('i18n-nihrz6ys') /* 合约升级 */}
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 5,
+              layout: 'horizontal',
+              wrapperCol: 20,
+            }}
+            ref={this._refsManager.linkRef('formily_contract_upgrade')}
+          >
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  placeholder: this.i18n('i18n-b3d2mz7i') /* 请输入合约名称 */,
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_default_select: 'VariableSetter',
+                default: __$$eval(() => this.state.contract?.record?.name),
+                name: 'displayName',
+                required: true,
+                title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
+                'x-pattern': 'disabled',
+                'x-validator': [],
+              }}
+            />
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  placeholder:
+                    this.i18n(
+                      'i18n-2ielocre'
+                    ) /* 合约版本供识别与维护使用，建议格式： v1.0 */,
+                },
+              }}
+              fieldProps={{
+                name: 'version',
+                required: true,
+                title: this.i18n('i18n-a20yo7fz') /* 当前版本号 */,
+                'x-pattern': 'disabled',
+                'x-validator': [],
+              }}
+            />
+            <FormilyInput
+              __component_name="FormilyInput"
+              componentProps={{
+                'x-component-props': {
+                  placeholder:
+                    this.i18n(
+                      'i18n-e0ey37p3'
+                    ) /* 合约版本供识别与维护使用，建议和当前保持类型一致 */,
+                },
+              }}
+              fieldProps={{
+                name: 'newVersion',
+                required: true,
+                title: this.i18n('i18n-1qxjy0jv') /* 升级后版本号 */,
+                'x-validator': [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    type: 'disabled',
+                    validator: function () {
+                      return this.validatorContractRepeat.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this),
+                  },
+                ],
+              }}
+            />
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  allowClear: false,
+                  disabled: false,
+                  notFoundContent: this.i18n('i18n-dy7hcp1k') /* 请选择 */,
+                  placeholder: '请选择',
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_default_select: 'StringSetter',
+                default: 'folder',
+                enum: [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: this.i18n('i18n-9vjtx036') /* 文件夹 */,
+                    type: 'disabled',
+                    value: 'folder',
+                  },
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: this.i18n('i18n-fhw8go0y') /* zip压缩包 */,
+                    type: 'disabled',
+                    value: 'zip',
+                  },
+                ],
+                name: 'format',
+                required: true,
+                title: this.i18n('i18n-6jtfhc9d') /* 上传格式 */,
+                'x-validator': [],
+              }}
+              ref={this._refsManager.linkRef('formilyselect-6c94a7fb')}
+            />
+            <FormilyUpload
+              __component_name="FormilyUpload"
+              componentProps={{
+                'x-component-props': {
+                  beforeUpload: function () {
+                    return this.beforeUpload.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
+                  directory: '{{!!($form?.values?.format === "folder")}}',
+                  onChange: function () {
+                    return this.onFilesChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([
+                        {
+                          type: 'upgrade',
+                        },
+                      ])
+                    );
+                  }.bind(this),
+                },
+              }}
+              fieldProps={{
+                enum: [],
+                name: 'files',
+                required: true,
+                title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
+                'x-component': 'FormilyUpload',
+                'x-validator': [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    message: this.i18n('i18n-9nvgrvip') /* 请上传文件 */,
+                    type: 'disabled',
+                    whitespace: true,
+                  },
+                ],
+              }}
+            >
+              <Button
+                __component_name="Button"
+                block={false}
+                danger={false}
+                disabled={false}
+                ghost={false}
+                icon={
+                  <Icon
+                    __component_name="Icon"
+                    size={12}
+                    style={{ marginRight: 3 }}
+                    type="PlusOutlined"
+                  />
+                }
+                shape="default"
+                type="default"
+              >
+                {this.i18n('i18n-l9xc0l1g') /* 选择上传的文件 */}
+              </Button>
+            </FormilyUpload>
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  allowClear: false,
+                  disabled: false,
+                  placeholder: this.i18n('i18n-928f3hdn') /* 请选择语言 */,
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_default_select: 'StringSetter',
+                default: 'Go',
+                enum: [
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: 'Go',
+                    type: 'disabled',
+                    value: 'Go',
+                  },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: 'Java',
+                    type: 'disabled',
+                    value: 'Java',
+                  },
+                  {
+                    _unsafe_MixedSetter_label_select: 'StringSetter',
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: 'Node',
+                    type: 'disabled',
+                    value: 'Node',
+                  },
+                ],
+                name: 'language',
+                title: this.i18n('i18n-7usiozsk') /* 选择语言 */,
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
         <Modal
           __component_name="Modal"
           __events={{
@@ -1432,243 +1780,6 @@ class NetworkDetail$$Page extends React.Component {
               }
             </Descriptions.Item>
           </Descriptions>
-        </Modal>
-        <Modal
-          __component_name="Modal"
-          __events={{
-            eventDataList: [
-              {
-                name: 'onCancel',
-                relatedEventName: 'closeModal',
-                type: 'componentEvent',
-              },
-              {
-                name: 'onOk',
-                relatedEventName: 'confirmUpgradeContractModal',
-                type: 'componentEvent',
-              },
-            ],
-            eventList: [
-              {
-                disabled: false,
-                name: 'afterClose',
-                templete:
-                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
-              },
-              {
-                disabled: true,
-                name: 'onCancel',
-                template:
-                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
-              },
-              {
-                disabled: true,
-                name: 'onOk',
-                template:
-                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
-              },
-            ],
-          }}
-          centered={false}
-          confirmLoading={__$$eval(() => this.state.contractUpgradeLoading)}
-          destroyOnClose={true}
-          forceRender={false}
-          keyboard={true}
-          mask={true}
-          maskClosable={false}
-          onCancel={function () {
-            return this.closeModal.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
-          }.bind(this)}
-          onOk={function () {
-            return this.confirmUpgradeContractModal.apply(
-              this,
-              Array.prototype.slice.call(arguments).concat([])
-            );
-          }.bind(this)}
-          open={__$$eval(
-            () =>
-              this.state.isOpenModal &&
-              this.state.modalType === 'upgradecontract'
-          )}
-          title={this.i18n('i18n-nihrz6ys') /* 合约升级 */}
-        >
-          <FormilyForm
-            __component_name="FormilyForm"
-            componentProps={{
-              colon: false,
-              labelAlign: 'left',
-              labelCol: 5,
-              layout: 'horizontal',
-              wrapperCol: 20,
-            }}
-            ref={this._refsManager.linkRef('formily_contract_upgrade')}
-          >
-            <FormilyInput
-              __component_name="FormilyInput"
-              componentProps={{
-                'x-component-props': {
-                  placeholder: this.i18n('i18n-b3d2mz7i') /* 请输入合约名称 */,
-                },
-              }}
-              fieldProps={{
-                _unsafe_MixedSetter_default_select: 'VariableSetter',
-                default: __$$eval(() => this.state.contract?.record?.name),
-                name: 'displayName',
-                required: true,
-                title: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
-                'x-pattern': 'disabled',
-                'x-validator': [],
-              }}
-            />
-            <FormilyInput
-              __component_name="FormilyInput"
-              componentProps={{
-                'x-component-props': {
-                  placeholder:
-                    this.i18n(
-                      'i18n-2ielocre'
-                    ) /* 合约版本供识别与维护使用，建议格式： v1.0 */,
-                },
-              }}
-              fieldProps={{
-                name: 'version',
-                required: true,
-                title: this.i18n('i18n-a20yo7fz') /* 当前版本号 */,
-                'x-pattern': 'disabled',
-                'x-validator': [],
-              }}
-            />
-            <FormilyInput
-              __component_name="FormilyInput"
-              componentProps={{
-                'x-component-props': {
-                  placeholder:
-                    this.i18n(
-                      'i18n-e0ey37p3'
-                    ) /* 合约版本供识别与维护使用，建议和当前保持类型一致 */,
-                },
-              }}
-              fieldProps={{
-                name: 'newVersion',
-                required: true,
-                title: this.i18n('i18n-1qxjy0jv') /* 升级后版本号 */,
-                'x-validator': [
-                  {
-                    children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
-                    id: 'disabled',
-                    type: 'disabled',
-                    validator: function () {
-                      return this.validatorContractRepeat.apply(
-                        this,
-                        Array.prototype.slice.call(arguments).concat([])
-                      );
-                    }.bind(this),
-                  },
-                ],
-              }}
-            />
-            <FormilyUpload
-              __component_name="FormilyUpload"
-              componentProps={{
-                'x-component-props': {
-                  beforeUpload: function () {
-                    return this.beforeUpload.apply(
-                      this,
-                      Array.prototype.slice.call(arguments).concat([])
-                    );
-                  }.bind(this),
-                  directory: true,
-                },
-              }}
-              fieldProps={{
-                enum: [],
-                name: 'files',
-                required: true,
-                title: this.i18n('i18n-tp1bif8s') /* 合约文件 */,
-                'x-component': 'FormilyUpload',
-                'x-validator': [
-                  {
-                    children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
-                    id: 'disabled',
-                    message: this.i18n('i18n-9nvgrvip') /* 请上传文件 */,
-                    type: 'disabled',
-                    whitespace: true,
-                  },
-                ],
-              }}
-            >
-              <Button
-                __component_name="Button"
-                block={false}
-                danger={false}
-                disabled={false}
-                ghost={false}
-                icon={
-                  <Icon
-                    __component_name="Icon"
-                    size={12}
-                    style={{ marginRight: 3 }}
-                    type="PlusOutlined"
-                  />
-                }
-                shape="default"
-                type="default"
-              >
-                {this.i18n('i18n-l9xc0l1g') /* 选择上传的文件 */}
-              </Button>
-            </FormilyUpload>
-            <FormilySelect
-              __component_name="FormilySelect"
-              componentProps={{
-                'x-component-props': {
-                  allowClear: false,
-                  disabled: false,
-                  placeholder: this.i18n('i18n-928f3hdn') /* 请选择语言 */,
-                },
-              }}
-              fieldProps={{
-                _unsafe_MixedSetter_default_select: 'StringSetter',
-                default: 'Go',
-                enum: [
-                  {
-                    _unsafe_MixedSetter_label_select: 'StringSetter',
-                    children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
-                    id: 'disabled',
-                    label: 'Go',
-                    type: 'disabled',
-                    value: 'Go',
-                  },
-                  {
-                    _unsafe_MixedSetter_label_select: 'StringSetter',
-                    children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
-                    id: 'disabled',
-                    label: 'Java',
-                    type: 'disabled',
-                    value: 'Java',
-                  },
-                  {
-                    _unsafe_MixedSetter_label_select: 'StringSetter',
-                    children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
-                    id: 'disabled',
-                    label: 'Node',
-                    type: 'disabled',
-                    value: 'Node',
-                  },
-                ],
-                name: 'language',
-                title: this.i18n('i18n-7usiozsk') /* 选择语言 */,
-                'x-validator': [],
-              }}
-            />
-          </FormilyForm>
         </Modal>
         <Modal
           __component_name="Modal"
@@ -2168,7 +2279,7 @@ class NetworkDetail$$Page extends React.Component {
                                   label: `${s.displayName || '-'}(${s.name})`,
                                 })),
                             }),
-                            label: item.name,
+                            label: item.displayName || '-',
                           })
                         )
                       ),
@@ -2289,7 +2400,9 @@ class NetworkDetail$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.channel?.record?.name || '-')}
+                  {__$$eval(
+                    () => this.state.channel?.record?.displayName || '-'
+                  )}
                 </Typography.Text>
                 <Typography.Text
                   __component_name="Typography.Text"
@@ -2508,6 +2621,42 @@ class NetworkDetail$$Page extends React.Component {
           <Col __component_name="Col" span={24}>
             <Tabs
               __component_name="Tabs"
+              __events={{
+                eventDataList: [
+                  {
+                    name: 'onChange',
+                    relatedEventName: 'onTabsChange',
+                    type: 'componentEvent',
+                  },
+                ],
+                eventList: [
+                  {
+                    disabled: true,
+                    name: 'onChange',
+                    template:
+                      "onChange(activeKey,${extParams}){\n// 切换面板的回调\nconsole.log('onChange',activeKey);}",
+                  },
+                  {
+                    disabled: true,
+                    name: 'onEdit',
+                    template:
+                      "onEdit(targetKey,action,${extParams}){\n// 新增和删除页签的回调\nconsole.log('onEdit',targetKey,action);}",
+                  },
+                  {
+                    disabled: false,
+                    name: 'onTabClick',
+                    template:
+                      "onTabClick(key,event,${extParams}){\n// tab 被点击的回调\nconsole.log('onTabClick',key,event);}",
+                  },
+                  {
+                    disabled: false,
+                    name: 'onTabScroll',
+                    template:
+                      "onTabScroll({direction},${extParams}){\n// tab 滚动时触\nconsole.log('onTabScroll',direction);}",
+                  },
+                ],
+              }}
+              activeKey={__$$eval(() => this.state.activeKey)}
               defaultActiveKey={__$$eval(
                 () => this.props?.location?.query?.tab || 'network'
               )}
@@ -6053,10 +6202,7 @@ class NetworkDetail$$Page extends React.Component {
                                       style={{ fontSize: '' }}
                                     >
                                       {__$$eval(
-                                        () =>
-                                          `${record.displayName || '-'}(${
-                                            record.name
-                                          })`
+                                        () => `${record.displayName || '-'}`
                                       )}
                                     </Typography.Text>
                                   ))(
@@ -6070,7 +6216,7 @@ class NetworkDetail$$Page extends React.Component {
                                   this.i18n('i18n-87kp314f') /* 策略名称 */,
                               },
                               {
-                                dataIndex: 'channel',
+                                dataIndex: 'channelDisplayName',
                                 key: 'channel',
                                 title:
                                   this.i18n('i18n-gnw09zuy') /* 应用通道 */,
@@ -6309,6 +6455,12 @@ class NetworkDetail$$Page extends React.Component {
                   label: this.i18n('i18n-7zhxmxra') /* 策略管理 */,
                 },
               ]}
+              onChange={function () {
+                return this.onTabsChange.apply(
+                  this,
+                  Array.prototype.slice.call(arguments).concat([])
+                );
+              }.bind(this)}
               size="large"
               style={{ marginTop: '-20px', paddingLeft: '20px' }}
               tabPosition="top"
@@ -7200,6 +7352,43 @@ class NetworkDetail$$Page extends React.Component {
                 ],
               }}
             />
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  allowClear: false,
+                  disabled: false,
+                  notFoundContent: this.i18n('i18n-dy7hcp1k') /* 请选择 */,
+                  placeholder: '请选择',
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_default_select: 'StringSetter',
+                default: 'folder',
+                enum: [
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: this.i18n('i18n-9vjtx036') /* 文件夹 */,
+                    type: 'disabled',
+                    value: 'folder',
+                  },
+                  {
+                    children: '未知',
+                    icon: 'tenx-ui-icon:Circle',
+                    id: 'disabled',
+                    label: this.i18n('i18n-fhw8go0y') /* zip压缩包 */,
+                    type: 'disabled',
+                    value: 'zip',
+                  },
+                ],
+                name: 'format',
+                required: true,
+                title: this.i18n('i18n-6jtfhc9d') /* 上传格式 */,
+                'x-validator': [],
+              }}
+            />
             <FormilyUpload
               __component_name="FormilyUpload"
               componentProps={{
@@ -7210,8 +7399,14 @@ class NetworkDetail$$Page extends React.Component {
                       Array.prototype.slice.call(arguments).concat([])
                     );
                   }.bind(this),
-                  directory: true,
+                  directory: '{{!!($form?.values?.format === "folder")}}',
                   multiple: false,
+                  onChange: function () {
+                    return this.onFilesChange.apply(
+                      this,
+                      Array.prototype.slice.call(arguments).concat([])
+                    );
+                  }.bind(this),
                 },
               }}
               fieldProps={{
