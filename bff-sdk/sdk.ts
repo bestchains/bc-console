@@ -87,6 +87,8 @@ export type Chaincodebuild = {
 
 export type Channel = {
   __typename?: 'Channel';
+  /** 用户作为admin管理的组织 */
+  adminOrganizations?: Maybe<Array<Organization>>;
   /** 合约 */
   chaincode?: Maybe<Array<Chaincode>>;
   /** 我创建的 */
@@ -109,7 +111,10 @@ export type Channel = {
   network?: Maybe<Scalars['String']>;
   /** 我的节点 */
   peers?: Maybe<Array<SpecPeer>>;
-  /** 通道连接文件（profile.json） */
+  /**
+   * 通道连接文件（profile.json）
+   * @deprecated 替代为query channelProfile()
+   */
   profileJson?: Maybe<Scalars['String']>;
   /** 状态 */
   status?: Maybe<CrdStatusType>;
@@ -673,6 +678,8 @@ export type Query = {
   chaincodebuilds: Array<Chaincodebuild>;
   /** 通道详情 */
   channel: Channel;
+  /** 通道连接文件（target：组织、节点） */
+  channelProfile?: Maybe<Scalars['String']>;
   /** 我参与的通道(区块链浏览器) */
   channels?: Maybe<Array<Channel>>;
   /** 创建策略时，可选的通道 */
@@ -713,6 +720,12 @@ export type QueryChaincodebuildsArgs = {
 
 export type QueryChannelArgs = {
   name: Scalars['String'];
+};
+
+export type QueryChannelProfileArgs = {
+  name: Scalars['String'];
+  organization: Scalars['String'];
+  peer: Scalars['String'];
 };
 
 export type QueryChannelsForCreateEpolicyArgs = {
@@ -1098,17 +1111,37 @@ export type UpdateMemberChannelMutation = {
   channelMemberUpdate: boolean;
 };
 
-export type GetChannelProfileQueryVariables = Exact<{
+export type GetChannelAdminOrganizationsQueryVariables = Exact<{
   name: Scalars['String'];
 }>;
 
-export type GetChannelProfileQuery = {
+export type GetChannelAdminOrganizationsQuery = {
   __typename?: 'Query';
   channel: {
     __typename?: 'Channel';
     name: string;
-    profileJson?: string | null;
+    adminOrganizations?: Array<{
+      __typename?: 'Organization';
+      name: string;
+      admin?: string | null;
+    }> | null;
+    peers?: Array<{
+      __typename?: 'SpecPeer';
+      name?: string | null;
+      namespace?: string | null;
+    }> | null;
   };
+};
+
+export type GetChannelProfileQueryVariables = Exact<{
+  name: Scalars['String'];
+  organization: Scalars['String'];
+  peer: Scalars['String'];
+}>;
+
+export type GetChannelProfileQuery = {
+  __typename?: 'Query';
+  channelProfile?: string | null;
 };
 
 export type GetMyChannelsQueryVariables = Exact<{ [key: string]: never }>;
@@ -1663,6 +1696,19 @@ export type GetIbppeersForCreateChannelQuery = {
   }>;
 };
 
+export type GetOverviewInfoQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetOverviewInfoQuery = {
+  __typename?: 'Query';
+  organizations: Array<{
+    __typename?: 'Organization';
+    name: string;
+    ibppeers?: Array<{ __typename?: 'Ibppeer'; name: string }> | null;
+  }>;
+  federations: Array<{ __typename?: 'Federation'; name: string }>;
+  networks: Array<{ __typename?: 'Network'; name: string }>;
+};
+
 export type GetProposalsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetProposalsQuery = {
@@ -1949,12 +1995,24 @@ export const UpdateMemberChannelDocument = gql`
     channelMemberUpdate(name: $name, members: $members)
   }
 `;
-export const GetChannelProfileDocument = gql`
-  query getChannelProfile($name: String!) {
+export const GetChannelAdminOrganizationsDocument = gql`
+  query getChannelAdminOrganizations($name: String!) {
     channel(name: $name) {
       name
-      profileJson
+      adminOrganizations {
+        name
+        admin
+      }
+      peers {
+        name
+        namespace
+      }
     }
+  }
+`;
+export const GetChannelProfileDocument = gql`
+  query getChannelProfile($name: String!, $organization: String!, $peer: String!) {
+    channelProfile(name: $name, organization: $organization, peer: $peer)
   }
 `;
 export const GetMyChannelsDocument = gql`
@@ -2379,6 +2437,22 @@ export const GetIbppeersForCreateChannelDocument = gql`
     }
   }
 `;
+export const GetOverviewInfoDocument = gql`
+  query getOverviewInfo {
+    organizations {
+      name
+      ibppeers {
+        name
+      }
+    }
+    federations {
+      name
+    }
+    networks {
+      name
+    }
+  }
+`;
 export const GetProposalsDocument = gql`
   query getProposals {
     proposals {
@@ -2599,6 +2673,21 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
           }),
         'updateMemberChannel',
         'mutation'
+      );
+    },
+    getChannelAdminOrganizations(
+      variables: GetChannelAdminOrganizationsQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetChannelAdminOrganizationsQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetChannelAdminOrganizationsQuery>(
+            GetChannelAdminOrganizationsDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getChannelAdminOrganizations',
+        'query'
       );
     },
     getChannelProfile(
@@ -2969,6 +3058,20 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
         'query'
       );
     },
+    getOverviewInfo(
+      variables?: GetOverviewInfoQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetOverviewInfoQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetOverviewInfoQuery>(GetOverviewInfoDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getOverviewInfo',
+        'query'
+      );
+    },
     getProposals(
       variables?: GetProposalsQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -3057,6 +3160,19 @@ export function getSdkWithHooks(
       return useSWR<GetChannelQuery, ClientError>(
         genKey<GetChannelQueryVariables>('GetChannel', variables),
         () => sdk.getChannel(variables),
+        config
+      );
+    },
+    useGetChannelAdminOrganizations(
+      variables: GetChannelAdminOrganizationsQueryVariables,
+      config?: SWRConfigInterface<GetChannelAdminOrganizationsQuery, ClientError>
+    ) {
+      return useSWR<GetChannelAdminOrganizationsQuery, ClientError>(
+        genKey<GetChannelAdminOrganizationsQueryVariables>(
+          'GetChannelAdminOrganizations',
+          variables
+        ),
+        () => sdk.getChannelAdminOrganizations(variables),
         config
       );
     },
@@ -3177,6 +3293,16 @@ export function getSdkWithHooks(
       return useSWR<GetIbppeersForCreateChannelQuery, ClientError>(
         genKey<GetIbppeersForCreateChannelQueryVariables>('GetIbppeersForCreateChannel', variables),
         () => sdk.getIbppeersForCreateChannel(variables),
+        config
+      );
+    },
+    useGetOverviewInfo(
+      variables?: GetOverviewInfoQueryVariables,
+      config?: SWRConfigInterface<GetOverviewInfoQuery, ClientError>
+    ) {
+      return useSWR<GetOverviewInfoQuery, ClientError>(
+        genKey<GetOverviewInfoQueryVariables>('GetOverviewInfo', variables),
+        () => sdk.getOverviewInfo(variables),
         config
       );
     },

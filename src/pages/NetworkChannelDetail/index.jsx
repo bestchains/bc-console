@@ -4,6 +4,9 @@ import React from 'react';
 
 import {
   Page,
+  Modal,
+  FormilyForm,
+  FormilySelect,
   Row,
   Col,
   Button,
@@ -16,7 +19,7 @@ import {
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 
-import utils from '../../utils/index';
+import utils, { RefsManager } from '../../utils/index';
 
 import * as __$$i18n from '../../i18n';
 
@@ -39,42 +42,206 @@ class NetworkChannelDetail$$Page extends React.Component {
 
     this.utils = utils;
 
+    this._refsManager = new RefsManager();
+
     __$$i18n._inject2(this);
 
-    this.state = {};
+    this.state = {
+      isOpenModal: false,
+      modalType: 'downLoadFile',
+      downLoadloading: false,
+    };
   }
 
-  $ = () => null;
+  $ = (refName) => {
+    return this._refsManager.get(refName);
+  };
 
-  $$ = () => [];
+  $$ = (refName) => {
+    return this._refsManager.getAll(refName);
+  };
 
-  componentWillUnmount() {
-    console.log('will unmount');
+  componentWillUnmount() {}
+
+  closeModal() {
+    this.setState({
+      isOpenModal: false,
+    });
+  }
+
+  openDownLoadFileModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'downLoadFile',
+    });
   }
 
   async downLoadFile() {
-    try {
-      const res = await this.props.appHelper.utils.bff?.getChannelProfile({
-        name: this?.match?.params?.channelId,
+    const form = this.$('formily_downLoadFile')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      this.setState({
+        downLoadloading: true,
       });
-      this.utils.downloadFile(res?.channel?.profileJson);
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-62p13m1r'),
-        errors: error?.response?.errors,
-      });
-    }
+      try {
+        const res = await this.props.appHelper.utils.bff?.getChannelProfile({
+          name: this?.match?.params?.channelId,
+          organization: JSON.parse(v.organization)?.name,
+          peer: v.peer,
+        });
+        this.utils.downloadFile(res?.channelProfile);
+        this.closeModal();
+        this.setState({
+          downLoadloading: false,
+        });
+      } catch (error) {
+        this.setState({
+          downLoadloading: false,
+        });
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-62p13m1r'),
+          errors: error?.response?.errors,
+        });
+      }
+    });
   }
 
-  componentDidMount() {
-    console.log('did mount');
-  }
+  componentDidMount() {}
 
   render() {
     const __$$context = this._context || this;
     const { state } = __$$context;
     return (
       <Page>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onOk',
+                relatedEventName: 'downLoadFile',
+                type: 'componentEvent',
+              },
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: true,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={__$$eval(() => this.state.downLoadloading)}
+          destroyOnClose={true}
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          onOk={function () {
+            return this.downLoadFile.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () =>
+              this.state.isOpenModal && this.state.modalType === 'downLoadFile'
+          )}
+          ref={this._refsManager.linkRef('modal-a461eb8d')}
+          title={this.i18n('i18n-hstzpc6f') /* 通道链接文件下载 */}
+        >
+          <FormilyForm
+            __component_name="FormilyForm"
+            componentProps={{
+              colon: false,
+              labelAlign: 'left',
+              labelCol: 4,
+              layout: 'horizontal',
+              wrapperCol: 20,
+            }}
+            ref={this._refsManager.linkRef('formily_downLoadFile')}
+          >
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  allowClear: false,
+                  disabled: false,
+                  placeholder: this.i18n('i18n-vg3668rl') /* 请选择组织 */,
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_enum_select: 'ExpressionSetter',
+                enum: __$$eval(() =>
+                  this.props.useGetChannelAdminOrganizations?.data?.channel?.adminOrganizations?.map(
+                    (item) => ({
+                      label: item.name,
+                      value: JSON.stringify({
+                        ...item,
+                        peers:
+                          this.props.useGetChannelAdminOrganizations?.data?.channel?.peers
+                            .filter((peer) => peer.namespace === item.name)
+                            ?.map((item) => ({
+                              label: item.name,
+                              value: item.name,
+                            })),
+                      }),
+                    })
+                  )
+                ),
+                name: 'organization',
+                required: true,
+                title: this.i18n('i18n-99ffug18') /* 选择组织 */,
+                'x-validator': [],
+              }}
+            />
+            <FormilySelect
+              __component_name="FormilySelect"
+              componentProps={{
+                'x-component-props': {
+                  _unsafe_MixedSetter_enum_select: 'StringSetter',
+                  allowClear: false,
+                  disabled: false,
+                  enum: '{{ $form?.values?.organization ? (JSON.parse($form?.values?.organization)?.peers ||[]) : []}}',
+                  placeholder:
+                    this.i18n('i18n-7i1sb56j') /* 选择下载文件的节点 */,
+                },
+              }}
+              fieldProps={{
+                _unsafe_MixedSetter_default_select: 'I18nSetter',
+                _unsafe_MixedSetter_description_select: 'VariableSetter',
+                name: 'peer',
+                required: true,
+                title: this.i18n('i18n-yq4w606j') /* 选择节点 */,
+                'x-validator': [],
+              }}
+            />
+          </FormilyForm>
+        </Modal>
         <Row __component_name="Row" wrap={true}>
           <Col
             __component_name="Col"
@@ -223,7 +390,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                                 eventDataList: [
                                   {
                                     name: 'onClick',
-                                    relatedEventName: 'downLoadFile',
+                                    relatedEventName: 'openDownLoadFileModal',
                                     type: 'componentEvent',
                                   },
                                 ],
@@ -242,13 +409,14 @@ class NetworkChannelDetail$$Page extends React.Component {
                               ghost={false}
                               icon=""
                               onClick={function () {
-                                return this.downLoadFile.apply(
+                                return this.openDownLoadFileModal.apply(
                                   this,
                                   Array.prototype.slice
                                     .call(arguments)
                                     .concat([])
                                 );
                               }.bind(this)}
+                              ref={this._refsManager.linkRef('button-505aa724')}
                               shape="default"
                               size="small"
                               type="link"
@@ -616,6 +784,12 @@ export default () => {
       sdkSwrFuncs={[
         {
           func: 'useGetChannel',
+          params: {
+            name: self.match?.params?.channelId,
+          },
+        },
+        {
+          func: 'useGetChannelAdminOrganizations',
           params: {
             name: self.match?.params?.channelId,
           },

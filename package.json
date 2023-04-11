@@ -60,7 +60,7 @@
     "@formily/core": "^2.1.4",
     "@formily/react": "^2.1.4",
     "@tenx-ui/charts": "1.1.2",
-    "@tenx-ui/icon": "^2.4.17",
+    "@tenx-ui/icon": "^2.4.18",
     "@tenx-ui/materials": "1.1.4",
     "@tenx-ui/utils": "^2.3.0",
     "@umijs/max": "^4.0.42",

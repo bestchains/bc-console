@@ -5,6 +5,11 @@ const routes = [
     component: '@/layouts',
     routes: [
       {
+        name: '总览',
+        path: '/overview',
+        component: '@/pages/Overview',
+      },
+      {
         name: '组织管理',
         path: '/organization',
         component: '@/pages/Organization',

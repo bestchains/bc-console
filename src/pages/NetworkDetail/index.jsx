@@ -64,6 +64,28 @@ class NetworkDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      activeKey: 'network',
+      allPeers: [],
+      channel: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+        step: 0,
+      },
+      channelPeers: [],
+      contract: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+        createLoading: false,
+      },
+      contractUpgradeLoading: false,
       isOpenModal: false,
       modalType: 'addchannel',
       organization: {
@@ -74,24 +96,8 @@ class NetworkDetail$$Page extends React.Component {
         current: 1,
         record: {},
       },
-      channel: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-        step: 0,
-      },
-      contract: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-        createLoading: false,
-      },
+      organizations: [],
+      peers: [],
       strategy: {
         filter: 'ALL',
         searchValue: undefined,
@@ -102,12 +108,6 @@ class NetworkDetail$$Page extends React.Component {
         list: [],
         channels: [],
       },
-      organizations: [],
-      peers: [],
-      channelPeers: [],
-      allPeers: [],
-      contractUpgradeLoading: false,
-      activeKey: 'network',
     };
   }
 
@@ -121,162 +121,8 @@ class NetworkDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  async getChannelsForCreateEpolicy(callback) {
-    const res =
-      await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
-        network: this.match?.params?.id,
-      });
-    this.setState(
-      {
-        strategy: {
-          ...this.state.strategy,
-          channels:
-            res?.channelsForCreateEpolicy?.map((item) => ({
-              value: JSON.stringify(item),
-              label: item.displayName || '-',
-            })) || [],
-        },
-      },
-      callback
-    );
-    const form = this.$('formily_create_strategy')?.formRef?.current?.form;
-    form.setFieldState('channel', {
-      dataSource:
-        res?.channelsForCreateEpolicy?.map((item) => ({
-          value: JSON.stringify(item),
-          label: item.displayName || '-',
-        })) || [],
-    });
-  }
-
-  async getEpolicies() {
-    const res = await this.props.appHelper.utils.bff.getEpolicies({
-      network: this.match?.params?.id,
-    });
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        list: res?.epolicies || [],
-      },
-    });
-  }
-
-  async getPeers(v, callback, usedPeers) {
-    const { initiator, organizations } = v;
-    const res =
-      await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
-        members: [initiator, ...(organizations || [])]?.filter((item) => item),
-      });
-    const allPeers = [];
-    res?.ibppeersForCreateChannel?.forEach((item) => {
-      item.ibppeers?.forEach((peer) => {
-        allPeers.push({
-          name: peer.name,
-          namespace: item.name,
-          key: item.name + peer.name,
-        });
-      });
-    });
-    const peers =
-      res?.ibppeersForCreateChannel
-        ?.map((item) => ({
-          key: item.name,
-          title: item.name,
-          children: item.ibppeers
-            ?.filter((item) => item.status === 'Deployed')
-            ?.map((peer) => ({
-              key: item.name + peer.name,
-              title: peer.name,
-            }))
-            ?.filter((peer) => {
-              return usedPeers?.length
-                ? usedPeers.every(
-                    (used) =>
-                      !(
-                        used.name === peer.title && used.namespace === item.name
-                      )
-                  )
-                : true;
-            }),
-        }))
-        ?.filter((item) => item?.children?.length > 0) || [];
-    this.setState(
-      {
-        peers,
-        allPeers,
-      },
-      callback
-    );
-  }
-
-  formatContract(e, payload) {
-    const list = (this.props.useGetChaincodebuilds?.data?.chaincodebuilds || [])
-      ?.filter((item) => {
-        return this.state.contract.searchValue
-          ? item.displayName?.includes(this.state.contract.searchValue)
-          : true;
-      })
-      ?.sort((a, b) => {
-        if (this.state.sorter?.order !== 'ascend') {
-          return (
-            new Date(b.creationTimestamp).getTime() -
-            new Date(a.creationTimestamp).getTime()
-          );
-        }
-        return (
-          new Date(a.creationTimestamp).getTime() -
-          new Date(b.creationTimestamp).getTime()
-        );
-      });
-    const result = {};
-    const initVersions = {};
-    list.forEach((item) => {
-      if (!result[item.displayName]) {
-        result[item.displayName] = {};
-      }
-      if (!result[item.displayName][item.name]) {
-        result[item.displayName][item.name] = item;
-      }
-    });
-    const formatList = Object.keys(result)?.map((displayName) => {
-      const versions = Object.values(result[displayName])?.sort((a, b) =>
-        b.version.localeCompare(a.version)
-      );
-      initVersions[displayName] = versions?.[0]?.name;
-      const record =
-        versions?.find(
-          (item) => item.name === this.state.initVersions?.[displayName]
-        ) || versions?.[0];
-      return {
-        displayName,
-        ...record,
-        versions: versions?.map((item) => ({
-          ...item,
-          label: item.version,
-          key: item.name,
-        })),
-      };
-    });
-    if (
-      !this.state.initVersions ||
-      Object.keys(this.state.initVersions || {})?.length !==
-        Object.keys(result || {})?.length ||
-      payload?.initVersions
-    ) {
-      this.setState({
-        initVersions,
-      });
-    }
-    return formatList;
-  }
-
-  getContractVersion(record) {
-    const name = this.state.initVersions?.[record?.displayName];
-    return record?.versions?.find((item) => item.name === name)?.version;
-  }
-
-  getContractVersions(record) {
-    return record?.versions || [];
+  beforeUpload() {
+    return false;
   }
 
   changeContractVersion(e, payload) {
@@ -286,186 +132,6 @@ class NetworkDetail$$Page extends React.Component {
         [payload?.record?.displayName]: e.key,
       },
     });
-  }
-
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-      channelPeers: [],
-    });
-  }
-
-  handleFilterChange(e) {
-    this.setState({
-      filter: e.target.value,
-    });
-  }
-
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-    });
-  }
-
-  handlePaginationChange(c, s) {
-    this.setState({
-      size: s,
-      current: c,
-    });
-  }
-
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
-      'i18n-v7xu122b9o'
-    )}`;
-  }
-
-  handleOrganizationPaginationChange(c, s) {
-    this.setState({
-      organization: {
-        ...this.state.organization,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleOrganizationTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      organization: {
-        ...this.state.organization,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  async validatorChannelName(value) {
-    try {
-      const res = await this.props?.appHelper?.utils?.bff?.getChannel({
-        name: value,
-      });
-      return this.i18n('i18n-0imredkn');
-    } catch (error) {}
-  }
-
-  handleChannelSearchValueChange(e) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleChannelPaginationChange(c, s) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleChannelTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  openAddChannelModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannel',
-    });
-  }
-
-  openAddChannelSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannelsuccess',
-    });
-  }
-
-  openAddChannelOrganizationModal(e, payload) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'addchannelorganization',
-    });
-  }
-
-  openAddChannelOrganizationSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannelorganizationsuccess',
-    });
-  }
-
-  openAddChannelPeerModal(e, payload) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'addchannelpeer',
-      peers: [],
-    });
-    this.getPeers(
-      {
-        organizations: payload?.record?.members?.map((item) => item.name) || [],
-      },
-      () => {},
-      payload.record.peers || []
-    );
-  }
-
-  channelAddModalNext() {
-    const form = this.$('formily_create_channel')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      this.setState({
-        channel: {
-          ...this.state.channel,
-          addData: v,
-          step: 1,
-        },
-      });
-      this.getPeers(v, () => {});
-    });
-  }
-
-  channelAddModalPre() {
-    this.setState(
-      {
-        channel: {
-          ...this.state.channel,
-          step: 0,
-        },
-      },
-      () => {
-        const form = this.$('formily_create_channel')?.formRef?.current?.form;
-        form.setValues(this.state.channel.addData);
-      }
-    );
   }
 
   async channelAddModalConfirm(e, payload) {
@@ -501,6 +167,35 @@ class NetworkDetail$$Page extends React.Component {
         errors: error?.response?.errors,
       });
     }
+  }
+
+  channelAddModalNext() {
+    const form = this.$('formily_create_channel')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      this.setState({
+        channel: {
+          ...this.state.channel,
+          addData: v,
+          step: 1,
+        },
+      });
+      this.getPeers(v, () => {});
+    });
+  }
+
+  channelAddModalPre() {
+    this.setState(
+      {
+        channel: {
+          ...this.state.channel,
+          step: 0,
+        },
+      },
+      () => {
+        const form = this.$('formily_create_channel')?.formRef?.current?.form;
+        form.setValues(this.state.channel.addData);
+      }
+    );
   }
 
   channelAddOrganizationModalConfirm(e, payload) {
@@ -567,157 +262,10 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  openDeleteChannelModal(e, payload) {
+  closeModal() {
     this.setState({
-      isOpenModal: true,
-      modalType: 'delete',
-      channel: {
-        ...this.state.channel,
-        record: payload?.record,
-      },
-    });
-  }
-
-  async confirmDeleteChannelModal(e, payload) {
-    // const federation = this.props.useGetFederation?.data?.federation || {}
-    // try {
-    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
-    //     name: federation?.name,
-    //     organization: this.state.channelRecord?.name,
-    //     initiator: federation?.initiator?.name
-    //   })
-    //   this.closeModal()
-    //   this.utils.notification.success({
-    //     message: this.i18n('i18n-yy3f9rxigm'),
-    //   })
-    //   this.props.useGetFederation.mutate()
-    // } catch (error) {
-    //   this.utils.notification.warnings({
-    //     message: this.i18n('i18n-p5gea1q7fem'),
-    //     errors: error?.response?.errors
-    //   })
-    // }
-  }
-
-  async validatorContractRepeat(value) {
-    const form = this.$('formily_create_contract')?.formRef?.current?.form;
-    const displayName =
-      this.state.modalType === 'addcontract'
-        ? form.getValuesIn('displayName')
-        : this.state.contract?.record?.displayName;
-    try {
-      const res = await this.props?.appHelper?.utils?.bff?.getChaincodebuilds({
-        network: this.match?.params?.id,
-        version: value,
-        displayName,
-      });
-      if (res?.chaincodebuilds?.length > 0) {
-        return this.i18n('i18n-wc70jk7n');
-      }
-    } catch (error) {}
-  }
-
-  handleContractSearchValueChange(e) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleContractPaginationChange(c, s) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleContractTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  openAddContractModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addcontract',
-    });
-  }
-
-  openDeploymentContractModal(e, payload) {
-    this.setState(
-      {
-        contract: {
-          ...this.state.contract,
-          record: payload.record,
-        },
-        isOpenModal: true,
-        modalType: 'deploymentcontract',
-      },
-      () => {
-        setTimeout(() => {
-          const form = this.$('formily_contract_deploy')?.formRef?.current
-            ?.form;
-          form.setValues({
-            displayName: payload.record?.displayName,
-            // edit
-            version: payload.record?.version,
-            name: payload.record?.name,
-          });
-        }, 0);
-      }
-    );
-  }
-
-  openDeploymentContractSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'deploymentcontractsuccess',
-    });
-  }
-
-  openUpgradeContractModal(e, payload) {
-    this.setState(
-      {
-        contract: {
-          ...this.state.contract,
-          record: payload.record,
-        },
-        isOpenModal: true,
-        modalType: 'upgradecontract',
-      },
-      () => {
-        setTimeout(() => {
-          const form = this.$('formily_contract_upgrade')?.formRef?.current
-            ?.form;
-          form.setValues({
-            displayName: payload.record?.displayName,
-            // edit
-            version: payload.record?.version,
-          });
-        }, 0);
-      }
-    );
-  }
-
-  openDeleteContractModal(e, payload) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'deletecontract',
+      isOpenModal: false,
+      channelPeers: [],
     });
   }
 
@@ -775,201 +323,6 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  confirmUpgradeContractModal(e, payload) {
-    const form = this.$('formily_contract_upgrade')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      this.setState({
-        contractUpgradeLoading: true,
-      });
-      const { versoin, format, files, ...params } = v;
-      try {
-        const query = {
-          ...params,
-          network: this.match?.params?.id,
-        };
-        if (format === 'zip') {
-          query.file = v.files?.fileList?.[0]?.originFileObj;
-        } else {
-          query.files = v.files?.fileList?.map((item) => item.originFileObj);
-          query.fileRelativePaths = v.files?.fileList?.map((item) => {
-            const file = item.originFileObj;
-            return file.webkitRelativePath;
-          });
-        }
-        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild(
-          query
-        );
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-a4rcftyd'),
-        });
-        // this.openAddChannelSuccessModal()
-        this.props.useGetChaincodebuilds.mutate();
-        this.setState({
-          contractUpgradeLoading: false,
-        });
-      } catch (error) {
-        this.setState({
-          contractUpgradeLoading: false,
-        });
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-7fxj402s'),
-          errors: error?.response?.errors,
-        });
-      }
-    });
-  }
-
-  confirmDeploymentContractModal(e, payload) {
-    const form = this.$('formily_contract_deploy')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      const chaincode = {
-        channel: JSON.parse(v.channel || '{}')?.name,
-        epolicy: v.epolicy,
-        name: v.name,
-        displayName: v.displayName,
-        // edit
-        // ibppeer: v.ibppeer
-      };
-
-      try {
-        const res = await this.props.appHelper.utils.bff.deployChaincode({
-          chaincode,
-        });
-        // this.closeModal()
-        // this.utils.notification.success({
-        //   message: this.i18n('i18n-l8fybssesij'),
-        // })
-        this.openDeploymentContractSuccessModal();
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-ekujezos'),
-          errors: error?.response?.errors,
-        });
-      }
-    });
-  }
-
-  async confirmDeleteContractModal(e, payload) {
-    try {
-      await this.props.appHelper.utils.bff.deleteChaincodebuild({
-        name: this.state.contract?.record?.name,
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-5m5bdexs'),
-      });
-      await this.props.useGetChaincodebuilds.mutate();
-      setTimeout(() => {
-        this.formatContract(_, {
-          initVersions: true,
-        });
-      });
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-esbyfrwe'),
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
-  openDeleteStrategyModal(e, payload) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'deletestrategy',
-    });
-  }
-
-  openStrategyDetailModal(e, payload) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'strategydetail',
-    });
-  }
-
-  async confirmDeleteStrategyModal(e, payload) {
-    try {
-      await this.props.appHelper.utils.bff.deleteEpolicy({
-        name: this.state.strategy?.record?.name,
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-u1byeit6'),
-      });
-      this.getEpolicies();
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-ctwrr17g'),
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
-  handleStrategySearchValueChange(e) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleStrategyPaginationChange(c, s) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleStrategyTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  openAddStrategyModal() {
-    this.setState(
-      {
-        isOpenModal: true,
-        modalType: 'addstrategy',
-      },
-      () => {
-        setTimeout(() => {
-          const form = this.$('formily_create_strategy')?.formRef?.current
-            ?.form;
-          form &&
-            form.setValues({
-              content: {
-                value: [
-                  {
-                    item: [],
-                  },
-                ],
-              },
-            });
-        }, 200);
-      }
-    );
-    this.getChannelsForCreateEpolicy(() => {});
-  }
-
   confirmAddStrategyModal(e, payload) {
     const network = this.props.useGetNetwork?.data?.network || {};
     const form = this.$('formily_create_strategy')?.formRef?.current?.form;
@@ -1018,16 +371,437 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  beforeUpload() {
-    return false;
+  async confirmDeleteChannelModal(e, payload) {
+    // const federation = this.props.useGetFederation?.data?.federation || {}
+    // try {
+    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
+    //     name: federation?.name,
+    //     organization: this.state.channelRecord?.name,
+    //     initiator: federation?.initiator?.name
+    //   })
+    //   this.closeModal()
+    //   this.utils.notification.success({
+    //     message: this.i18n('i18n-yy3f9rxigm'),
+    //   })
+    //   this.props.useGetFederation.mutate()
+    // } catch (error) {
+    //   this.utils.notification.warnings({
+    //     message: this.i18n('i18n-p5gea1q7fem'),
+    //     errors: error?.response?.errors
+    //   })
+    // }
   }
 
-  onTabsChange(activeKey) {
-    this.history?.replace(
-      this?.history?.location?.pathname + '?tab=' + activeKey
+  async confirmDeleteContractModal(e, payload) {
+    try {
+      await this.props.appHelper.utils.bff.deleteChaincodebuild({
+        name: this.state.contract?.record?.name,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-5m5bdexs'),
+      });
+      await this.props.useGetChaincodebuilds.mutate();
+      setTimeout(() => {
+        this.formatContract(_, {
+          initVersions: true,
+        });
+      });
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-esbyfrwe'),
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  async confirmDeleteStrategyModal(e, payload) {
+    try {
+      await this.props.appHelper.utils.bff.deleteEpolicy({
+        name: this.state.strategy?.record?.name,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-u1byeit6'),
+      });
+      this.getEpolicies();
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-ctwrr17g'),
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  confirmDeploymentContractModal(e, payload) {
+    const form = this.$('formily_contract_deploy')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      const chaincode = {
+        channel: JSON.parse(v.channel || '{}')?.name,
+        epolicy: v.epolicy,
+        name: v.name,
+        displayName: v.displayName,
+        // edit
+        // ibppeer: v.ibppeer
+      };
+
+      try {
+        const res = await this.props.appHelper.utils.bff.deployChaincode({
+          chaincode,
+        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-l8fybssesij'),
+        // })
+        this.openDeploymentContractSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-ekujezos'),
+          errors: error?.response?.errors,
+        });
+      }
+    });
+  }
+
+  confirmUpgradeContractModal(e, payload) {
+    const form = this.$('formily_contract_upgrade')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      this.setState({
+        contractUpgradeLoading: true,
+      });
+      const { versoin, format, files, ...params } = v;
+      try {
+        const query = {
+          ...params,
+          network: this.match?.params?.id,
+        };
+        if (format === 'zip') {
+          query.file = v.files?.fileList?.[0]?.originFileObj;
+        } else {
+          query.files = v.files?.fileList?.map((item) => item.originFileObj);
+          query.fileRelativePaths = v.files?.fileList?.map((item) => {
+            const file = item.originFileObj;
+            return file.webkitRelativePath;
+          });
+        }
+        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild(
+          query
+        );
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-a4rcftyd'),
+        });
+        // this.openAddChannelSuccessModal()
+        this.props.useGetChaincodebuilds.mutate();
+        this.setState({
+          contractUpgradeLoading: false,
+        });
+      } catch (error) {
+        this.setState({
+          contractUpgradeLoading: false,
+        });
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-7fxj402s'),
+          errors: error?.response?.errors,
+        });
+      }
+    });
+  }
+
+  formatContract(e, payload) {
+    const list = (this.props.useGetChaincodebuilds?.data?.chaincodebuilds || [])
+      ?.filter((item) => {
+        return this.state.contract.searchValue
+          ? item.displayName?.includes(this.state.contract.searchValue)
+          : true;
+      })
+      ?.sort((a, b) => {
+        if (this.state.sorter?.order !== 'ascend') {
+          return (
+            new Date(b.creationTimestamp).getTime() -
+            new Date(a.creationTimestamp).getTime()
+          );
+        }
+        return (
+          new Date(a.creationTimestamp).getTime() -
+          new Date(b.creationTimestamp).getTime()
+        );
+      });
+    const result = {};
+    const initVersions = {};
+    list.forEach((item) => {
+      if (!result[item.displayName]) {
+        result[item.displayName] = {};
+      }
+      if (!result[item.displayName][item.name]) {
+        result[item.displayName][item.name] = item;
+      }
+    });
+    const formatList = Object.keys(result)?.map((displayName) => {
+      const versions = Object.values(result[displayName])?.sort((a, b) =>
+        b.version.localeCompare(a.version)
+      );
+      initVersions[displayName] = versions?.[0]?.name;
+      const record =
+        versions?.find(
+          (item) => item.name === this.state.initVersions?.[displayName]
+        ) || versions?.[0];
+      return {
+        displayName,
+        ...record,
+        versions: versions?.map((item) => ({
+          ...item,
+          label: item.version,
+          key: item.name,
+        })),
+      };
+    });
+    if (
+      !this.state.initVersions ||
+      Object.keys(this.state.initVersions || {})?.length !==
+        Object.keys(result || {})?.length ||
+      payload?.initVersions
+    ) {
+      this.setState({
+        initVersions,
+      });
+    }
+    return formatList;
+  }
+
+  async getChannelsForCreateEpolicy(callback) {
+    const res =
+      await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
+        network: this.match?.params?.id,
+      });
+    this.setState(
+      {
+        strategy: {
+          ...this.state.strategy,
+          channels:
+            res?.channelsForCreateEpolicy?.map((item) => ({
+              value: JSON.stringify(item),
+              label: item.displayName || '-',
+            })) || [],
+        },
+      },
+      callback
     );
+    const form = this.$('formily_create_strategy')?.formRef?.current?.form;
+    form.setFieldState('channel', {
+      dataSource:
+        res?.channelsForCreateEpolicy?.map((item) => ({
+          value: JSON.stringify(item),
+          label: item.displayName || '-',
+        })) || [],
+    });
+  }
+
+  getContractVersion(record) {
+    const name = this.state.initVersions?.[record?.displayName];
+    return record?.versions?.find((item) => item.name === name)?.version;
+  }
+
+  getContractVersions(record) {
+    return record?.versions || [];
+  }
+
+  async getEpolicies() {
+    const res = await this.props.appHelper.utils.bff.getEpolicies({
+      network: this.match?.params?.id,
+    });
     this.setState({
-      activeKey,
+      strategy: {
+        ...this.state.strategy,
+        list: res?.epolicies || [],
+      },
+    });
+  }
+
+  async getPeers(v, callback, usedPeers) {
+    const { initiator, organizations } = v;
+    const res =
+      await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
+        members: [initiator, ...(organizations || [])]?.filter((item) => item),
+      });
+    const allPeers = [];
+    res?.ibppeersForCreateChannel?.forEach((item) => {
+      item.ibppeers?.forEach((peer) => {
+        allPeers.push({
+          name: peer.name,
+          namespace: item.name,
+          key: item.name + peer.name,
+        });
+      });
+    });
+    const peers =
+      res?.ibppeersForCreateChannel
+        ?.map((item) => ({
+          key: item.name,
+          title: item.name,
+          children: item.ibppeers
+            ?.filter((item) => item.status === 'Deployed')
+            ?.map((peer) => ({
+              key: item.name + peer.name,
+              title: peer.name,
+            }))
+            ?.filter((peer) => {
+              return usedPeers?.length
+                ? usedPeers.every(
+                    (used) =>
+                      !(
+                        used.name === peer.title && used.namespace === item.name
+                      )
+                  )
+                : true;
+            }),
+        }))
+        ?.filter((item) => item?.children?.length > 0) || [];
+    this.setState(
+      {
+        peers,
+        allPeers,
+      },
+      callback
+    );
+  }
+
+  handleChannelPaginationChange(c, s) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleChannelSearchValueChange(e) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleChannelTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handleContractPaginationChange(c, s) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleContractSearchValueChange(e) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleContractTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handleFilterChange(e) {
+    this.setState({
+      filter: e.target.value,
+    });
+  }
+
+  handleOrganizationPaginationChange(c, s) {
+    this.setState({
+      organization: {
+        ...this.state.organization,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleOrganizationTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      organization: {
+        ...this.state.organization,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+    });
+  }
+
+  handleStrategyPaginationChange(c, s) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleStrategySearchValueChange(e) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleStrategyTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
     });
   }
 
@@ -1064,6 +838,232 @@ class NetworkDetail$$Page extends React.Component {
         },
       });
     });
+  }
+
+  onTabsChange(activeKey) {
+    this.history?.replace(
+      this?.history?.location?.pathname + '?tab=' + activeKey
+    );
+    this.setState({
+      activeKey,
+    });
+  }
+
+  openAddChannelModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannel',
+    });
+  }
+
+  openAddChannelOrganizationModal(e, payload) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'addchannelorganization',
+    });
+  }
+
+  openAddChannelOrganizationSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelorganizationsuccess',
+    });
+  }
+
+  openAddChannelPeerModal(e, payload) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'addchannelpeer',
+      peers: [],
+    });
+    this.getPeers(
+      {
+        organizations: payload?.record?.members?.map((item) => item.name) || [],
+      },
+      () => {},
+      payload.record.peers || []
+    );
+  }
+
+  openAddChannelSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelsuccess',
+    });
+  }
+
+  openAddContractModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addcontract',
+    });
+  }
+
+  openAddStrategyModal() {
+    this.setState(
+      {
+        isOpenModal: true,
+        modalType: 'addstrategy',
+      },
+      () => {
+        setTimeout(() => {
+          const form = this.$('formily_create_strategy')?.formRef?.current
+            ?.form;
+          form &&
+            form.setValues({
+              content: {
+                value: [
+                  {
+                    item: [],
+                  },
+                ],
+              },
+            });
+        }, 200);
+      }
+    );
+    this.getChannelsForCreateEpolicy(() => {});
+  }
+
+  openDeleteChannelModal(e, payload) {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+      channel: {
+        ...this.state.channel,
+        record: payload?.record,
+      },
+    });
+  }
+
+  openDeleteContractModal(e, payload) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletecontract',
+    });
+  }
+
+  openDeleteStrategyModal(e, payload) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletestrategy',
+    });
+  }
+
+  openDeploymentContractModal(e, payload) {
+    this.setState(
+      {
+        contract: {
+          ...this.state.contract,
+          record: payload.record,
+        },
+        isOpenModal: true,
+        modalType: 'deploymentcontract',
+      },
+      () => {
+        setTimeout(() => {
+          const form = this.$('formily_contract_deploy')?.formRef?.current
+            ?.form;
+          form.setValues({
+            displayName: payload.record?.displayName,
+            // edit
+            version: payload.record?.version,
+            name: payload.record?.name,
+          });
+        }, 0);
+      }
+    );
+  }
+
+  openDeploymentContractSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'deploymentcontractsuccess',
+    });
+  }
+
+  openStrategyDetailModal(e, payload) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'strategydetail',
+    });
+  }
+
+  openUpgradeContractModal(e, payload) {
+    this.setState(
+      {
+        contract: {
+          ...this.state.contract,
+          record: payload.record,
+        },
+        isOpenModal: true,
+        modalType: 'upgradecontract',
+      },
+      () => {
+        setTimeout(() => {
+          const form = this.$('formily_contract_upgrade')?.formRef?.current
+            ?.form;
+          form.setValues({
+            displayName: payload.record?.displayName,
+            // edit
+            version: payload.record?.version,
+          });
+        }, 0);
+      }
+    );
+  }
+
+  paginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
+  }
+
+  async validatorChannelName(value) {
+    try {
+      const res = await this.props?.appHelper?.utils?.bff?.getChannel({
+        name: value,
+      });
+      return this.i18n('i18n-0imredkn');
+    } catch (error) {}
+  }
+
+  async validatorContractRepeat(value) {
+    const form = this.$('formily_create_contract')?.formRef?.current?.form;
+    const displayName =
+      this.state.modalType === 'addcontract'
+        ? form.getValuesIn('displayName')
+        : this.state.contract?.record?.displayName;
+    try {
+      const res = await this.props?.appHelper?.utils?.bff?.getChaincodebuilds({
+        network: this.match?.params?.id,
+        version: value,
+        displayName,
+      });
+      if (res?.chaincodebuilds?.length > 0) {
+        return this.i18n('i18n-wc70jk7n');
+      }
+    } catch (error) {}
   }
 
   componentDidMount() {
@@ -5511,7 +5511,12 @@ class NetworkDetail$$Page extends React.Component {
                                       shape="default"
                                       type="link"
                                     >
-                                      {__$$eval(() => record.displayName)}
+                                      {__$$eval(
+                                        () =>
+                                          `${record.displayName || '-'}(${
+                                            record?.name || '-'
+                                          })`
+                                      )}
                                     </Button>
                                   ))(
                                     __$$createChildContext(__$$context, {

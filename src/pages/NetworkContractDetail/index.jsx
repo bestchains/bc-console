@@ -256,8 +256,13 @@ class NetworkContractDetail$$Page extends React.Component {
                             >
                               {__$$eval(
                                 () =>
-                                  this.props.useGetChaincodebuild?.data
-                                    ?.chaincodebuild?.displayName
+                                  `${
+                                    this.props.useGetChaincodebuild?.data
+                                      ?.chaincodebuild?.displayName || '-'
+                                  }(${
+                                    this.props.useGetChaincodebuild?.data
+                                      ?.chaincodebuild?.name || '-'
+                                  })`
                               )}
                             </Typography.Text>
                           }

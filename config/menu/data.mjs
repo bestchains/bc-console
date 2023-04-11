@@ -6,6 +6,8 @@ import BaasFederation from "@tenx-ui/icon/lib/BaasFederation.js";
 import BaasProposal from "@tenx-ui/icon/lib/BaasProposal.js";
 import BaasNetwork from "@tenx-ui/icon/lib/BaasNetwork.js";
 import ChromeFilled from "@tenx-ui/icon/lib/ChromeFilled.js";
+import BaasOverview from "@tenx-ui/icon/lib/BaasOverview.js";
+
 export const User = 'User'
 export const TENANT_ADMIN = 'TenantAdmin'
 export const PlatformAdmin = 'PlatformAdmin' // 3
@@ -25,6 +27,14 @@ const data = [
         text: '区块链服务平台',
         textEn: 'BaaS',
         children: [
+          {
+            id: 'baas-overview',
+            text: '总览',
+            textEn: 'Overview',
+            icon: BaasOverview,
+            pathname: '/overview',
+            tenant: false,
+          },
           {
             id: 'baas-organization',
             text: '组织管理',
