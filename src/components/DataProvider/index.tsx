@@ -1,5 +1,5 @@
 import React from 'react';
-import utils from '../../utils';
+import utils from '../../utils/__utils';
 
 export interface DataProviderProps {
   render: (params: { [key: string]: any }) => JSX.Element;

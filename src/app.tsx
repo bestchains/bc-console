@@ -5,26 +5,22 @@
 
 /**
  * 运行时配置文件，可以在这里扩展运行时的能力，比如修改路由、修改 render 方法等
- *
- * @author Vsion
- * @date 2022-01-15
  */
-import React from 'react';
-import { RunTimeLayoutConfig } from '@umijs/max';
-import { Typography, Modal } from 'antd';
-import { history } from '@umijs/max';
-import logo from '@/assets/img/logo-title-white.png';
-import theme from '../config/theme';
-import { initUnifiedLinkHistory } from '@tenx-ui/utils/es/UnifiedLink';
-import utils from './utils';
-import { basename, IS_PROD, IS_QIAN_KUN } from './constants';
-import { getLocale, setLocale } from './i18n';
-import { Tooltip } from 'antd';
-import { GlobalOutlined } from '@ant-design/icons';
+
+import logo from '@/assets/img/logo.png';
 import { _qiankunData } from '@/utils/helper';
+import { GlobalOutlined } from '@ant-design/icons';
+import { initUnifiedLinkHistory } from '@tenx-ui/utils/es/UnifiedLink';
+import { history, RunTimeLayoutConfig } from '@umijs/max';
+import { Modal, Tooltip, Typography } from 'antd';
+import React from 'react';
+import theme from '../config/theme';
+import { basename, IS_PROD, IS_QIAN_KUN } from './__constants';
+import { getLocale, setLocale } from './i18n';
+import utils from './utils/__utils';
 
 // TODO：qiankun umi 子应用 window.routerBase 问题，目前需要手动设置一下 routerBase 的值
-window.routerBase = basename;
+(window as any).routerBase = basename;
 
 export const qiankun = {
   // 应用加载之前
@@ -62,7 +58,7 @@ const Title = ({ icon }: any) => {
   if (icon) {
     return <div style={{ lineHeight: '28px' }}>{userName.split('')?.[0]}</div>;
   }
-  return <div style={{ color: '#fff' }}>{userName}</div>;
+  return <div>{userName}</div>;
 };
 
 export const getInitialState = () => ({});
@@ -117,7 +113,6 @@ export const layout: RunTimeLayoutConfig = initState => {
         </Typography.Link>,
         <Tooltip key="locale" title={langInfo.tooltip}>
           <GlobalOutlined
-            style={{ color: '#fff' }}
             onClick={() => {
               setLocale(langInfo.change);
               window.location.reload();

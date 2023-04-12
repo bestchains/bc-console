@@ -5,9 +5,21 @@ import { notification } from '@tenx-ui/materials';
 import { createRef } from 'react';
 import { sdk as bff } from '../../bff-sdk';
 
-export const AUTH_DATA = 'authData';
+const utils = {};
 
-export const getAuthData = () => {
+utils.bff = bff;
+
+utils.message = message;
+
+utils.notification = notification;
+
+/** 本地存储中认证数据保存的 key */
+const __AUTH_DATA = 'authData';
+utils.AUTH_DATA = __AUTH_DATA;
+export const AUTH_DATA = __AUTH_DATA;
+
+/** 获取认证数据 */
+const __getAuthData = () => {
   try {
     const authData = JSON.parse(window.localStorage.getItem(AUTH_DATA) || '{}');
     return authData;
@@ -16,17 +28,26 @@ export const getAuthData = () => {
     return {};
   }
 };
+utils.getAuthData = __getAuthData;
+export const getAuthData = __getAuthData;
 
-export const setAuthData = (data) => {
+/** 设置认证数据 */
+const __setAuthData = (data) => {
   window.localStorage.setItem(AUTH_DATA, JSON.stringify(data));
 };
+utils.setAuthData = __setAuthData;
+export const setAuthData = __setAuthData;
 
-export const removeAuthData = () => {
+/** 移除认证数据 */
+const __removeAuthData = () => {
   window.localStorage.removeItem(AUTH_DATA);
   window.sessionStorage.removeItem(AUTH_DATA);
 };
+utils.removeAuthData = __removeAuthData;
+export const removeAuthData = __removeAuthData;
 
-export const parseToken = function parseToken(token) {
+/** 解析 token */
+const __parseToken = function parseToken(token) {
   return token
     .split('.')
     .map((str) => {
@@ -44,18 +65,24 @@ export const parseToken = function parseToken(token) {
       }),
       {}
     );
-};
+}.bind(utils);
+utils.parseToken = __parseToken;
+export const parseToken = __parseToken;
 
-export const isTokenExpired = function isTokenExpired(token) {
+/** 判断 token 是否有效 */
+const __isTokenExpired = function isTokenExpired(token) {
   token = token || getAuthData()?.token?.id_token;
   if (!token) {
     return true;
   }
   const expiredTimestampInMs = parseToken(token).exp * 1000;
   return new Date().getTime() >= expiredTimestampInMs;
-};
+}.bind(utils);
+utils.isTokenExpired = __isTokenExpired;
+export const isTokenExpired = __isTokenExpired;
 
-export const paginationShowTotal = function paginationShowTotal(
+/** 共计 xx 条 */
+const __paginationShowTotal = function paginationShowTotal(
   total,
   range,
   props
@@ -63,16 +90,22 @@ export const paginationShowTotal = function paginationShowTotal(
   return `${props.i18n('i18n-5xl7aihzcuy')} ${total} ${props.i18n(
     'i18n-v7xu122b9o'
   )}`;
-};
+}.bind(utils);
+utils.paginationShowTotal = __paginationShowTotal;
+export const paginationShowTotal = __paginationShowTotal;
 
-export const formatCpu = (v) => {
+/** 格式化 cpu */
+const __formatCpu = (v) => {
   if (v.includes('m')) {
     return parseFloat(v) / 1000;
   }
   return parseFloat(v);
 };
+utils.formatCpu = __formatCpu;
+export const formatCpu = __formatCpu;
 
-export const downloadFile = (
+/** 下载文件 */
+const __downloadFile = (
   data,
   filename = 'profile.json',
   type = 'text/json'
@@ -89,14 +122,26 @@ export const downloadFile = (
   e.initMouseEvent('click');
   a.dispatchEvent(e);
 };
+utils.downloadFile = __downloadFile;
+export const downloadFile = __downloadFile;
 
-export const getLengthReg = (min = 0, max = 200) => `^.{${min},${max}}$`;
+/** 长度校验 */
+const __getLengthReg = (min = 0, max = 200) => `^.{${min},${max}}$`;
+utils.getLengthReg = __getLengthReg;
+export const getLengthReg = __getLengthReg;
 
-export const decodeBase64 = (str) => decodeURIComponent(atob(str));
+/** Base64 解码 */
+const __decodeBase64 = (str) => decodeURIComponent(atob(str));
+utils.decodeBase64 = __decodeBase64;
+export const decodeBase64 = __decodeBase64;
 
-export const encodeBase64 = (str) => btoa(encodeURIComponent(str));
+/** Base64 加密 */
+const __encodeBase64 = (str) => btoa(encodeURIComponent(str));
+utils.encodeBase64 = __encodeBase64;
+export const encodeBase64 = __encodeBase64;
 
-export const getAuthorization = () => {
+/** header 认证信息 */
+const __getAuthorization = () => {
   const AUTH_DATA = 'authData';
   const getAuthData = () => {
     try {
@@ -114,6 +159,8 @@ export const getAuthorization = () => {
   const Authorization = token_type && id_token && `${token_type} ${id_token}`;
   return Authorization;
 };
+utils.getAuthorization = __getAuthorization;
+export const getAuthorization = __getAuthorization;
 
 export class RefsManager {
   constructor() {
@@ -158,6 +205,7 @@ export class RefsManager {
     return refIns;
   }
 }
+utils.RefsManager = RefsManager;
 
 export default {
   bff,

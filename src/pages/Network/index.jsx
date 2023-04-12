@@ -20,18 +20,33 @@ import {
   UnifiedLink,
 } from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from '@umijs/max';
+import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
+import * as qs from 'querystring';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
-import __$$constants from '../../constants';
+import __$$constants from '../../__constants';
 
 import './index.css';
 
 class Network$$Page extends React.Component {
+  get location() {
+    return this.props.self?.location;
+  }
+  get match() {
+    return this.props.self?.match;
+  }
+  get history() {
+    return this.props.self?.history;
+  }
+  get appHelper() {
+    return this.props.self?.appHelper;
+  }
+
   _context = this;
 
   get constants() {
@@ -40,9 +55,6 @@ class Network$$Page extends React.Component {
 
   constructor(props, context) {
     super(props);
-    this.location = props.self?.location;
-    this.match = props.self?.match;
-    this.history = props.self?.history;
 
     this.utils = utils;
 
@@ -81,13 +93,8 @@ class Network$$Page extends React.Component {
 
   async confirmDeleteModal(e, payload) {
     try {
-      var _this$state$record;
       await this.props.appHelper.utils.bff.deleteNetwork({
-        name:
-          (_this$state$record = this.state.record) === null ||
-          _this$state$record === void 0
-            ? void 0
-            : _this$state$record.name,
+        name: this.state.record?.name,
       });
       this.closeModal();
       this.utils.notification.success({
@@ -95,45 +102,19 @@ class Network$$Page extends React.Component {
       });
       this.props.useGetFederations.mutate();
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-8kpvya3f'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
 
   async confirmDissolveModal(e, payload) {
     try {
-      var _this$state$record,
-        _this$state$record2,
-        _this$state$record2$i,
-        _this$state$record3;
       await this.props.appHelper.utils.bff.dissolveNetwork({
-        name:
-          (_this$state$record = this.state.record) === null ||
-          _this$state$record === void 0
-            ? void 0
-            : _this$state$record.name,
-        initiator:
-          (_this$state$record2 = this.state.record) === null ||
-          _this$state$record2 === void 0
-            ? void 0
-            : (_this$state$record2$i = _this$state$record2.initiator) ===
-                null || _this$state$record2$i === void 0
-            ? void 0
-            : _this$state$record2$i.name,
-        federation:
-          (_this$state$record3 = this.state.record) === null ||
-          _this$state$record3 === void 0
-            ? void 0
-            : _this$state$record3.federation,
+        name: this.state.record?.name,
+        initiator: this.state.record?.initiator?.name,
+        federation: this.state.record?.federation,
       });
       // this.closeModal()
       // this.utils.message.success({
@@ -163,11 +144,7 @@ class Network$$Page extends React.Component {
   }
 
   handleRefresh(event) {
-    var _this$props$utils$bff;
-    (_this$props$utils$bff = this.props.utils.bff.useGetNetworks) === null ||
-    _this$props$utils$bff === void 0
-      ? void 0
-      : _this$props$utils$bff.mute();
+    this.props.utils.bff.useGetNetworks?.mute();
   }
 
   handleSearchValueChange(e) {
@@ -188,7 +165,7 @@ class Network$$Page extends React.Component {
   onMenuClick(e, payload) {
     const { key } = payload;
     this.setState({
-      record: payload === null || payload === void 0 ? void 0 : payload.record,
+      record: payload?.record,
     });
     if (key === 'dissolve') {
       this.openDissolveModal();
@@ -197,19 +174,7 @@ class Network$$Page extends React.Component {
       this.openDeleteModal();
     }
     if (key === 'detail') {
-      var _this$history, _payload$record;
-      (_this$history = this.history) === null || _this$history === void 0
-        ? void 0
-        : _this$history.push(
-            `/network/detail/${
-              payload === null || payload === void 0
-                ? void 0
-                : (_payload$record = payload.record) === null ||
-                  _payload$record === void 0
-                ? void 0
-                : _payload$record.name
-            }`
-          );
+      this.history?.push(`/network/detail/${payload?.record?.name}`);
     }
   }
 
@@ -1335,18 +1300,21 @@ class Network$$Page extends React.Component {
   }
 }
 
-export default () => {
+const PageWrapper = () => {
   const location = useLocation();
+  const history = getUnifiedHistory();
   const match = matchPath({ path: '/network' }, location.pathname);
   location.match = match;
-  const self = {
+  location.query = qs.parse(location.search);
+  const appHelper = {
+    utils,
     location,
     match,
     history,
   };
-  const appHelper = {
-    utils,
-    ...self,
+  const self = {
+    appHelper,
+    ...appHelper,
   };
   return (
     <DataProvider
@@ -1362,6 +1330,7 @@ export default () => {
     />
   );
 };
+export default PageWrapper;
 
 function __$$eval(expr) {
   try {

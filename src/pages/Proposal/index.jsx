@@ -16,18 +16,33 @@ import {
   Status,
 } from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from '@umijs/max';
+import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
+import * as qs from 'querystring';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
-import __$$constants from '../../constants';
+import __$$constants from '../../__constants';
 
 import './index.css';
 
 class Proposal$$Page extends React.Component {
+  get location() {
+    return this.props.self?.location;
+  }
+  get match() {
+    return this.props.self?.match;
+  }
+  get history() {
+    return this.props.self?.history;
+  }
+  get appHelper() {
+    return this.props.self?.appHelper;
+  }
+
   _context = this;
 
   get constants() {
@@ -36,9 +51,6 @@ class Proposal$$Page extends React.Component {
 
   constructor(props, context) {
     super(props);
-    this.location = props.self?.location;
-    this.match = props.self?.match;
-    this.history = props.self?.history;
 
     this.utils = utils;
 
@@ -47,13 +59,13 @@ class Proposal$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      current: 1,
+      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
-      filter: 'ALL',
-      searchValue: undefined,
       searchKey: 'name',
+      searchValue: undefined,
       size: 10,
-      current: 1,
       types: [
         {
           text: this.i18n('i18n-gspz6pec67u'),
@@ -103,13 +115,6 @@ class Proposal$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  openCreateModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'create',
-    });
-  }
-
   closeModal() {
     this.setState({
       isOpenModal: false,
@@ -117,17 +122,7 @@ class Proposal$$Page extends React.Component {
   }
 
   confirmCreateModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_create')?.formRef?.current?.form;
     form.submit(async (v) => {
       // await this.props.appHelper.utils.bff.createOrganization({ organization: v })
       // this.closeModal()
@@ -145,17 +140,17 @@ class Proposal$$Page extends React.Component {
     });
   }
 
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      current: 1,
-    });
-  }
-
   handlePaginationChange(c, s) {
     this.setState({
       size: s,
       current: c,
+    });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
     });
   }
 
@@ -167,13 +162,22 @@ class Proposal$$Page extends React.Component {
     });
   }
 
+  openCreateModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'create',
+    });
+  }
+
   paginationShowTotal(total, range) {
     return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
       'i18n-v7xu122b9o'
     )}`;
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    console.log(this.constants);
+  }
 
   render() {
     const __$$context = this._context || this;
@@ -723,18 +727,21 @@ class Proposal$$Page extends React.Component {
   }
 }
 
-export default () => {
+const PageWrapper = () => {
   const location = useLocation();
+  const history = getUnifiedHistory();
   const match = matchPath({ path: '/proposal' }, location.pathname);
   location.match = match;
-  const self = {
+  location.query = qs.parse(location.search);
+  const appHelper = {
+    utils,
     location,
     match,
     history,
   };
-  const appHelper = {
-    utils,
-    ...self,
+  const self = {
+    appHelper,
+    ...appHelper,
   };
   return (
     <DataProvider
@@ -750,6 +757,7 @@ export default () => {
     />
   );
 };
+export default PageWrapper;
 
 function __$$eval(expr) {
   try {

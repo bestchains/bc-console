@@ -24,18 +24,33 @@ import {
   Status,
 } from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from '@umijs/max';
+import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
+import * as qs from 'querystring';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
-import __$$constants from '../../constants';
+import __$$constants from '../../__constants';
 
 import './index.css';
 
 class Federation$$Page extends React.Component {
+  get location() {
+    return this.props.self?.location;
+  }
+  get match() {
+    return this.props.self?.match;
+  }
+  get history() {
+    return this.props.self?.history;
+  }
+  get appHelper() {
+    return this.props.self?.appHelper;
+  }
+
   _context = this;
 
   get constants() {
@@ -44,9 +59,6 @@ class Federation$$Page extends React.Component {
 
   constructor(props, context) {
     super(props);
-    this.location = props.self?.location;
-    this.match = props.self?.match;
-    this.history = props.self?.history;
 
     this.utils = utils;
 
@@ -85,35 +97,17 @@ class Federation$$Page extends React.Component {
   }
 
   confirmCreateModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_create')?.formRef?.current?.form;
     form.submit(async (v) => {
       delete v.displayName;
       this.setState({
         createLoading: true,
       });
       try {
-        var _v$organizations;
         await this.props.appHelper.utils.bff.createFederation({
           federation: v,
         });
-        if (
-          (v === null || v === void 0
-            ? void 0
-            : (_v$organizations = v.organizations) === null ||
-              _v$organizations === void 0
-            ? void 0
-            : _v$organizations.length) > 0
-        ) {
+        if (v?.organizations?.length > 0) {
           this.openCreateSuccessModal();
         } else {
           this.closeModal();
@@ -126,19 +120,12 @@ class Federation$$Page extends React.Component {
           createLoading: false,
         });
       } catch (error) {
-        var _error$response;
         this.setState({
           createLoading: false,
         });
         this.utils.notification.warnings({
           message: this.i18n('i18n-n58z07yheg'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
@@ -146,13 +133,8 @@ class Federation$$Page extends React.Component {
 
   async confirmDeleteModal(e, payload) {
     try {
-      var _this$state$record;
       await this.props.appHelper.utils.bff.deleteFederation({
-        name:
-          (_this$state$record = this.state.record) === null ||
-          _this$state$record === void 0
-            ? void 0
-            : _this$state$record.name,
+        name: this.state.record?.name,
       });
       this.closeModal();
       this.utils.notification.success({
@@ -160,29 +142,17 @@ class Federation$$Page extends React.Component {
       });
       this.props.useGetFederations.mutate();
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-2tfq4ggp9cv'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
 
   async confirmDissolveModal(e, payload) {
     try {
-      var _this$state$record;
       await this.props.appHelper.utils.bff.dissolveFederation({
-        name:
-          (_this$state$record = this.state.record) === null ||
-          _this$state$record === void 0
-            ? void 0
-            : _this$state$record.name,
+        name: this.state.record?.name,
       });
       // this.closeModal()
       // this.utils.notification.success({
@@ -191,16 +161,9 @@ class Federation$$Page extends React.Component {
       this.openDissolveSuccessModal();
       this.props.useGetFederations.mutate();
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-j5kb8u4qc1b'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
@@ -237,7 +200,7 @@ class Federation$$Page extends React.Component {
   onMenuClick(e, payload) {
     const { key } = payload || {};
     this.setState({
-      record: payload === null || payload === void 0 ? void 0 : payload.record,
+      record: payload?.record,
     });
     if (key === 'dissolve') {
       this.openDissolveModal();
@@ -289,20 +252,10 @@ class Federation$$Page extends React.Component {
   }
 
   validatorName(value) {
-    var _this$props,
-      _this$props$useGetFed,
-      _this$props$useGetFed2,
-      _this$props$useGetFed3;
     if (
-      (_this$props = this.props) !== null &&
-      _this$props !== void 0 &&
-      (_this$props$useGetFed = _this$props.useGetFederations) !== null &&
-      _this$props$useGetFed !== void 0 &&
-      (_this$props$useGetFed2 = _this$props$useGetFed.data) !== null &&
-      _this$props$useGetFed2 !== void 0 &&
-      (_this$props$useGetFed3 = _this$props$useGetFed2.federations) !== null &&
-      _this$props$useGetFed3 !== void 0 &&
-      _this$props$useGetFed3.some((item) => item.name === value)
+      this.props?.useGetFederations?.data?.federations?.some(
+        (item) => item.name === value
+      )
     ) {
       return this.i18n('i18n-4y6fvhua');
     }
@@ -310,20 +263,14 @@ class Federation$$Page extends React.Component {
 
   componentDidMount() {
     const getOrganizations = async () => {
-      var _res$organizations;
       const res = await this.props.appHelper.utils.bff.getOrganizations();
       this.setState({
         organizations:
-          (res === null || res === void 0
-            ? void 0
-            : (_res$organizations = res.organizations) === null ||
-              _res$organizations === void 0
-            ? void 0
-            : _res$organizations.map((item) => ({
-                ...item,
-                value: item.name,
-                label: `${item.name}(${item.admin})`,
-              }))) || [],
+          res?.organizations?.map((item) => ({
+            ...item,
+            value: item.name,
+            label: `${item.name}(${item.admin})`,
+          })) || [],
       });
     };
     getOrganizations();
@@ -1720,18 +1667,21 @@ class Federation$$Page extends React.Component {
   }
 }
 
-export default () => {
+const PageWrapper = () => {
   const location = useLocation();
+  const history = getUnifiedHistory();
   const match = matchPath({ path: '/federation' }, location.pathname);
   location.match = match;
-  const self = {
+  location.query = qs.parse(location.search);
+  const appHelper = {
+    utils,
     location,
     match,
     history,
   };
-  const appHelper = {
-    utils,
-    ...self,
+  const self = {
+    appHelper,
+    ...appHelper,
   };
   return (
     <DataProvider
@@ -1747,6 +1697,7 @@ export default () => {
     />
   );
 };
+export default PageWrapper;
 
 function __$$eval(expr) {
   try {
