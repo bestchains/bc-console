@@ -24,18 +24,33 @@ import {
   Alert,
 } from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from '@umijs/max';
+import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
+import * as qs from 'querystring';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
 
-import utils, { RefsManager } from '../../utils/index';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
-import __$$constants from '../../constants';
+import __$$constants from '../../__constants';
 
 import './index.css';
 
 class FederationDetail$$Page extends React.Component {
+  get location() {
+    return this.props.self?.location;
+  }
+  get match() {
+    return this.props.self?.match;
+  }
+  get history() {
+    return this.props.self?.history;
+  }
+  get appHelper() {
+    return this.props.self?.appHelper;
+  }
+
   _context = this;
 
   get constants() {
@@ -44,9 +59,6 @@ class FederationDetail$$Page extends React.Component {
 
   constructor(props, context) {
     super(props);
-    this.location = props.self?.location;
-    this.match = props.self?.match;
-    this.history = props.self?.history;
 
     this.utils = utils;
 
@@ -1713,18 +1725,21 @@ class FederationDetail$$Page extends React.Component {
   }
 }
 
-export default () => {
+const PageWrapper = () => {
   const location = useLocation();
+  const history = getUnifiedHistory();
   const match = matchPath({ path: '/federation/:id' }, location.pathname);
   location.match = match;
-  const self = {
+  location.query = qs.parse(location.search);
+  const appHelper = {
+    utils,
     location,
     match,
     history,
   };
-  const appHelper = {
-    utils,
-    ...self,
+  const self = {
+    appHelper,
+    ...appHelper,
   };
   return (
     <DataProvider
@@ -1746,6 +1761,7 @@ export default () => {
     />
   );
 };
+export default PageWrapper;
 
 function __$$eval(expr) {
   try {

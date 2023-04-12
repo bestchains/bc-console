@@ -25,18 +25,33 @@ import {
   FormilyNumberPicker,
 } from '@tenx-ui/materials';
 
-import { useLocation, history, matchPath } from '@umijs/max';
+import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
+import * as qs from 'querystring';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/__utils';
 
 import * as __$$i18n from '../../i18n';
 
-import __$$constants from '../../constants';
+import __$$constants from '../../__constants';
 
 import './index.css';
 
 class OrganizationDetail$$Page extends React.Component {
+  get location() {
+    return this.props.self?.location;
+  }
+  get match() {
+    return this.props.self?.match;
+  }
+  get history() {
+    return this.props.self?.history;
+  }
+  get appHelper() {
+    return this.props.self?.appHelper;
+  }
+
   _context = this;
 
   get constants() {
@@ -45,9 +60,6 @@ class OrganizationDetail$$Page extends React.Component {
 
   constructor(props, context) {
     super(props);
-    this.location = props.self?.location;
-    this.match = props.self?.match;
-    this.history = props.self?.history;
 
     this.utils = utils;
 
@@ -85,46 +97,20 @@ class OrganizationDetail$$Page extends React.Component {
   }
 
   confirmCreateModal(e, payload) {
-    var _this$props$useGetOrg,
-      _this$props$useGetOrg2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
     const organization =
-      ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
-      _this$props$useGetOrg === void 0
-        ? void 0
-        : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) === null ||
-          _this$props$useGetOrg2 === void 0
-        ? void 0
-        : _this$props$useGetOrg2.organization) || {};
-    const form =
-      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+      this.props.useGetOrganization?.data?.organization || {};
+    const form = this.$('formily_create')?.formRef?.current?.form;
     form.submit(async (v) => {
       try {
-        var _concat;
         const res = await this.props.appHelper.utils.bff.updateOrganization({
           name: organization.name,
           organization: {
-            users:
-              (_concat = (
-                (organization === null || organization === void 0
-                  ? void 0
-                  : organization.users) || []
-              ).concat({
+            users: (organization?.users || [])
+              .concat({
                 name: v.name,
                 isOrganizationAdmin: !!v.isOrganizationAdmin === 'true',
-              })) === null || _concat === void 0
-                ? void 0
-                : _concat.map((item) => item.name),
+              })
+              ?.map((item) => item.name),
           },
         });
         // this.closeModal()
@@ -134,45 +120,18 @@ class OrganizationDetail$$Page extends React.Component {
         this.openCreateSuccessModal();
         this.props.useGetOrganization.mutate();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-43getajmxf3'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
   }
 
   confirmCreateNodelModal(e, payload) {
-    var _this$props$useGetOrg,
-      _this$props$useGetOrg2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
     const organization =
-      ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
-      _this$props$useGetOrg === void 0
-        ? void 0
-        : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) === null ||
-          _this$props$useGetOrg2 === void 0
-        ? void 0
-        : _this$props$useGetOrg2.organization) || {};
-    const form =
-      (_this$$ = this.$('formily_create_node')) === null || _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+      this.props.useGetOrganization?.data?.organization || {};
+    const form = this.$('formily_create_node')?.formRef?.current?.form;
     form.submit(async (v) => {
       try {
         const res = await this.props.appHelper.utils.bff.createIbppeer({
@@ -185,48 +144,20 @@ class OrganizationDetail$$Page extends React.Component {
         });
         this.getIbppeers();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-sunw6qwy'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
   }
 
   async confirmDeleteModal(e, payload) {
-    var _this$props$useGetOrg, _this$props$useGetOrg2, _filter;
     const organization =
-      ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
-      _this$props$useGetOrg === void 0
-        ? void 0
-        : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) === null ||
-          _this$props$useGetOrg2 === void 0
-        ? void 0
-        : _this$props$useGetOrg2.organization) || {};
-    const users =
-      (_filter = (
-        (organization === null || organization === void 0
-          ? void 0
-          : organization.users) || []
-      ).filter((item) => {
-        var _this$state$record;
-        return (
-          item.name !==
-          ((_this$state$record = this.state.record) === null ||
-          _this$state$record === void 0
-            ? void 0
-            : _this$state$record.name)
-        );
-      })) === null || _filter === void 0
-        ? void 0
-        : _filter.map((item) => item.name);
+      this.props.useGetOrganization?.data?.organization || {};
+    const users = (organization?.users || [])
+      .filter((item) => item.name !== this.state.record?.name)
+      ?.map((item) => item.name);
     try {
       await this.props.appHelper.utils.bff.updateOrganization({
         name: organization.name,
@@ -240,44 +171,17 @@ class OrganizationDetail$$Page extends React.Component {
       });
       this.props.useGetOrganization.mutate();
     } catch (error) {
-      var _error$response;
       this.utils.notification.warnings({
         message: this.i18n('i18n-p5gea1q7fem'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response = error.response) === null ||
-              _error$response === void 0
-            ? void 0
-            : _error$response.errors,
+        errors: error?.response?.errors,
       });
     }
   }
 
   confirmTransferModal(e, payload) {
-    var _this$props$useGetOrg,
-      _this$props$useGetOrg2,
-      _this$$,
-      _this$$$formRef,
-      _this$$$formRef$curre;
     const organization =
-      ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
-      _this$props$useGetOrg === void 0
-        ? void 0
-        : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) === null ||
-          _this$props$useGetOrg2 === void 0
-        ? void 0
-        : _this$props$useGetOrg2.organization) || {};
-    const form =
-      (_this$$ = this.$('formily_transfer')) === null || _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+      this.props.useGetOrganization?.data?.organization || {};
+    const form = this.$('formily_transfer')?.formRef?.current?.form;
     form.submit(async (v) => {
       try {
         await this.props.appHelper.utils.bff.updateOrganization({
@@ -290,34 +194,20 @@ class OrganizationDetail$$Page extends React.Component {
         });
         this.props.useGetOrganization.mutate();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-zzu9mo73zo'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
   }
 
   async getIbppeers() {
-    var _this$match, _this$match$params;
     const res = await this.props.appHelper.utils.bff.getIbppeers({
-      organization:
-        (_this$match = this.match) === null || _this$match === void 0
-          ? void 0
-          : (_this$match$params = _this$match.params) === null ||
-            _this$match$params === void 0
-          ? void 0
-          : _this$match$params.id,
+      organization: this.match?.params?.id,
     });
     this.setState({
-      peers: (res === null || res === void 0 ? void 0 : res.ibppeers) || [],
+      peers: res?.ibppeers || [],
     });
   }
 
@@ -400,38 +290,12 @@ class OrganizationDetail$$Page extends React.Component {
       },
       () => {
         setTimeout(() => {
-          var _this$props$useGetOrg,
-            _this$props$useGetOrg2,
-            _this$$,
-            _this$$$formRef,
-            _this$$$formRef$curre,
-            _this$state$peers;
           const organization =
-            ((_this$props$useGetOrg = this.props.useGetOrganization) === null ||
-            _this$props$useGetOrg === void 0
-              ? void 0
-              : (_this$props$useGetOrg2 = _this$props$useGetOrg.data) ===
-                  null || _this$props$useGetOrg2 === void 0
-              ? void 0
-              : _this$props$useGetOrg2.organization) || {};
-          const form =
-            (_this$$ = this.$('formily_create_node')) === null ||
-            _this$$ === void 0
-              ? void 0
-              : (_this$$$formRef = _this$$.formRef) === null ||
-                _this$$$formRef === void 0
-              ? void 0
-              : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-                _this$$$formRef$curre === void 0
-              ? void 0
-              : _this$$$formRef$curre.form;
+            this.props.useGetOrganization?.data?.organization || {};
+          const form = this.$('formily_create_node')?.formRef?.current?.form;
           form.setValues({
             organization: organization.name,
-            nodes:
-              ((_this$state$peers = this.state.peers) === null ||
-              _this$state$peers === void 0
-                ? void 0
-                : _this$state$peers.length) || 0,
+            nodes: this.state.peers?.length || 0,
             count: 1,
             storage: 50,
             time: '30',
@@ -452,7 +316,7 @@ class OrganizationDetail$$Page extends React.Component {
     this.setState({
       isOpenModal: true,
       modalType: 'delete',
-      record: payload === null || payload === void 0 ? void 0 : payload.record,
+      record: payload?.record,
     });
   }
 
@@ -460,7 +324,7 @@ class OrganizationDetail$$Page extends React.Component {
     this.setState({
       isOpenModal: true,
       modalType: 'transfer',
-      record: payload === null || payload === void 0 ? void 0 : payload.record,
+      record: payload?.record,
     });
   }
 
@@ -2648,18 +2512,21 @@ class OrganizationDetail$$Page extends React.Component {
   }
 }
 
-export default () => {
+const PageWrapper = () => {
   const location = useLocation();
+  const history = getUnifiedHistory();
   const match = matchPath({ path: '/organization/:id' }, location.pathname);
   location.match = match;
-  const self = {
+  location.query = qs.parse(location.search);
+  const appHelper = {
+    utils,
     location,
     match,
     history,
   };
-  const appHelper = {
-    utils,
-    ...self,
+  const self = {
+    appHelper,
+    ...appHelper,
   };
   return (
     <DataProvider
@@ -2679,6 +2546,7 @@ export default () => {
     />
   );
 };
+export default PageWrapper;
 
 function __$$eval(expr) {
   try {
