@@ -568,6 +568,8 @@ export type Organization = {
   displayName?: Maybe<Scalars['String']>;
   /** 所在联盟 */
   federations?: Maybe<Array<Scalars['String']>>;
+  /** 我是否参与（作为组织的Admin或Client） */
+  iAmIn?: Maybe<Scalars['Boolean']>;
   /** 所有节点 */
   ibppeers?: Maybe<Array<Ibppeer>>;
   /** 加入时间（只在联盟中使用） */
@@ -1589,6 +1591,7 @@ export type GetOrganizationsQuery = {
     creationTimestamp: string;
     lastHeartbeatTime?: string | null;
     admin?: string | null;
+    iAmIn?: boolean | null;
     status?: CrdStatusType | null;
     reason?: string | null;
     federations?: Array<string> | null;
@@ -1610,6 +1613,7 @@ export type GetOrganizationQuery = {
     creationTimestamp: string;
     lastHeartbeatTime?: string | null;
     admin?: string | null;
+    iAmIn?: boolean | null;
     status?: CrdStatusType | null;
     reason?: string | null;
     federations?: Array<string> | null;
@@ -1703,6 +1707,7 @@ export type GetOverviewInfoQuery = {
   organizations: Array<{
     __typename?: 'Organization';
     name: string;
+    iAmIn?: boolean | null;
     ibppeers?: Array<{ __typename?: 'Ibppeer'; name: string }> | null;
   }>;
   federations: Array<{ __typename?: 'Federation'; name: string }>;
@@ -2352,6 +2357,7 @@ export const GetOrganizationsDocument = gql`
       creationTimestamp
       lastHeartbeatTime
       admin
+      iAmIn
       status
       reason
       networks {
@@ -2370,6 +2376,7 @@ export const GetOrganizationDocument = gql`
       creationTimestamp
       lastHeartbeatTime
       admin
+      iAmIn
       status
       reason
       networks {
@@ -2441,6 +2448,7 @@ export const GetOverviewInfoDocument = gql`
   query getOverviewInfo {
     organizations {
       name
+      iAmIn
       ibppeers {
         name
       }

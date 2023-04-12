@@ -34,6 +34,7 @@ import {
 } from '@tenx-ui/materials';
 
 import { useLocation, history, matchPath } from '@umijs/max';
+import { getUnifiedHistory } from "@tenx-ui/utils/es/UnifiedLink";
 import DataProvider from '../../components/DataProvider';
 
 import utils, { RefsManager } from '../../utils/index';
@@ -7520,7 +7521,7 @@ export default () => {
   const self = {
     location,
     match,
-    history,
+    history: getUnifiedHistory(),
   };
   const appHelper = {
     utils,

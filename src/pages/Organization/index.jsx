@@ -25,7 +25,7 @@ import {
 import { useLocation, history, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 
-import utils, { RefsManager } from '../../utils';
+import utils, { RefsManager } from '../../utils/index';
 
 import * as __$$i18n from '../../i18n';
 
@@ -80,17 +80,7 @@ class Organization$$Page extends React.Component {
   }
 
   confirmCreateModal(e, payload) {
-    var _this$$, _this$$$formRef, _this$$$formRef$curre;
-    const form =
-      (_this$$ = this.$('formily_create')) === null || _this$$ === void 0
-        ? void 0
-        : (_this$$$formRef = _this$$.formRef) === null ||
-          _this$$$formRef === void 0
-        ? void 0
-        : (_this$$$formRef$curre = _this$$$formRef.current) === null ||
-          _this$$$formRef$curre === void 0
-        ? void 0
-        : _this$$$formRef$curre.form;
+    const form = this.$('formily_create')?.formRef?.current?.form;
     form.submit(async (v) => {
       try {
         await this.props.appHelper.utils.bff.createOrganization({
@@ -103,16 +93,9 @@ class Organization$$Page extends React.Component {
         this.openCreateSuceessModal();
         this.props.useGetOrganizations.mutate();
       } catch (error) {
-        var _error$response;
         this.utils.notification.warnings({
           message: this.i18n('i18n-y29rf6lwd8q'),
-          errors:
-            error === null || error === void 0
-              ? void 0
-              : (_error$response = error.response) === null ||
-                _error$response === void 0
-              ? void 0
-              : _error$response.errors,
+          errors: error?.response?.errors,
         });
       }
     });
@@ -120,13 +103,8 @@ class Organization$$Page extends React.Component {
 
   async confirmDeleteModal(e, payload) {
     try {
-      var _this$state$record;
       await this.props.appHelper.utils.bff.deleteOrganization({
-        name:
-          (_this$state$record = this.state.record) === null ||
-          _this$state$record === void 0
-            ? void 0
-            : _this$state$record.name,
+        name: this.state.record?.name,
       });
       this.closeModal();
       this.props.useGetOrganizations.mutate();
@@ -134,18 +112,10 @@ class Organization$$Page extends React.Component {
         message: this.i18n('i18n-4lcfgutb'),
       });
     } catch (error) {
-      var _error$response, _error$response$error, _error$response2;
       if (
-        error !== null &&
-        error !== void 0 &&
-        (_error$response = error.response) !== null &&
-        _error$response !== void 0 &&
-        (_error$response$error = _error$response.errors) !== null &&
-        _error$response$error !== void 0 &&
-        _error$response$error.some(
+        error?.response?.errors?.some(
           (item) =>
-            (item === null || item === void 0 ? void 0 : item.message) ===
-            'the organization is initiator of one federation'
+            item?.message === 'the organization is initiator of one federation'
         )
       ) {
         this.utils.notification.warnings({
@@ -156,21 +126,13 @@ class Organization$$Page extends React.Component {
       }
       this.utils.notification.warnings({
         message: this.i18n('i18n-e7ei7djt'),
-        errors:
-          error === null || error === void 0
-            ? void 0
-            : (_error$response2 = error.response) === null ||
-              _error$response2 === void 0
-            ? void 0
-            : _error$response2.errors,
+        errors: error?.response?.errors,
       });
     }
   }
 
   getType(id, payload) {
-    if (
-      (payload === null || payload === void 0 ? void 0 : payload.id) === 'Error'
-    ) {
+    if (payload?.id === 'Error') {
       return {
         children: this.i18n('i18n-xtno2l9qqog'),
         icon: 'CloseCircleFilled',
@@ -245,21 +207,10 @@ class Organization$$Page extends React.Component {
   }
 
   validatorName(value) {
-    var _this$props,
-      _this$props$useGetOrg,
-      _this$props$useGetOrg2,
-      _this$props$useGetOrg3;
     if (
-      (_this$props = this.props) !== null &&
-      _this$props !== void 0 &&
-      (_this$props$useGetOrg = _this$props.useGetOrganizations) !== null &&
-      _this$props$useGetOrg !== void 0 &&
-      (_this$props$useGetOrg2 = _this$props$useGetOrg.data) !== null &&
-      _this$props$useGetOrg2 !== void 0 &&
-      (_this$props$useGetOrg3 = _this$props$useGetOrg2.organizations) !==
-        null &&
-      _this$props$useGetOrg3 !== void 0 &&
-      _this$props$useGetOrg3.some((item) => item.name === value)
+      this.props?.useGetOrganizations?.data?.organizations?.some(
+        (item) => item.name === value
+      )
     ) {
       return this.i18n('i18n-4y6fvhua');
     }
@@ -1149,6 +1100,7 @@ class Organization$$Page extends React.Component {
                 ]}
                 dataSource={__$$eval(() =>
                   this.props.useGetOrganizations?.data?.organizations
+                    ?.filter((item) => item.iAmIn)
                     ?.filter((item) => {
                       if (this.state.filter === 'ALL') {
                         return true;
@@ -1208,6 +1160,7 @@ class Organization$$Page extends React.Component {
                   total: __$$eval(
                     () =>
                       this.props.useGetOrganizations?.data?.organizations
+                        ?.filter((item) => item.iAmIn)
                         ?.filter((item) => {
                           if (this.state.filter === 'ALL') {
                             return true;
