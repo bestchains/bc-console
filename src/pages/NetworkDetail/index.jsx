@@ -854,7 +854,7 @@ class NetworkDetail$$Page extends React.Component {
 
   onTabsChange(activeKey) {
     this.history?.replace(
-      this?.history?.location?.pathname + '?tab=' + activeKey
+      this.location?.pathname + '?tab=' + activeKey
     );
     this.setState({
       activeKey,
