@@ -73,10 +73,11 @@ export const layout: RunTimeLayoutConfig = initState => {
   }
   const _theme = initState.initialState?.theme;
   initUnifiedLinkHistory(
-    initState.initialState?.history || {
-      goBack: history.back,
-      ...history,
-    }
+    initState.initialState?.getHistory?.() ||
+      initState.initialState?.history || {
+        goBack: history.back,
+        ...history,
+      }
   );
 
   const notProdOrQiankun = !IS_PROD && !IS_QIAN_KUN;
