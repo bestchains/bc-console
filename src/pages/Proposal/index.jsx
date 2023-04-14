@@ -19,7 +19,7 @@ import {
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 import * as qs from 'querystring';
-import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
 
@@ -731,8 +731,8 @@ const PageWrapper = () => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/proposal' }, location.pathname);
-  location.match = match;
-  location.query = qs.parse(location.search);
+  history.match = match;
+  history.query = qs.parse(location.search);
   const appHelper = {
     utils,
     location,
@@ -745,6 +745,7 @@ const PageWrapper = () => {
   };
   return (
     <DataProvider
+      self={self}
       sdkSwrFuncs={[
         {
           func: 'useGetProposals',

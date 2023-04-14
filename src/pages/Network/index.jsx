@@ -23,7 +23,7 @@ import {
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 import * as qs from 'querystring';
-import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
 
@@ -63,15 +63,15 @@ class Network$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      current: 1,
-      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
+      filter: 'ALL',
+      searchValue: undefined,
+      searchKey: 'name',
+      size: 10,
+      current: 1,
       organizations: [],
       record: {},
-      searchKey: 'name',
-      searchValue: undefined,
-      size: 10,
     };
   }
 
@@ -85,10 +85,67 @@ class Network$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  onMenuClick(e, payload) {
+    const { key } = payload;
+    this.setState({
+      record: payload?.record,
+    });
+    if (key === 'dissolve') {
+      this.openDissolveModal();
+    }
+    if (key === 'delete') {
+      this.openDeleteModal();
+    }
+    if (key === 'detail') {
+      this.history?.push(`/network/detail/${payload?.record?.name}`);
+    }
+  }
+
+  openDissolveModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'dissolve',
+    });
+  }
+
+  openDissolveSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'dissolvesuccess',
+    });
+  }
+
+  openDeleteModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+    });
+  }
+
   closeModal() {
     this.setState({
       isOpenModal: false,
     });
+  }
+
+  async confirmDissolveModal(e, payload) {
+    try {
+      await this.props.appHelper.utils.bff.dissolveNetwork({
+        name: this.state.record?.name,
+        initiator: this.state.record?.initiator?.name,
+        federation: this.state.record?.federation,
+      });
+      // this.closeModal()
+      // this.utils.message.success({
+      //   content: this.i18n('i18n-65qwbj9telu'),
+      // })
+      this.openDissolveSuccessModal();
+      this.props.useGetFederations.mutate();
+    } catch (error) {
+      this.utils.message.warning({
+        content: this.i18n('i18n-sryyou2g7dd'),
+      });
+    }
   }
 
   async confirmDeleteModal(e, payload) {
@@ -109,29 +166,16 @@ class Network$$Page extends React.Component {
     }
   }
 
-  async confirmDissolveModal(e, payload) {
-    try {
-      await this.props.appHelper.utils.bff.dissolveNetwork({
-        name: this.state.record?.name,
-        initiator: this.state.record?.initiator?.name,
-        federation: this.state.record?.federation,
-      });
-      // this.closeModal()
-      // this.utils.message.success({
-      //   content: this.i18n('i18n-65qwbj9telu'),
-      // })
-      this.openDissolveSuccessModal();
-      this.props.useGetFederations.mutate();
-    } catch (error) {
-      this.utils.message.warning({
-        content: this.i18n('i18n-j5kb8u4qc1b'),
-      });
-    }
-  }
-
   handleFilterChange(e) {
     this.setState({
       filter: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
       current: 1,
     });
   }
@@ -143,17 +187,6 @@ class Network$$Page extends React.Component {
     });
   }
 
-  handleRefresh(event) {
-    this.props.utils.bff.useGetNetworks?.mute();
-  }
-
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      current: 1,
-    });
-  }
-
   handleTableChange(pagination, filters, sorter, extra) {
     this.setState({
       pagination,
@@ -162,41 +195,8 @@ class Network$$Page extends React.Component {
     });
   }
 
-  onMenuClick(e, payload) {
-    const { key } = payload;
-    this.setState({
-      record: payload?.record,
-    });
-    if (key === 'dissolve') {
-      this.openDissolveModal();
-    }
-    if (key === 'delete') {
-      this.openDeleteModal();
-    }
-    if (key === 'detail') {
-      this.history?.push(`/network/detail/${payload?.record?.name}`);
-    }
-  }
-
-  openDeleteModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'delete',
-    });
-  }
-
-  openDissolveModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'dissolve',
-    });
-  }
-
-  openDissolveSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'dissolvesuccess',
-    });
+  handleRefresh(event) {
+    this.props.utils.bff.useGetNetworks?.mute();
   }
 
   componentDidMount() {}
@@ -1304,8 +1304,8 @@ const PageWrapper = () => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/network' }, location.pathname);
-  location.match = match;
-  location.query = qs.parse(location.search);
+  history.match = match;
+  history.query = qs.parse(location.search);
   const appHelper = {
     utils,
     location,
@@ -1318,6 +1318,7 @@ const PageWrapper = () => {
   };
   return (
     <DataProvider
+      self={self}
       sdkSwrFuncs={[
         {
           func: 'useGetNetworks',

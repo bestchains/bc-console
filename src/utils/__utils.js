@@ -142,19 +142,7 @@ export const encodeBase64 = __encodeBase64;
 
 /** header 认证信息 */
 const __getAuthorization = () => {
-  const AUTH_DATA = 'authData';
-  const getAuthData = () => {
-    try {
-      const authData = JSON.parse(
-        window.localStorage.getItem(AUTH_DATA) || '{}'
-      );
-      return authData;
-    } catch (error) {
-      console.warn('getAuthData failed', error);
-      return {};
-    }
-  };
-  const authData = getAuthData();
+  const authData = this.getAuthData();
   const { token_type, id_token } = authData.token || {};
   const Authorization = token_type && id_token && `${token_type} ${id_token}`;
   return Authorization;
