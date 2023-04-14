@@ -27,7 +27,7 @@ import { PieChart, LineChart } from '@tenx-ui/charts';
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 import * as qs from 'querystring';
-import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import { createFetchHandler as __$$createFetchRequestHandler } from '@alilc/lowcode-datasource-fetch-handler';
 
@@ -387,7 +387,7 @@ class Browser$$Page extends React.Component {
         []?.concat(res?.channels)?.map((item) => ({
           ...item,
           value: `${item.network}_${item.name}`,
-          label: `${item.network}_${item.name}`,
+          label: `${item.network}_${item.displayName}`,
         })) || [];
       this.setState(
         {
@@ -3536,8 +3536,8 @@ const PageWrapper = () => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/browser' }, location.pathname);
-  location.match = match;
-  location.query = qs.parse(location.search);
+  history.match = match;
+  history.query = qs.parse(location.search);
   const appHelper = {
     utils,
     location,
@@ -3550,6 +3550,7 @@ const PageWrapper = () => {
   };
   return (
     <DataProvider
+      self={self}
       sdkSwrFuncs={[]}
       render={(dataProps) => (
         <Browser$$Page {...dataProps} self={self} appHelper={appHelper} />

@@ -36,7 +36,7 @@ import {
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 import * as qs from 'querystring';
-import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
 
@@ -854,7 +854,7 @@ class NetworkDetail$$Page extends React.Component {
 
   onTabsChange(activeKey) {
     this.history?.replace(
-      this.location?.pathname + '?tab=' + activeKey
+      this.props.appHelper?.location?.pathname + '?tab=' + activeKey
     );
     this.setState({
       activeKey,
@@ -1008,6 +1008,10 @@ class NetworkDetail$$Page extends React.Component {
       isOpenModal: true,
       modalType: 'deploymentcontractsuccess',
     });
+  }
+
+  openNewPage(e, payload) {
+    window.open(payload?.url);
   }
 
   openStrategyDetailModal(e, payload) {
@@ -2692,6 +2696,7 @@ class NetworkDetail$$Page extends React.Component {
                             bordered={false}
                             hoverable={false}
                             loading={false}
+                            ref={this._refsManager.linkRef('card-551554fb')}
                             size="default"
                             type="default"
                           >
@@ -2825,19 +2830,73 @@ class NetworkDetail$$Page extends React.Component {
                                         </Typography.Text>
                                       </Col>
                                       <Col span={24}>
-                                        <UnifiedLink
-                                          target="_blank"
-                                          to={__$$eval(
-                                            () =>
-                                              `/network/detail/${this.match?.params?.id}?tab=channel`
+                                        <Button
+                                          __component_name="Button"
+                                          __events={{
+                                            eventDataList: [
+                                              {
+                                                name: 'onClick',
+                                                paramStr:
+                                                  '{\n \t "url":`/network/detail/${this.match?.params?.id}?tab=channel` \n}',
+                                                relatedEventName: 'openNewPage',
+                                                type: 'componentEvent',
+                                              },
+                                            ],
+                                            eventList: [
+                                              {
+                                                disabled: true,
+                                                name: 'onClick',
+                                                template:
+                                                  "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                              },
+                                            ],
+                                          }}
+                                          block={false}
+                                          danger={false}
+                                          disabled={false}
+                                          ghost={false}
+                                          onClick={function () {
+                                            return this.openNewPage.apply(
+                                              this,
+                                              Array.prototype.slice
+                                                .call(arguments)
+                                                .concat([
+                                                  {
+                                                    url: `/network/detail/${this.match?.params?.id}?tab=channel`,
+                                                  },
+                                                ])
+                                            );
+                                          }.bind(this)}
+                                          ref={this._refsManager.linkRef(
+                                            'button-b6d683d0'
                                           )}
+                                          shape="default"
+                                          type="link"
                                         >
                                           {
                                             this.i18n(
                                               'i18n-pjvvvoe9'
-                                            ) /* 通道管理 */
+                                            ) /* undefined */
                                           }
-                                        </UnifiedLink>
+                                        </Button>
+                                        {!!false && (
+                                          <UnifiedLink
+                                            ref={this._refsManager.linkRef(
+                                              'unifiedlink-3cef5705'
+                                            )}
+                                            target="_blank"
+                                            to={__$$eval(
+                                              () =>
+                                                `/network/detail/${this.match?.params?.id}?tab=channel`
+                                            )}
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-pjvvvoe9'
+                                              ) /* 通道管理 */
+                                            }
+                                          </UnifiedLink>
+                                        )}
                                       </Col>
                                     </Row>
                                   </Col>
@@ -2932,24 +2991,90 @@ class NetworkDetail$$Page extends React.Component {
                                           }
                                         </Typography.Text>
                                       </Col>
-                                      <Col span={24}>
-                                        <UnifiedLink
-                                          target="_blank"
-                                          to={__$$eval(
-                                            () =>
-                                              `/network/detail/${this.match?.params?.id}?tab=contract`
+                                      <Col
+                                        ref={this._refsManager.linkRef(
+                                          'col-047197ba'
+                                        )}
+                                        span={24}
+                                      >
+                                        {!!false && (
+                                          <UnifiedLink
+                                            ref={this._refsManager.linkRef(
+                                              'unifiedlink-a807e12d'
+                                            )}
+                                            target="_blank"
+                                            to={__$$eval(
+                                              () =>
+                                                `/network/detail/${this.match?.params?.id}?tab=contract`
+                                            )}
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-5wdi9bc5'
+                                              ) /* 合约管理 */
+                                            }
+                                          </UnifiedLink>
+                                        )}
+                                        <Button
+                                          __component_name="Button"
+                                          __events={{
+                                            eventDataList: [
+                                              {
+                                                name: 'onClick',
+                                                paramStr:
+                                                  '{\n \t "url":`/network/detail/${this.match?.params?.id}?tab=contract`\n}',
+                                                relatedEventName: 'openNewPage',
+                                                type: 'componentEvent',
+                                              },
+                                            ],
+                                            eventList: [
+                                              {
+                                                disabled: true,
+                                                name: 'onClick',
+                                                template:
+                                                  "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                              },
+                                            ],
+                                          }}
+                                          block={false}
+                                          danger={false}
+                                          disabled={false}
+                                          ghost={false}
+                                          icon=""
+                                          onClick={function () {
+                                            return this.openNewPage.apply(
+                                              this,
+                                              Array.prototype.slice
+                                                .call(arguments)
+                                                .concat([
+                                                  {
+                                                    url: `/network/detail/${this.match?.params?.id}?tab=contract`,
+                                                  },
+                                                ])
+                                            );
+                                          }.bind(this)}
+                                          ref={this._refsManager.linkRef(
+                                            'button-b6d683d0'
                                           )}
+                                          shape="default"
+                                          type="link"
                                         >
                                           {
                                             this.i18n(
                                               'i18n-5wdi9bc5'
-                                            ) /* 合约管理 */
+                                            ) /* undefined */
                                           }
-                                        </UnifiedLink>
+                                        </Button>
                                       </Col>
                                     </Row>
                                   </Col>
-                                  <Col span={2} style={{ paddingTop: '28px' }}>
+                                  <Col
+                                    ref={this._refsManager.linkRef(
+                                      'col-8359f165'
+                                    )}
+                                    span={2}
+                                    style={{ paddingTop: '28px' }}
+                                  >
                                     <Divider
                                       __component_name="Divider"
                                       dashed={true}
@@ -3150,17 +3275,76 @@ class NetworkDetail$$Page extends React.Component {
                                           }
                                         </Typography.Text>
                                       </Col>
-                                      <Col span={24}>
-                                        <UnifiedLink
-                                          target="_blank"
-                                          to="/browser"
+                                      <Col
+                                        ref={this._refsManager.linkRef(
+                                          'col-10cca78d'
+                                        )}
+                                        span={24}
+                                      >
+                                        <Button
+                                          __component_name="Button"
+                                          __events={{
+                                            eventDataList: [
+                                              {
+                                                name: 'onClick',
+                                                paramStr:
+                                                  '{\n \t "url":"/browser" \n}',
+                                                relatedEventName: 'openNewPage',
+                                                type: 'componentEvent',
+                                              },
+                                            ],
+                                            eventList: [
+                                              {
+                                                disabled: true,
+                                                name: 'onClick',
+                                                template:
+                                                  "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                              },
+                                            ],
+                                          }}
+                                          block={false}
+                                          danger={false}
+                                          disabled={false}
+                                          ghost={false}
+                                          onClick={function () {
+                                            return this.openNewPage.apply(
+                                              this,
+                                              Array.prototype.slice
+                                                .call(arguments)
+                                                .concat([
+                                                  {
+                                                    url: '/browser',
+                                                  },
+                                                ])
+                                            );
+                                          }.bind(this)}
+                                          ref={this._refsManager.linkRef(
+                                            'button-b6d683d0'
+                                          )}
+                                          shape="default"
+                                          type="link"
                                         >
                                           {
                                             this.i18n(
                                               'i18n-gyh9gtql'
-                                            ) /* 区块链浏览器 */
+                                            ) /* undefined */
                                           }
-                                        </UnifiedLink>
+                                        </Button>
+                                        {!!false && (
+                                          <UnifiedLink
+                                            ref={this._refsManager.linkRef(
+                                              'unifiedlink-afd8ab83'
+                                            )}
+                                            target="_blank"
+                                            to="/browser"
+                                          >
+                                            {
+                                              this.i18n(
+                                                'i18n-gyh9gtql'
+                                              ) /* 区块链浏览器 */
+                                            }
+                                          </UnifiedLink>
+                                        )}
                                       </Col>
                                     </Row>
                                   </Col>
@@ -7529,8 +7713,8 @@ const PageWrapper = () => {
   const location = useLocation();
   const history = getUnifiedHistory();
   const match = matchPath({ path: '/network/detail/:id' }, location.pathname);
-  location.match = match;
-  location.query = qs.parse(location.search);
+  history.match = match;
+  history.query = qs.parse(location.search);
   const appHelper = {
     utils,
     location,
@@ -7543,6 +7727,7 @@ const PageWrapper = () => {
   };
   return (
     <DataProvider
+      self={self}
       sdkSwrFuncs={[
         {
           func: 'useGetNetwork',

@@ -18,7 +18,7 @@ import {
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
 import * as qs from 'querystring';
-import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink';
+import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils from '../../utils/__utils';
 
@@ -671,8 +671,8 @@ const PageWrapper = () => {
     { path: '/network/detail/:id/contract/:contractId' },
     location.pathname
   );
-  location.match = match;
-  location.query = qs.parse(location.search);
+  history.match = match;
+  history.query = qs.parse(location.search);
   const appHelper = {
     utils,
     location,
@@ -685,6 +685,7 @@ const PageWrapper = () => {
   };
   return (
     <DataProvider
+      self={self}
       sdkSwrFuncs={[
         {
           func: 'useGetChaincodebuild',
