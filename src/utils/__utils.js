@@ -141,7 +141,7 @@ utils.encodeBase64 = __encodeBase64;
 export const encodeBase64 = __encodeBase64;
 
 /** header 认证信息 */
-const __getAuthorization = () => {
+const __getAuthorization = function () {
   const authData = this.getAuthData();
   const { token_type, id_token } = authData.token || {};
   const Authorization = token_type && id_token && `${token_type} ${id_token}`;
