@@ -27,7 +27,7 @@ import {
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -68,15 +68,15 @@ class OrganizationDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      current: 1,
-      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
-      peers: [],
-      record: {},
-      searchKey: 'name',
+      filter: 'ALL',
       searchValue: undefined,
+      searchKey: 'name',
       size: 10,
+      current: 1,
+      record: {},
+      peers: [],
     };
   }
 
@@ -90,118 +90,6 @@ class OrganizationDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-    });
-  }
-
-  confirmCreateModal(e, payload) {
-    const organization =
-      this.props.useGetOrganization?.data?.organization || {};
-    const form = this.$('formily_create')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      try {
-        const res = await this.props.appHelper.utils.bff.updateOrganization({
-          name: organization.name,
-          organization: {
-            users: (organization?.users || [])
-              .concat({
-                name: v.name,
-                isOrganizationAdmin: !!v.isOrganizationAdmin === 'true',
-              })
-              ?.map((item) => item.name),
-          },
-        });
-        // this.closeModal()
-        // this.utils.notification.success({
-        //   message: this.i18n('i18n-x26twb9oy0l'),
-        // })
-        this.openCreateSuccessModal();
-        this.props.useGetOrganization.mutate();
-      } catch (error) {
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-43getajmxf3'),
-          errors: error?.response?.errors,
-        });
-      }
-    });
-  }
-
-  confirmCreateNodelModal(e, payload) {
-    const organization =
-      this.props.useGetOrganization?.data?.organization || {};
-    const form = this.$('formily_create_node')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      try {
-        const res = await this.props.appHelper.utils.bff.createIbppeer({
-          org: organization.name,
-          count: v.count,
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-knuex06q'),
-        });
-        this.getIbppeers();
-      } catch (error) {
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-sunw6qwy'),
-          errors: error?.response?.errors,
-        });
-      }
-    });
-  }
-
-  async confirmDeleteModal(e, payload) {
-    const organization =
-      this.props.useGetOrganization?.data?.organization || {};
-    const users = (organization?.users || [])
-      .filter((item) => item.name !== this.state.record?.name)
-      ?.map((item) => item.name);
-    try {
-      await this.props.appHelper.utils.bff.updateOrganization({
-        name: organization.name,
-        organization: {
-          users,
-        },
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-yy3f9rxigm'),
-      });
-      this.props.useGetOrganization.mutate();
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-p5gea1q7fem'),
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
-  confirmTransferModal(e, payload) {
-    const organization =
-      this.props.useGetOrganization?.data?.organization || {};
-    const form = this.$('formily_transfer')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      try {
-        await this.props.appHelper.utils.bff.updateOrganization({
-          name: organization.name,
-          organization: v,
-        });
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-hjonznxjara'),
-        });
-        this.props.useGetOrganization.mutate();
-      } catch (error) {
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-zzu9mo73zo'),
-          errors: error?.response?.errors,
-        });
-      }
-    });
-  }
-
   async getIbppeers() {
     const res = await this.props.appHelper.utils.bff.getIbppeers({
       organization: this.match?.params?.id,
@@ -209,70 +97,6 @@ class OrganizationDetail$$Page extends React.Component {
     this.setState({
       peers: res?.ibppeers || [],
     });
-  }
-
-  handleFilterChange(e) {
-    this.setState({
-      filter: e.target.value,
-      current: 1,
-    });
-  }
-
-  handleNodeFilterChange(e) {
-    this.setState({
-      filter: e.target.value,
-      current: 1,
-    });
-  }
-
-  handleNodePaginationChange(c, s) {
-    this.setState({
-      size: s,
-      current: c,
-    });
-  }
-
-  handleNodeSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      current: 1,
-    });
-  }
-
-  handleNodeTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
-  handlePaginationChange(c, s) {
-    this.setState({
-      size: s,
-      current: c,
-    });
-  }
-
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      current: 1,
-    });
-  }
-
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
-  nodePaginationShowTotal(total, range) {
-    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
-      'i18n-v7xu122b9o'
-    )}`;
   }
 
   openCreateModal() {
@@ -312,14 +136,6 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
-  openDeleteModal(e, payload) {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'delete',
-      record: payload?.record,
-    });
-  }
-
   openTransferModal(e, payload) {
     this.setState({
       isOpenModal: true,
@@ -328,7 +144,191 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  openDeleteModal(e, payload) {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+      record: payload?.record,
+    });
+  }
+
+  closeModal() {
+    this.setState({
+      isOpenModal: false,
+    });
+  }
+
+  confirmCreateModal(e, payload) {
+    const organization =
+      this.props.useGetOrganization?.data?.organization || {};
+    const form = this.$('formily_create')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      try {
+        const res = await this.props.appHelper.utils.bff.updateOrganization({
+          name: organization.name,
+          organization: {
+            users: (organization?.users || [])
+              .concat({
+                name: v.name,
+                isOrganizationAdmin: !!v.isOrganizationAdmin === 'true',
+              })
+              ?.map((item) => item.name),
+          },
+        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-x26twb9oy0l'),
+        // })
+        this.openCreateSuccessModal();
+        this.props.useGetOrganization.mutate();
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-43getajmxf3'),
+          errors: error?.response?.errors,
+        });
+      }
+    });
+  }
+
+  confirmTransferModal(e, payload) {
+    const organization =
+      this.props.useGetOrganization?.data?.organization || {};
+    const form = this.$('formily_transfer')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      try {
+        await this.props.appHelper.utils.bff.updateOrganization({
+          name: organization.name,
+          organization: v,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-hjonznxjara'),
+        });
+        this.props.useGetOrganization.mutate();
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-zzu9mo73zo'),
+          errors: error?.response?.errors,
+        });
+      }
+    });
+  }
+
+  async confirmDeleteModal(e, payload) {
+    const organization =
+      this.props.useGetOrganization?.data?.organization || {};
+    const users = (organization?.users || [])
+      .filter((item) => item.name !== this.state.record?.name)
+      ?.map((item) => item.name);
+    try {
+      await this.props.appHelper.utils.bff.updateOrganization({
+        name: organization.name,
+        organization: {
+          users,
+        },
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-yy3f9rxigm'),
+      });
+      this.props.useGetOrganization.mutate();
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-p5gea1q7fem'),
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  confirmCreateNodelModal(e, payload) {
+    const organization =
+      this.props.useGetOrganization?.data?.organization || {};
+    const form = this.$('formily_create_node')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      try {
+        const res = await this.props.appHelper.utils.bff.createIbppeer({
+          org: organization.name,
+          count: v.count,
+        });
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-knuex06q'),
+        });
+        this.getIbppeers();
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-sunw6qwy'),
+          errors: error?.response?.errors,
+        });
+      }
+    });
+  }
+
+  handleFilterChange(e) {
+    this.setState({
+      filter: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
+  }
+
   paginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
+  }
+
+  handleNodeFilterChange(e) {
+    this.setState({
+      filter: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleNodeSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleNodePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleNodeTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
+  }
+
+  nodePaginationShowTotal(total, range) {
     return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
       'i18n-v7xu122b9o'
     )}`;
@@ -812,7 +812,11 @@ class OrganizationDetail$$Page extends React.Component {
                                 }}
                                 block={false}
                                 danger={false}
-                                disabled={false}
+                                disabled={__$$eval(
+                                  () =>
+                                    this.props.useGetOrganization?.data
+                                      ?.organization?.status !== 'Deployed'
+                                )}
                                 ghost={false}
                                 icon={
                                   <Icon
