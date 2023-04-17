@@ -22,7 +22,7 @@ import {
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -132,7 +132,6 @@ class Network$$Page extends React.Component {
     try {
       await this.props.appHelper.utils.bff.dissolveNetwork({
         name: this.state.record?.name,
-        initiator: this.state.record?.initiator?.name,
         federation: this.state.record?.federation,
       });
       // this.closeModal()
@@ -140,7 +139,7 @@ class Network$$Page extends React.Component {
       //   content: this.i18n('i18n-65qwbj9telu'),
       // })
       this.openDissolveSuccessModal();
-      this.props.useGetFederations.mutate();
+      this.props.useGetNetworks.mutate();
     } catch (error) {
       this.utils.message.warning({
         content: this.i18n('i18n-sryyou2g7dd'),
@@ -157,7 +156,7 @@ class Network$$Page extends React.Component {
       this.utils.notification.success({
         message: this.i18n('i18n-wm7zxvqr'),
       });
-      this.props.useGetFederations.mutate();
+      this.props.useGetNetworks.mutate();
     } catch (error) {
       this.utils.notification.warnings({
         message: this.i18n('i18n-8kpvya3f'),

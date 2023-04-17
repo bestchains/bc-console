@@ -376,7 +376,6 @@ export type MutationNetworkDeleteArgs = {
 
 export type MutationNetworkDissolveArgs = {
   federation: Scalars['String'];
-  initiator: Scalars['String'];
   name: Scalars['String'];
 };
 
@@ -1557,7 +1556,6 @@ export type CreateNetworkMutation = {
 export type DissolveNetworkMutationVariables = Exact<{
   name: Scalars['String'];
   federation: Scalars['String'];
-  initiator: Scalars['String'];
 }>;
 
 export type DissolveNetworkMutation = {
@@ -2339,8 +2337,8 @@ export const CreateNetworkDocument = gql`
   }
 `;
 export const DissolveNetworkDocument = gql`
-  mutation dissolveNetwork($name: String!, $federation: String!, $initiator: String!) {
-    networkDissolve(name: $name, federation: $federation, initiator: $initiator)
+  mutation dissolveNetwork($name: String!, $federation: String!) {
+    networkDissolve(name: $name, federation: $federation)
   }
 `;
 export const DeleteNetworkDocument = gql`
