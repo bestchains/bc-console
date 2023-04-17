@@ -159,7 +159,7 @@ class Browser$$Page extends React.Component {
           options: function () {
             return {
               headers: {
-                Authorization: 'this.utils.getAuthorization()',
+                Authorization: this.utils.getAuthorization(),
               },
               isCors: true,
               method: 'GET',
@@ -188,7 +188,7 @@ class Browser$$Page extends React.Component {
           options: function () {
             return {
               headers: {
-                Authorization: 'this.utils.getAuthorization()',
+                Authorization: this.utils.getAuthorization(),
               },
               isCors: true,
               method: 'GET',
@@ -207,7 +207,7 @@ class Browser$$Page extends React.Component {
           options: function () {
             return {
               headers: {
-                Authorization: 'this.utils.getAuthorization()',
+                Authorization: this.utils.getAuthorization(),
               },
               isCors: true,
               method: 'GET',
@@ -226,7 +226,7 @@ class Browser$$Page extends React.Component {
           options: function () {
             return {
               headers: {
-                Authorization: 'this.utils.getAuthorization()',
+                Authorization: this.utils.getAuthorization(),
               },
               isCors: true,
               method: 'GET',
