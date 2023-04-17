@@ -18,7 +18,7 @@ import {
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -718,7 +718,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                     __component_name="Table"
                     columns={[
                       {
-                        dataIndex: 'name',
+                        dataIndex: 'displayName',
                         key: 'name',
                         title: this.i18n('i18n-87kp314f') /* 策略名称 */,
                       },
@@ -760,7 +760,7 @@ class NetworkChannelDetail$$Page extends React.Component {
                     )}
                     loading={__$$eval(() => this.props.useGetChannel?.loading)}
                     pagination={false}
-                    rowKey="id"
+                    rowKey="name"
                     scroll={{ scrollToFirstRowOnChange: false, y: 130 }}
                     showHeader={true}
                     size="small"

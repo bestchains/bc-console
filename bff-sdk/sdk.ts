@@ -974,6 +974,7 @@ export type GetChaincodebuildQuery = {
       epolicy?: Array<{
         __typename?: 'Epolicy';
         name: string;
+        displayName?: string | null;
         value: string;
       }> | null;
     }> | null;
@@ -1036,6 +1037,7 @@ export type GetChannelQuery = {
     epolicy?: Array<{
       __typename?: 'Epolicy';
       name: string;
+      displayName?: string | null;
       description?: string | null;
       creationTimestamp?: string | null;
     }> | null;
@@ -1884,6 +1886,7 @@ export const GetChaincodebuildDocument = gql`
         displayName
         epolicy {
           name
+          displayName
           value
         }
       }
@@ -1941,6 +1944,7 @@ export const GetChannelDocument = gql`
       creationTimestamp
       epolicy {
         name
+        displayName
         description
         creationTimestamp
       }

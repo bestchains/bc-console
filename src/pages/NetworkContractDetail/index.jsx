@@ -17,7 +17,7 @@ import {
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils from '../../utils/__utils';
@@ -605,7 +605,7 @@ class NetworkContractDetail$$Page extends React.Component {
                         __component_name="Table"
                         columns={[
                           {
-                            dataIndex: 'name',
+                            dataIndex: 'displayName',
                             key: 'name',
                             title: this.i18n('i18n-4wgfgnn6') /* 通道 */,
                           },
@@ -624,7 +624,7 @@ class NetworkContractDetail$$Page extends React.Component {
                                   {__$$eval(
                                     () =>
                                       record?.epolicy
-                                        ?.map((item) => item?.name)
+                                        ?.map((item) => item?.displayName)
                                         ?.join(',') || '-'
                                   )}
                                 </Typography.Text>
@@ -647,7 +647,7 @@ class NetworkContractDetail$$Page extends React.Component {
                           () => this.props.useGetChaincodebuild?.loading
                         )}
                         pagination={false}
-                        rowKey="id"
+                        rowKey="name"
                         scroll={{ scrollToFirstRowOnChange: false, y: 180 }}
                         showHeader={true}
                         size="small"
