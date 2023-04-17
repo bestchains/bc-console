@@ -68,15 +68,15 @@ class OrganizationDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      current: 1,
+      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
-      filter: 'ALL',
-      searchValue: undefined,
-      searchKey: 'name',
-      size: 10,
-      current: 1,
-      record: {},
       peers: [],
+      record: {},
+      searchKey: 'name',
+      searchValue: undefined,
+      size: 10,
     };
   }
 
@@ -89,68 +89,6 @@ class OrganizationDetail$$Page extends React.Component {
   };
 
   componentWillUnmount() {}
-
-  async getIbppeers() {
-    const res = await this.props.appHelper.utils.bff.getIbppeers({
-      organization: this.match?.params?.id,
-    });
-    this.setState({
-      peers: res?.ibppeers || [],
-    });
-  }
-
-  openCreateModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'create',
-    });
-  }
-
-  openCreateNodeModal() {
-    this.setState(
-      {
-        isOpenModal: true,
-        modalType: 'createnode',
-      },
-      () => {
-        setTimeout(() => {
-          const organization =
-            this.props.useGetOrganization?.data?.organization || {};
-          const form = this.$('formily_create_node')?.formRef?.current?.form;
-          form.setValues({
-            organization: organization.name,
-            nodes: this.state.peers?.length || 0,
-            count: 1,
-            storage: 50,
-            time: '30',
-          });
-        }, 0);
-      }
-    );
-  }
-
-  openCreateSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'createsuccess',
-    });
-  }
-
-  openTransferModal(e, payload) {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'transfer',
-      record: payload?.record,
-    });
-  }
-
-  openDeleteModal(e, payload) {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'delete',
-      record: payload?.record,
-    });
-  }
 
   closeModal() {
     this.setState({
@@ -190,24 +128,24 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
-  confirmTransferModal(e, payload) {
+  confirmCreateNodelModal(e, payload) {
     const organization =
       this.props.useGetOrganization?.data?.organization || {};
-    const form = this.$('formily_transfer')?.formRef?.current?.form;
+    const form = this.$('formily_create_node')?.formRef?.current?.form;
     form.submit(async (v) => {
       try {
-        await this.props.appHelper.utils.bff.updateOrganization({
-          name: organization.name,
-          organization: v,
+        const res = await this.props.appHelper.utils.bff.createIbppeer({
+          org: organization.name,
+          count: v.count,
         });
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n('i18n-hjonznxjara'),
+          message: this.i18n('i18n-knuex06q'),
         });
-        this.props.useGetOrganization.mutate();
+        this.getIbppeers();
       } catch (error) {
         this.utils.notification.warnings({
-          message: this.i18n('i18n-zzu9mo73zo'),
+          message: this.i18n('i18n-sunw6qwy'),
           errors: error?.response?.errors,
         });
       }
@@ -240,27 +178,36 @@ class OrganizationDetail$$Page extends React.Component {
     }
   }
 
-  confirmCreateNodelModal(e, payload) {
+  confirmTransferModal(e, payload) {
     const organization =
       this.props.useGetOrganization?.data?.organization || {};
-    const form = this.$('formily_create_node')?.formRef?.current?.form;
+    const form = this.$('formily_transfer')?.formRef?.current?.form;
     form.submit(async (v) => {
       try {
-        const res = await this.props.appHelper.utils.bff.createIbppeer({
-          org: organization.name,
-          count: v.count,
+        await this.props.appHelper.utils.bff.updateOrganization({
+          name: organization.name,
+          organization: v,
         });
         this.closeModal();
         this.utils.notification.success({
-          message: this.i18n('i18n-knuex06q'),
+          message: this.i18n('i18n-hjonznxjara'),
         });
-        this.getIbppeers();
+        this.props.useGetOrganization.mutate();
       } catch (error) {
         this.utils.notification.warnings({
-          message: this.i18n('i18n-sunw6qwy'),
+          message: this.i18n('i18n-zzu9mo73zo'),
           errors: error?.response?.errors,
         });
       }
+    });
+  }
+
+  async getIbppeers() {
+    const res = await this.props.appHelper.utils.bff.getIbppeers({
+      organization: this.match?.params?.id,
+    });
+    this.setState({
+      peers: res?.ibppeers || [],
     });
   }
 
@@ -271,44 +218,9 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-      current: 1,
-    });
-  }
-
-  handlePaginationChange(c, s) {
-    this.setState({
-      size: s,
-      current: c,
-    });
-  }
-
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
-      'i18n-v7xu122b9o'
-    )}`;
-  }
-
   handleNodeFilterChange(e) {
     this.setState({
       filter: e.target.value,
-      current: 1,
-    });
-  }
-
-  handleNodeSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
       current: 1,
     });
   }
@@ -320,6 +232,13 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  handleNodeSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
   handleNodeTableChange(pagination, filters, sorter, extra) {
     this.setState({
       pagination,
@@ -328,7 +247,88 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
+  }
+
   nodePaginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
+  }
+
+  openCreateModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'create',
+    });
+  }
+
+  openCreateNodeModal() {
+    this.setState(
+      {
+        isOpenModal: true,
+        modalType: 'createnode',
+      },
+      () => {
+        setTimeout(() => {
+          const organization =
+            this.props.useGetOrganization?.data?.organization || {};
+          const form = this.$('formily_create_node')?.formRef?.current?.form;
+          form.setValues({
+            organization: organization.name,
+            nodes: this.state.peers?.length || 0,
+            count: 1,
+            storage: 50,
+            time: '30',
+          });
+        }, 0);
+      }
+    );
+  }
+
+  openCreateSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'createsuccess',
+    });
+  }
+
+  openDeleteModal(e, payload) {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+      record: payload?.record,
+    });
+  }
+
+  openTransferModal(e, payload) {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'transfer',
+      record: payload?.record,
+    });
+  }
+
+  paginationShowTotal(total, range) {
     return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
       'i18n-v7xu122b9o'
     )}`;
@@ -615,10 +615,10 @@ class OrganizationDetail$$Page extends React.Component {
                           type: 'disabled',
                         },
                         {
-                          children: this.i18n('i18n-fifkprltibf') /* 正常 */,
-                          icon: 'CheckCircleFilled',
+                          children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                          icon: 'ClockCircleFilled',
                           id: 'Deploying',
-                          type: 'success',
+                          type: 'warning',
                         },
                         {
                           children: this.i18n('i18n-xtno2l9qqog') /* 异常 */,
@@ -633,10 +633,10 @@ class OrganizationDetail$$Page extends React.Component {
                           type: 'success',
                         },
                         {
-                          children: this.i18n('i18n-fifkprltibf') /* 正常 */,
-                          icon: 'CheckCircleFilled',
+                          children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                          icon: 'ClockCircleFilled',
                           id: 'Created',
-                          type: 'success',
+                          type: 'warning',
                         },
                       ]}
                     />
@@ -1652,11 +1652,11 @@ class OrganizationDetail$$Page extends React.Component {
                                     {
                                       children:
                                         this.i18n(
-                                          'i18n-fifkprltibf'
-                                        ) /* 正常 */,
-                                      icon: 'CheckCircleFilled',
+                                          'i18n-7xnyzmr7'
+                                        ) /* 创建中 */,
+                                      icon: 'ClockCircleFilled',
                                       id: 'Deploying',
-                                      type: 'success',
+                                      type: 'warning',
                                     },
                                     {
                                       children:

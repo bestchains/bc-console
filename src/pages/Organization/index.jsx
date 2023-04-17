@@ -24,7 +24,7 @@ import {
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -998,17 +998,17 @@ class Organization$$Page extends React.Component {
                             },
                             {
                               children:
-                                this.i18n('i18n-fifkprltibf') /* 正常 */,
-                              icon: 'CheckCircleFilled',
+                                this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                              icon: 'ClockCircleFilled',
                               id: 'Deploying',
-                              type: 'success',
+                              type: 'warning',
                             },
                             {
                               children:
-                                this.i18n('i18n-fifkprltibf') /* 正常 */,
-                              icon: 'CheckCircleFilled',
+                                this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                              icon: 'ClockCircleFilled',
                               id: 'Created',
-                              type: 'success',
+                              type: 'warning',
                             },
                           ]}
                         />
