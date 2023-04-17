@@ -26,7 +26,7 @@ import { PieChart, LineChart } from '@tenx-ui/charts';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import { createFetchHandler as __$$createFetchRequestHandler } from '@alilc/lowcode-datasource-fetch-handler';
@@ -85,15 +85,6 @@ class Browser$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      isOpenModal: false,
-      modalType: 'create',
-      filter: 'ALL',
-      searchValue: undefined,
-      searchKey: 'name',
-      network: '',
-      tab: 'overview',
-      myChannels: [],
-      overview: {},
       block: {
         time: null,
         size: 10,
@@ -102,6 +93,15 @@ class Browser$$Page extends React.Component {
         list: [],
         loading: false,
       },
+      filter: 'ALL',
+      isOpenModal: false,
+      modalType: 'create',
+      myChannels: [],
+      network: '',
+      overview: {},
+      searchKey: 'name',
+      searchValue: undefined,
+      tab: 'overview',
       transaction: {
         time: null,
         size: 10,
@@ -243,39 +243,79 @@ class Browser$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  formatTimeParams(v) {
-    return v ? parseInt(new Date(v).getTime() / 1000) : undefined;
-  }
-
-  async getMyChannels() {
-    try {
-      const res = await this.props.appHelper.utils.bff.getMyChannels();
-      const myChannels =
-        []?.concat(res?.channels)?.map((item) => ({
-          ...item,
-          value: `${item.network}_${item.displayName}`,
-          label: `${item.network}_${item.displayName}`,
-        })) || [];
-      this.setState(
-        {
-          myChannels,
-          network: myChannels?.[0]?.value,
-        },
-        () => {
-          this.loadData();
-        }
-      );
-    } catch (error) {}
-  }
-
   closeModal() {
     this.setState({
       isOpenModal: false,
     });
   }
 
-  paginationShowTotal(a, b) {
-    return this.utils.paginationShowTotal(a, b, this);
+  formatTimeParams(v) {
+    return v ? parseInt(new Date(v).getTime() / 1000) : undefined;
+  }
+
+  formateTransactionsCount(text, item, index) {
+    const percent =
+      parseFloat(
+        item.data?.angleField / this.state.overview?.transactionsCountTotal
+      )?.toFixed(2) * 100;
+    return (
+      <span>
+        <span
+          style={{
+            display: 'inline-block',
+            width: '100px',
+          }}
+        >
+          {text}
+        </span>
+        <span
+          style={{
+            float: 'right',
+          }}
+        >
+          {percent} %
+        </span>
+      </span>
+    );
+  }
+
+  getAllQueryBySeg() {
+    this.getQueryBySeg({
+      type: 'blockH',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
+        interval: 3600,
+        number: 24,
+        type: 'blocks',
+      },
+    });
+    this.getQueryBySeg({
+      type: 'transactionH',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
+        interval: 3600,
+        number: 24,
+        type: 'transactions',
+      },
+    });
+    this.getQueryBySeg({
+      type: 'blockM',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
+        interval: 60,
+        number: 60,
+        type: 'blocks',
+      },
+    });
+    this.getQueryBySeg({
+      type: 'transactionM',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
+        interval: 60,
+        number: 60,
+        type: 'transactions',
+      },
+    });
   }
 
   getBrowserBlocks() {
@@ -340,6 +380,27 @@ class Browser$$Page extends React.Component {
       });
   }
 
+  async getMyChannels() {
+    try {
+      const res = await this.props.appHelper.utils.bff.getMyChannels();
+      const myChannels =
+        []?.concat(res?.channels)?.map((item) => ({
+          ...item,
+          value: `${item.network}_${item.displayName}`,
+          label: `${item.network}_${item.displayName}`,
+        })) || [];
+      this.setState(
+        {
+          myChannels,
+          network: myChannels?.[0]?.value,
+        },
+        () => {
+          this.loadData();
+        }
+      );
+    } catch (error) {}
+  }
+
   getOverview() {
     this.setState({
       overview: {
@@ -363,6 +424,39 @@ class Browser$$Page extends React.Component {
           overview: {
             ...this.state.overview,
             data: {},
+            loading: false,
+          },
+        });
+      });
+  }
+
+  getQueryBySeg({ type, query }) {
+    this.setState({
+      overview: {
+        ...this.state.overview,
+        loading: true,
+      },
+    });
+    this.dataSourceMap.getQueryBySeg
+      .load(query)
+      .then((res) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            [type]: res?.map((item) => ({
+              seriesField: this.i18n('i18n-1pf627eu'),
+              xField: item.end * 1000,
+              yField: item.count,
+            })),
+            loading: false,
+          },
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            [type]: [],
             loading: false,
           },
         });
@@ -409,102 +503,171 @@ class Browser$$Page extends React.Component {
       });
   }
 
-  formateTransactionsCount(text, item, index) {
-    const percent =
-      parseFloat(
-        item.data?.angleField / this.state.overview?.transactionsCountTotal
-      )?.toFixed(2) * 100;
-    return (
-      <span>
-        <span
-          style={{
-            display: 'inline-block',
-            width: '100px',
-          }}
-        >
-          {text}
-        </span>
-        <span
-          style={{
-            float: 'right',
-          }}
-        >
-          {percent} %
-        </span>
-      </span>
+  handleBlockPaginationChange(c, s) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          size: s,
+          current: c,
+        },
+      },
+      this.loadData
     );
   }
 
-  getQueryBySeg({ type, query }) {
-    this.setState({
-      overview: {
-        ...this.state.overview,
-        loading: true,
+  handleBlockReset() {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          time: null,
+          current: 1,
+        },
       },
-    });
-    this.dataSourceMap.getQueryBySeg
-      .load(query)
-      .then((res) => {
-        this.setState({
-          overview: {
-            ...this.state.overview,
-            [type]: res?.map((item) => ({
-              seriesField: this.i18n('i18n-1pf627eu'),
-              xField: item.end * 1000,
-              yField: item.count,
-            })),
-            loading: false,
-          },
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          overview: {
-            ...this.state.overview,
-            [type]: [],
-            loading: false,
-          },
-        });
-      });
+      this.loadData
+    );
   }
 
-  getAllQueryBySeg() {
-    this.getQueryBySeg({
-      type: 'blockH',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
-        interval: 3600,
-        number: 24,
-        type: 'blocks',
+  handleBlockSearch() {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          current: 1,
+        },
       },
-    });
-    this.getQueryBySeg({
-      type: 'transactionH',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
-        interval: 3600,
-        number: 24,
-        type: 'transactions',
+      this.loadData
+    );
+  }
+
+  handleBlockTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          pagination,
+          filters,
+          sorter,
+          size: pagination.pageSize,
+          current: pagination.current,
+        },
       },
-    });
-    this.getQueryBySeg({
-      type: 'blockM',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
-        interval: 60,
-        number: 60,
-        type: 'blocks',
+      this.loadData
+    );
+  }
+
+  handleBlockTimeChange(v) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          time: v,
+        },
       },
-    });
-    this.getQueryBySeg({
-      type: 'transactionM',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
-        interval: 60,
-        number: 60,
-        type: 'transactions',
+      this.loadData
+    );
+  }
+
+  handleNetworkChannelChange(v) {
+    this.setState(
+      {
+        network: v,
+        current: 1,
       },
+      this.loadData
+    );
+  }
+
+  handleSearch(value, event) {
+    this.setState(
+      {
+        current: 1,
+      },
+      this.loadData
+    );
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
     });
+  }
+
+  handleTabChange(v) {
+    this.setState(
+      {
+        tab: v,
+        current: 1,
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionPaginationChange(c, s) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          size: s,
+          current: c,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionReset() {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          time: null,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionSearch() {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          pagination,
+          filters,
+          sorter,
+          size: pagination.pageSize,
+          current: pagination.current,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionTimeChange(v) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          time: v,
+        },
+      },
+      this.loadData
+    );
   }
 
   loadData() {
@@ -536,41 +699,6 @@ class Browser$$Page extends React.Component {
     }
   }
 
-  handleNetworkChannelChange(v) {
-    this.setState(
-      {
-        network: v,
-        current: 1,
-      },
-      this.loadData
-    );
-  }
-
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-    });
-  }
-
-  handleSearch(value, event) {
-    this.setState(
-      {
-        current: 1,
-      },
-      this.loadData
-    );
-  }
-
-  handleTabChange(v) {
-    this.setState(
-      {
-        tab: v,
-        current: 1,
-      },
-      this.loadData
-    );
-  }
-
   openBlockDetailModal(e, { record }) {
     this.setState({
       isOpenModal: true,
@@ -586,109 +714,6 @@ class Browser$$Page extends React.Component {
     });
   }
 
-  handleBlockPaginationChange(c, s) {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          size: s,
-          current: c,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleBlockTableChange(pagination, filters, sorter, extra) {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          pagination,
-          filters,
-          sorter,
-          size: pagination.pageSize,
-          current: pagination.current,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleBlockSearch() {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          current: 1,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleBlockReset() {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          time: null,
-          current: 1,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleBlockTimeChange(v) {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          time: v,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleTransactionSearch() {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          current: 1,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleTransactionReset() {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          time: null,
-          current: 1,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleTransactionTimeChange(v) {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          time: v,
-        },
-      },
-      this.loadData
-    );
-  }
-
   openTransactionDetailModal(e, { record }) {
     this.setState({
       isOpenModal: true,
@@ -700,33 +725,8 @@ class Browser$$Page extends React.Component {
     });
   }
 
-  handleTransactionPaginationChange(c, s) {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          size: s,
-          current: c,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleTransactionTableChange(pagination, filters, sorter, extra) {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          pagination,
-          filters,
-          sorter,
-          size: pagination.pageSize,
-          current: pagination.current,
-        },
-      },
-      this.loadData
-    );
+  paginationShowTotal(a, b) {
+    return this.utils.paginationShowTotal(a, b, this);
   }
 
   componentDidMount() {
@@ -3167,6 +3167,11 @@ class Browser$$Page extends React.Component {
                           ],
                         }}
                         columns={[
+                          {
+                            dataIndex: 'blockNumber',
+                            key: 'blockNumber',
+                            title: this.i18n('i18n-4dh77hfc') /* undefined */,
+                          },
                           {
                             dataIndex: 'creator',
                             key: 'Creator',
