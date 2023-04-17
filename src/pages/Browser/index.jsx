@@ -3170,7 +3170,7 @@ class Browser$$Page extends React.Component {
                           {
                             dataIndex: 'blockNumber',
                             key: 'blockNumber',
-                            title: this.i18n('i18n-4dh77hfc') /* undefined */,
+                            title: this.i18n('i18n-4dh77hfc') /* 区块高度 */,
                           },
                           {
                             dataIndex: 'creator',
