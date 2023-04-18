@@ -1044,7 +1044,12 @@ class NetworkDetail$$Page extends React.Component {
   }
 
   openNewPage(e, payload) {
-    window.open(payload?.url);
+    this.history?.replace(payload?.url);
+    if (payload?.activeKey) {
+      this.setState({
+        activeKey: payload?.activeKey,
+      });
+    }
   }
 
   onFilesChange(files, payload) {
@@ -2846,17 +2851,17 @@ class NetworkDetail$$Page extends React.Component {
                                               {
                                                 name: 'onClick',
                                                 paramStr:
-                                                  '{\n \t "url":`/bc/network/detail/${this.match?.params?.id}?tab=channel`\n}',
+                                                  '{\n \t "url":`/network/detail/${this.match?.params?.id}?tab=channel`,\n\t\tactiveKey: "channel"\n}',
                                                 relatedEventName: 'openNewPage',
                                                 type: 'componentEvent',
                                               },
                                             ],
                                             eventList: [
                                               {
-                                                disabled: true,
                                                 name: 'onClick',
                                                 template:
                                                   "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                                disabled: true,
                                               },
                                             ],
                                           }}
@@ -2871,7 +2876,8 @@ class NetworkDetail$$Page extends React.Component {
                                                 .call(arguments)
                                                 .concat([
                                                   {
-                                                    url: `/bc/network/detail/${this.match?.params?.id}?tab=channel`,
+                                                    url: `/network/detail/${this.match?.params?.id}?tab=channel`,
+                                                    activeKey: 'channel',
                                                   },
                                                 ])
                                             );
@@ -3026,17 +3032,17 @@ class NetworkDetail$$Page extends React.Component {
                                               {
                                                 name: 'onClick',
                                                 paramStr:
-                                                  '{\n \t "url":`/bc/network/detail/${this.match?.params?.id}?tab=contract`\n}',
+                                                  '{\n \t "url":`/network/detail/${this.match?.params?.id}?tab=contract`,\n\t\tactiveKey: "contract"\n}',
                                                 relatedEventName: 'openNewPage',
                                                 type: 'componentEvent',
                                               },
                                             ],
                                             eventList: [
                                               {
-                                                disabled: true,
                                                 name: 'onClick',
                                                 template:
                                                   "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                                disabled: true,
                                               },
                                             ],
                                           }}
@@ -3051,7 +3057,8 @@ class NetworkDetail$$Page extends React.Component {
                                                 .call(arguments)
                                                 .concat([
                                                   {
-                                                    url: `/bc/network/detail/${this.match?.params?.id}?tab=contract`,
+                                                    url: `/network/detail/${this.match?.params?.id}?tab=contract`,
+                                                    activeKey: 'contract',
                                                   },
                                                 ])
                                             );
@@ -3295,7 +3302,7 @@ class NetworkDetail$$Page extends React.Component {
                                               {
                                                 name: 'onClick',
                                                 paramStr:
-                                                  '{\n \t "url": "/bc/browser"\n}',
+                                                  '{\n \t "url": "/browser"\n}',
                                                 relatedEventName: 'openNewPage',
                                                 type: 'componentEvent',
                                               },
@@ -3320,7 +3327,7 @@ class NetworkDetail$$Page extends React.Component {
                                                 .call(arguments)
                                                 .concat([
                                                   {
-                                                    url: '/bc/browser',
+                                                    url: '/browser',
                                                   },
                                                 ])
                                             );
@@ -6320,9 +6327,7 @@ class NetworkDetail$$Page extends React.Component {
                                     );
                                   }.bind(this)}
                                   placeholder={
-                                    this.i18n(
-                                      'i18n-rlwqgw1a'
-                                    ) /* 输入合约名称查询 */
+                                    this.i18n('i18n-iz3eoa9s') /* undefined */
                                   }
                                 />
                               </Space>
