@@ -14,40 +14,46 @@ utils.message = message;
 utils.notification = notification;
 
 /** 本地存储中认证数据保存的 key */
-const __AUTH_DATA = 'authData';
-utils.AUTH_DATA = __AUTH_DATA;
-export const AUTH_DATA = __AUTH_DATA;
+utils.AUTH_DATA = function __AUTH_DATA() {
+  return 'authData';
+}.apply(utils);
+export const AUTH_DATA = utils.AUTH_DATA;
 
 /** 获取认证数据 */
-const __getAuthData = () => {
-  try {
-    const authData = JSON.parse(window.localStorage.getItem(AUTH_DATA) || '{}');
-    return authData;
-  } catch (error) {
-    console.warn('getAuthData failed', error);
-    return {};
-  }
-};
-utils.getAuthData = __getAuthData;
-export const getAuthData = __getAuthData;
+utils.getAuthData = function __getAuthData() {
+  return () => {
+    try {
+      const authData = JSON.parse(
+        window.localStorage.getItem(this.AUTH_DATA) || '{}'
+      );
+      return authData;
+    } catch (error) {
+      console.warn('getAuthData failed', error);
+      return {};
+    }
+  };
+}.apply(utils);
+export const getAuthData = utils.getAuthData;
 
 /** 设置认证数据 */
-const __setAuthData = (data) => {
-  window.localStorage.setItem(AUTH_DATA, JSON.stringify(data));
-};
-utils.setAuthData = __setAuthData;
-export const setAuthData = __setAuthData;
+utils.setAuthData = function __setAuthData() {
+  return (data) => {
+    window.localStorage.setItem(this.AUTH_DATA, JSON.stringify(data));
+  };
+}.apply(utils);
+export const setAuthData = utils.setAuthData;
 
 /** 移除认证数据 */
-const __removeAuthData = () => {
-  window.localStorage.removeItem(AUTH_DATA);
-  window.sessionStorage.removeItem(AUTH_DATA);
-};
-utils.removeAuthData = __removeAuthData;
-export const removeAuthData = __removeAuthData;
+utils.removeAuthData = function __removeAuthData() {
+  return () => {
+    window.localStorage.removeItem(this.AUTH_DATA);
+    window.sessionStorage.removeItem(this.AUTH_DATA);
+  };
+}.apply(utils);
+export const removeAuthData = utils.removeAuthData;
 
 /** 解析 token */
-const __parseToken = function parseToken(token) {
+utils.parseToken = function parseToken(token) {
   return token
     .split('.')
     .map((str) => {
@@ -66,89 +72,104 @@ const __parseToken = function parseToken(token) {
       {}
     );
 }.bind(utils);
-utils.parseToken = __parseToken;
-export const parseToken = __parseToken;
+export const parseToken = utils.parseToken;
 
 /** 判断 token 是否有效 */
-const __isTokenExpired = function isTokenExpired(token) {
-  token = token || getAuthData()?.token?.id_token;
+utils.isTokenExpired = function isTokenExpired(token) {
+  token = token || this.getAuthData()?.token?.id_token;
   if (!token) {
     return true;
   }
-  const expiredTimestampInMs = parseToken(token).exp * 1000;
+  const expiredTimestampInMs = this.parseToken(token).exp * 1000;
   return new Date().getTime() >= expiredTimestampInMs;
 }.bind(utils);
-utils.isTokenExpired = __isTokenExpired;
-export const isTokenExpired = __isTokenExpired;
+export const isTokenExpired = utils.isTokenExpired;
+
+/** 获取 Authorization header */
+utils.getAuthorization = function __getAuthorization() {
+  return () => {
+    const authData = this.getAuthData();
+    const { token_type, id_token } = authData.token || {};
+    const Authorization = token_type && id_token && `${token_type} ${id_token}`;
+    return Authorization;
+  };
+}.apply(utils);
+export const getAuthorization = utils.getAuthorization;
+
+/** 获取 axios 默认配置，也可在配置中指定拦截器，用于数据源初始化 axios handler */
+utils.getAxiosHanlderConfig = function __getAxiosHanlderConfig() {
+  return () => ({
+    // 详细配置见：http://dev-npm.tenxcloud.net/-/web/detail/@yunti/lowcode-datasource-axios-handler
+    interceptors: {
+      request: [
+        {
+          onFulfilled: (config) => {
+            if (!config.headers.get('Authorization')) {
+              config.headers.set('Authorization', this.getAuthorization());
+            }
+            return config;
+          },
+        },
+      ],
+    },
+  });
+}.apply(utils);
+export const getAxiosHanlderConfig = utils.getAxiosHanlderConfig;
 
 /** 共计 xx 条 */
-const __paginationShowTotal = function paginationShowTotal(
-  total,
-  range,
-  props
-) {
+utils.paginationShowTotal = function paginationShowTotal(total, range, props) {
   return `${props.i18n('i18n-5xl7aihzcuy')} ${total} ${props.i18n(
     'i18n-v7xu122b9o'
   )}`;
 }.bind(utils);
-utils.paginationShowTotal = __paginationShowTotal;
-export const paginationShowTotal = __paginationShowTotal;
+export const paginationShowTotal = utils.paginationShowTotal;
 
 /** 格式化 cpu */
-const __formatCpu = (v) => {
-  if (v.includes('m')) {
-    return parseFloat(v) / 1000;
-  }
-  return parseFloat(v);
-};
-utils.formatCpu = __formatCpu;
-export const formatCpu = __formatCpu;
+utils.formatCpu = function __formatCpu() {
+  return (v) => {
+    if (v.includes('m')) {
+      return parseFloat(v) / 1000;
+    }
+    return parseFloat(v);
+  };
+}.apply(utils);
+export const formatCpu = utils.formatCpu;
 
 /** 下载文件 */
-const __downloadFile = (
-  data,
-  filename = 'profile.json',
-  type = 'text/json'
-) => {
-  if (typeof data === 'object') {
-    data = JSON.stringify(data, undefined, 4);
-  }
-  const blob = new Blob([data], { type }),
-    e = document.createEvent('MouseEvents'),
-    a = document.createElement('a');
-  a.download = filename;
-  a.href = window.URL.createObjectURL(blob);
-  a.dataset.downloadurl = [type, a.download, a.href].join(':');
-  e.initMouseEvent('click');
-  a.dispatchEvent(e);
-};
-utils.downloadFile = __downloadFile;
-export const downloadFile = __downloadFile;
+utils.downloadFile = function __downloadFile() {
+  return (data, filename = 'profile.json', type = 'text/json') => {
+    if (typeof data === 'object') {
+      data = JSON.stringify(data, undefined, 4);
+    }
+    const blob = new Blob([data], { type }),
+      e = document.createEvent('MouseEvents'),
+      a = document.createElement('a');
+    a.download = filename;
+    a.href = window.URL.createObjectURL(blob);
+    a.dataset.downloadurl = [type, a.download, a.href].join(':');
+    e.initMouseEvent('click');
+    a.dispatchEvent(e);
+  };
+}.apply(utils);
+export const downloadFile = utils.downloadFile;
 
 /** 长度校验 */
-const __getLengthReg = (min = 0, max = 200) => `^.{${min},${max}}$`;
-utils.getLengthReg = __getLengthReg;
-export const getLengthReg = __getLengthReg;
+utils.getLengthReg = function __getLengthReg() {
+  return (min = 0, max = 200) => `^.{${min},${max}}$`;
+}.apply(utils);
+export const getLengthReg = utils.getLengthReg;
 
 /** Base64 解码 */
-const __decodeBase64 = (str) => decodeURIComponent(atob(str));
-utils.decodeBase64 = __decodeBase64;
-export const decodeBase64 = __decodeBase64;
+utils.decodeBase64 = function __decodeBase64() {
+  return (str) => decodeURIComponent(atob(str));
+}.apply(utils);
+export const decodeBase64 = utils.decodeBase64;
 
 /** Base64 加密 */
-const __encodeBase64 = (str) => btoa(encodeURIComponent(str));
-utils.encodeBase64 = __encodeBase64;
-export const encodeBase64 = __encodeBase64;
-
-/** header 认证信息 */
-const __getAuthorization = function () {
-  const authData = this.getAuthData();
-  const { token_type, id_token } = authData.token || {};
-  const Authorization = token_type && id_token && `${token_type} ${id_token}`;
-  return Authorization;
-};
-utils.getAuthorization = __getAuthorization;
-export const getAuthorization = __getAuthorization;
+utils.encodeBase64 = function __encodeBase64() {
+  return (str) => btoa(encodeURIComponent(str));
+}.apply(utils);
+export const encodeBase64 = utils.encodeBase64;
 
 export class RefsManager {
   constructor() {
@@ -214,6 +235,10 @@ export default {
 
   isTokenExpired,
 
+  getAuthorization,
+
+  getAxiosHanlderConfig,
+
   paginationShowTotal,
 
   formatCpu,
@@ -225,6 +250,4 @@ export default {
   decodeBase64,
 
   encodeBase64,
-
-  getAuthorization,
 };

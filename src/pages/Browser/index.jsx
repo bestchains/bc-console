@@ -29,7 +29,7 @@ import DataProvider from '../../components/DataProvider';
 import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
-import { createFetchHandler as __$$createFetchRequestHandler } from '@alilc/lowcode-datasource-fetch-handler';
+import { createAxiosHandler as __$$createAxiosRequestHandler } from '@yunti/lowcode-datasource-axios-handler';
 
 import { create as __$$createDataSourceEngine } from '@alilc/lowcode-datasource-engine/runtime';
 
@@ -60,7 +60,9 @@ class Browser$$Page extends React.Component {
   _dataSourceConfig = this._defineDataSourceConfig();
   _dataSourceEngine = __$$createDataSourceEngine(this._dataSourceConfig, this, {
     runtimeConfig: true,
-    requestHandlersMap: { fetch: __$$createFetchRequestHandler() },
+    requestHandlersMap: {
+      axios: __$$createAxiosRequestHandler(utils.getAxiosHanlderConfig?.()),
+    },
   });
 
   get dataSourceMap() {
@@ -132,9 +134,7 @@ class Browser$$Page extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              headers: {
-                Authorization: this.utils.getAuthorization(),
-              },
+              headers: {},
               isCors: true,
               method: 'GET',
               params: {
@@ -149,7 +149,7 @@ class Browser$$Page extends React.Component {
               uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/blocks`,
             };
           }.bind(_this),
-          type: 'fetch',
+          type: 'axios',
         },
         {
           id: 'getBrowserTransactions',
@@ -158,9 +158,7 @@ class Browser$$Page extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              headers: {
-                Authorization: this.utils.getAuthorization(),
-              },
+              headers: {},
               isCors: true,
               method: 'GET',
               params: {
@@ -178,7 +176,7 @@ class Browser$$Page extends React.Component {
               uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/transactions`,
             };
           }.bind(_this),
-          type: 'fetch',
+          type: 'axios',
         },
         {
           id: 'getOverviewSummary',
@@ -187,9 +185,7 @@ class Browser$$Page extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              headers: {
-                Authorization: this.utils.getAuthorization(),
-              },
+              headers: {},
               isCors: true,
               method: 'GET',
               params: {},
@@ -197,7 +193,7 @@ class Browser$$Page extends React.Component {
               uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/overview/summary`,
             };
           }.bind(_this),
-          type: 'fetch',
+          type: 'axios',
         },
         {
           id: 'getTransactionsCount',
@@ -206,9 +202,7 @@ class Browser$$Page extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              headers: {
-                Authorization: this.utils.getAuthorization(),
-              },
+              headers: {},
               isCors: true,
               method: 'GET',
               params: {},
@@ -216,7 +210,7 @@ class Browser$$Page extends React.Component {
               uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/transactionsCount`,
             };
           }.bind(_this),
-          type: 'fetch',
+          type: 'axios',
         },
         {
           id: 'getQueryBySeg',
@@ -225,9 +219,7 @@ class Browser$$Page extends React.Component {
           }.bind(_this),
           options: function () {
             return {
-              headers: {
-                Authorization: this.utils.getAuthorization(),
-              },
+              headers: {},
               isCors: true,
               method: 'GET',
               params: {},
@@ -235,7 +227,7 @@ class Browser$$Page extends React.Component {
               uri: `${this.constants?.BC_EXPLORER_API_PREFIX}/networks/${this.state.network}/overview/query-by-seg`,
             };
           }.bind(_this),
-          type: 'fetch',
+          type: 'axios',
         },
       ],
     };
@@ -473,7 +465,6 @@ class Browser$$Page extends React.Component {
     this.dataSourceMap.getTransactionsCount
       .load({})
       .then((res) => {
-        console.log(res?.data);
         this.setState({
           overview: {
             ...this.state.overview,

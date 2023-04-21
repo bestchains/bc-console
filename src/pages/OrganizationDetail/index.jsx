@@ -17,6 +17,7 @@ import {
   Input,
   Table,
   Modal,
+  Select,
   FormilyForm,
   FormilyInput,
   FormilySelect,
@@ -24,6 +25,8 @@ import {
   UnifiedLink,
   FormilyNumberPicker,
 } from '@tenx-ui/materials';
+
+import { default as Logs } from '@tenx-ui/logs';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -66,11 +69,13 @@ class OrganizationDetail$$Page extends React.Component {
     this._refsManager = new RefsManager();
 
     __$$i18n._inject2(this);
-
+    this.logs = []
     this.state = {
       current: 1,
       filter: 'ALL',
       isOpenModal: false,
+      logsContainer: undefined,
+      logsTotal: undefined,
       modalType: 'create',
       peers: [],
       record: {},
@@ -90,7 +95,29 @@ class OrganizationDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  changeLogsContainer(v, payload) {
+    this.setState({
+      logsContainer: v,
+    });
+    const { namespace, name, containers } = this.state?.record?.pod || {};
+    this.initWebsocketLogs({
+      query: {
+        pod: name,
+        namespace,
+        container: v,
+      },
+    });
+  }
+
+  changeLogsTotal(v, payload) {
+    this.setState({
+      logsTotal: v,
+    });
+  }
+
   closeModal() {
+    this.state.ws && this.state.ws.close();
+    this.logRef && this.logRef.clearLogs();
     this.setState({
       isOpenModal: false,
     });
@@ -202,6 +229,20 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  downloadLogs(e, payload) {
+      const logs = this.state.logs
+      ?.slice(this.state.logs?.length - (this.state.logsTotal || this.state.logs?.length))
+      ?.map((item) =>
+        item?.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '')
+      )
+      ?.join('\r\n');
+    this.utils.downloadFile(logs, this.state.record?.name + '.log');
+  }
+
+  getComponentRef(ref) {
+    this.logRef = ref;
+  }
+
   async getIbppeers() {
     const res = await this.props.appHelper.utils.bff.getIbppeers({
       organization: this.match?.params?.id,
@@ -269,6 +310,47 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  initWebsocketLogs({ query }) {
+    if (!this.logRef) {
+      setTimeout(() => {
+        this.initWebsocketLogs({
+          query,
+        });
+      }, 200);
+      return;
+    }
+    this.logs = [];
+    this.state.ws && this.state.ws.close();
+    this.logRef.clearLogs();
+    this.logRef.writelns('加载中...');
+    const pre = window.location.protocol === 'http:' ? 'ws:' : 'wss:';
+    const url = `${pre}//${window.location.host}${
+      this.constants.BC_WS_LOGS_API_URL
+    }?pod=${query?.pod}&namespace=${query?.namespace}&container=${
+      query?.container
+    }&token=${this.utils.getAuthData()?.token?.id_token}`;
+    const protocol = undefined;
+    const ws = new WebSocket(url, protocol);
+    this.setState({
+      ws,
+    });
+    ws.onopen = () => {
+      this.logRef.clearLogs();
+      // ws.send();
+    };
+
+    ws.onmessage = (event) => {
+      const { data } = event;
+      this.logRef.writelns(data);
+      this.logs = this.logs.concat(data);
+      this.setState({
+        logs: this.logs
+      })
+    };
+    ws.onerror = (err) => {};
+    ws.onclose = (err) => {};
+  }
+
   nodePaginationShowTotal(total, range) {
     return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
       'i18n-v7xu122b9o'
@@ -320,6 +402,23 @@ class OrganizationDetail$$Page extends React.Component {
     });
   }
 
+  openNodeLogsModal(e, payload) {
+    const { namespace, name, containers } = payload?.record?.pod || {};
+    this.initWebsocketLogs({
+      query: {
+        pod: name,
+        namespace,
+        container: containers?.[0],
+      },
+    });
+    this.setState({
+      isOpenModal: true,
+      modalType: 'nodelogs',
+      record: payload?.record,
+      logsContainer: containers?.[0],
+    });
+  }
+
   openTransferModal(e, payload) {
     this.setState({
       isOpenModal: true,
@@ -354,7 +453,7 @@ class OrganizationDetail$$Page extends React.Component {
           >
             <Button.Back
               __component_name="Button.Back"
-              title={this.i18n('i18n-m6n5fnxybu') /* 管理组织 */}
+              title={this.i18n('i18n-m6n5fnxybu') /* 详情 */}
               type="simple"
             />
           </Col>
@@ -372,6 +471,8 @@ class OrganizationDetail$$Page extends React.Component {
               <Descriptions
                 __component_name="Descriptions"
                 bordered={false}
+                borderedBottom={false}
+                borderedBottomDashed={false}
                 colon={false}
                 column={2}
                 items={[
@@ -418,10 +519,10 @@ class OrganizationDetail$$Page extends React.Component {
                             type: 'disabled',
                           },
                           {
-                            children: this.i18n('i18n-fifkprltibf') /* 正常 */,
-                            icon: 'CheckCircleFilled',
+                            children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                            icon: 'ClockCircleFilled',
                             id: 'Deploying',
-                            type: 'success',
+                            type: 'warning',
                           },
                           {
                             children: this.i18n('i18n-xtno2l9qqog') /* 异常 */,
@@ -436,10 +537,10 @@ class OrganizationDetail$$Page extends React.Component {
                             type: 'success',
                           },
                           {
-                            children: this.i18n('i18n-fifkprltibf') /* 正常 */,
-                            icon: 'CheckCircleFilled',
+                            children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                            icon: 'ClockCircleFilled',
                             id: 'Created',
-                            type: 'success',
+                            type: 'warning',
                           },
                         ]}
                       />
@@ -1054,7 +1155,7 @@ class OrganizationDetail$$Page extends React.Component {
                                           children:
                                             this.i18n(
                                               'i18n-fifkprltibf'
-                                            ) /* 正常 */,
+                                            ) /* - */,
                                           icon: 'CheckCircleFilled',
                                           id: 'zc',
                                           type: 'success',
@@ -1124,11 +1225,7 @@ class OrganizationDetail$$Page extends React.Component {
                                         shape="default"
                                         type="link"
                                       >
-                                        {
-                                          this.i18n(
-                                            'i18n-v10ihnkwhn'
-                                          ) /* 转移 */
-                                        }
+                                        {this.i18n('i18n-v10ihnkwhn') /* - */}
                                       </Button>
                                     ),
                                     !!__$$eval(
@@ -1176,11 +1273,7 @@ class OrganizationDetail$$Page extends React.Component {
                                         shape="default"
                                         type="link"
                                       >
-                                        {
-                                          this.i18n(
-                                            'i18n-ias68eipm18'
-                                          ) /* 删除 */
-                                        }
+                                        {this.i18n('i18n-ias68eipm18') /* - */}
                                       </Button>
                                     ),
                                   ])(
@@ -1577,7 +1670,7 @@ class OrganizationDetail$$Page extends React.Component {
                                     strong={false}
                                     style={{ fontSize: '' }}
                                   >
-                                    {this.i18n('i18n-m8df8p4v') /* 核CPU */}
+                                    {this.i18n('i18n-m8df8p4v') /* - */}
                                   </Typography.Text>
                                   <Typography.Text
                                     __component_name="Typography.Text"
@@ -1599,7 +1692,7 @@ class OrganizationDetail$$Page extends React.Component {
                                     strong={false}
                                     style={{ fontSize: '' }}
                                   >
-                                    {this.i18n('i18n-3y2g20xr') /* G内存 */}
+                                    {this.i18n('i18n-3y2g20xr') /* - */}
                                   </Typography.Text>
                                 </Space>
                               ))(
@@ -1642,27 +1735,21 @@ class OrganizationDetail$$Page extends React.Component {
                                   types={[
                                     {
                                       children:
-                                        this.i18n(
-                                          'i18n-fifkprltibf'
-                                        ) /* 正常 */,
+                                        this.i18n('i18n-fifkprltibf') /* - */,
                                       icon: 'CheckCircleFilled',
                                       id: 'Deployed',
                                       type: 'success',
                                     },
                                     {
                                       children:
-                                        this.i18n(
-                                          'i18n-7xnyzmr7'
-                                        ) /* 创建中 */,
+                                        this.i18n('i18n-7xnyzmr7') /* - */,
                                       icon: 'ClockCircleFilled',
                                       id: 'Deploying',
                                       type: 'warning',
                                     },
                                     {
                                       children:
-                                        this.i18n(
-                                          'i18n-xtno2l9qqog'
-                                        ) /* 异常 */,
+                                        this.i18n('i18n-xtno2l9qqog') /* - */,
                                       icon: 'CloseCircleFilled',
                                       id: 'Error',
                                       type: 'error',
@@ -1685,7 +1772,15 @@ class OrganizationDetail$$Page extends React.Component {
                                 <Button
                                   __component_name="Button"
                                   __events={{
-                                    eventDataList: [],
+                                    eventDataList: [
+                                      {
+                                        name: 'onClick',
+                                        paramStr:
+                                          '{\n \t "record":this.record \n}',
+                                        relatedEventName: 'openNodeLogsModal',
+                                        type: 'componentEvent',
+                                      },
+                                    ],
                                     eventList: [
                                       {
                                         disabled: true,
@@ -1697,13 +1792,25 @@ class OrganizationDetail$$Page extends React.Component {
                                   }}
                                   block={false}
                                   danger={false}
-                                  disabled={true}
+                                  disabled={false}
                                   ghost={false}
                                   icon=""
+                                  onClick={function () {
+                                    return this.openNodeLogsModal.apply(
+                                      this,
+                                      Array.prototype.slice
+                                        .call(arguments)
+                                        .concat([
+                                          {
+                                            record: record,
+                                          },
+                                        ])
+                                    );
+                                  }.bind(__$$context)}
                                   shape="default"
                                   type="link"
                                 >
-                                  {this.i18n('i18n-7zfzajob') /* 日志 */}
+                                  {this.i18n('i18n-7zfzajob') /* - */}
                                 </Button>,
                                 <Button
                                   __component_name="Button"
@@ -1726,7 +1833,7 @@ class OrganizationDetail$$Page extends React.Component {
                                   shape="default"
                                   type="link"
                                 >
-                                  {this.i18n('i18n-15rtqwxm') /* 监控 */}
+                                  {this.i18n('i18n-15rtqwxm') /* - */}
                                 </Button>,
                               ])(
                                 __$$createChildContext(__$$context, {
@@ -1827,6 +1934,275 @@ class OrganizationDetail$$Page extends React.Component {
                 relatedEventName: 'closeModal',
                 type: 'componentEvent',
               },
+            ],
+            eventList: [
+              {
+                disabled: false,
+                name: 'afterClose',
+                templete:
+                  "onCancel(${extParams}){\n// 完全关闭后的回调\nconsole.log('afterClose');}",
+              },
+              {
+                disabled: true,
+                name: 'onCancel',
+                template:
+                  "onCancel(${extParams}){\n// 点击遮罩层或右上角叉或取消按钮的回调\nconsole.log('onCancel');}",
+              },
+              {
+                disabled: false,
+                name: 'onOk',
+                template:
+                  "onOk(${extParams}){\n// 点击确定回调\nconsole.log('onOk');}",
+              },
+            ],
+          }}
+          centered={false}
+          confirmLoading={false}
+          destroyOnClose={true}
+          footer={
+            <Row __component_name="Row" justify="space-between" wrap={false}>
+              <Col __component_name="Col" />
+              <Col __component_name="Col" />
+            </Row>
+          }
+          forceRender={false}
+          keyboard={true}
+          mask={true}
+          maskClosable={false}
+          onCancel={function () {
+            return this.closeModal.apply(
+              this,
+              Array.prototype.slice.call(arguments).concat([])
+            );
+          }.bind(this)}
+          open={__$$eval(
+            () => this.state.isOpenModal && this.state.modalType === 'nodelogs'
+          )}
+          title={[
+            <Typography.Title
+              __component_name="Typography.Title"
+              bold={true}
+              bordered={false}
+              ellipsis={true}
+              level={2}
+            >
+              {__$$eval(() => this?.state?.record?.name || '-')}
+            </Typography.Title>,
+            <Typography.Title
+              __component_name="Typography.Title"
+              bold={true}
+              bordered={false}
+              ellipsis={true}
+              level={2}
+            >
+              {this.i18n('i18n-qbsph9pa') /* 节点的日志 */}
+            </Typography.Title>,
+          ]}
+          width="900px"
+        >
+          <Row __component_name="Row" wrap={true}>
+            <Col __component_name="Col" span={24}>
+              <Row __component_name="Row" justify="space-between" wrap={false}>
+                <Col __component_name="Col">
+                  <Space align="center" direction="horizontal">
+                    <Select
+                      __component_name="Select"
+                      __events={{
+                        eventDataList: [
+                          {
+                            name: 'onChange',
+                            relatedEventName: 'changeLogsContainer',
+                            type: 'componentEvent',
+                          },
+                        ],
+                        eventList: [
+                          {
+                            disabled: true,
+                            name: 'onChange',
+                            template:
+                              "onChange(value,option,${extParams}){\n// 选中 option，或 input 的 value 变化时，调用此函数\nconsole.log('onChange',value,option);}",
+                          },
+                          {
+                            disabled: false,
+                            name: 'onSearch',
+                            template:
+                              "onSearch(value,${extParams}){\n// 文本框值变化时回调\nconsole.log('onSearch',value);}",
+                          },
+                        ],
+                      }}
+                      allowClear={false}
+                      disabled={false}
+                      maxTagCount={0}
+                      maxTagTextLength={0}
+                      onChange={function () {
+                        return this.changeLogsContainer.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
+                      options={__$$eval(
+                        () =>
+                          this.state?.record?.pod?.containers?.map(
+                            (container) => ({
+                              label: container,
+                              value: container,
+                            })
+                          ) || []
+                      )}
+                      placeholder={this.i18n('i18n-fvjc99uh') /* 请选择容器 */}
+                      showSearch={true}
+                      style={{ width: 200 }}
+                      value={__$$eval(() => this.state.logsContainer)}
+                    />
+                    <Select
+                      __component_name="Select"
+                      __events={{
+                        eventDataList: [
+                          {
+                            name: 'onChange',
+                            relatedEventName: 'changeLogsTotal',
+                            type: 'componentEvent',
+                          },
+                        ],
+                        eventList: [
+                          {
+                            disabled: true,
+                            name: 'onChange',
+                            template:
+                              "onChange(value,option,${extParams}){\n// 选中 option，或 input 的 value 变化时，调用此函数\nconsole.log('onChange',value,option);}",
+                          },
+                          {
+                            disabled: false,
+                            name: 'onSearch',
+                            template:
+                              "onSearch(value,${extParams}){\n// 文本框值变化时回调\nconsole.log('onSearch',value);}",
+                          },
+                        ],
+                      }}
+                      allowClear={true}
+                      disabled={false}
+                      maxTagCount={0}
+                      maxTagTextLength={0}
+                      onChange={function () {
+                        return this.changeLogsTotal.apply(
+                          this,
+                          Array.prototype.slice.call(arguments).concat([])
+                        );
+                      }.bind(this)}
+                      options={[
+                        {
+                          _unsafe_MixedSetter_label_select: 'StringSetter',
+                          label: '50',
+                          value: '50',
+                        },
+                        {
+                          _unsafe_MixedSetter_label_select: 'StringSetter',
+                          label: '100',
+                          value: '100',
+                        },
+                        {
+                          _unsafe_MixedSetter_label_select: 'StringSetter',
+                          label: '200',
+                          value: '200',
+                        },
+                        {
+                          _unsafe_MixedSetter_label_select: 'StringSetter',
+                          disabled: false,
+                          label: '500',
+                          value: '500',
+                        },
+                        {
+                          _unsafe_MixedSetter_label_select: 'StringSetter',
+                          disabled: false,
+                          label: '1000',
+                          value: '1000',
+                        },
+                        {
+                          _unsafe_MixedSetter_label_select: 'StringSetter',
+                          disabled: false,
+                          label: '2000',
+                          value: '2000',
+                        },
+                      ]}
+                      placeholder={this.i18n('i18n-2qmyluwa') /* 请选择条数 */}
+                      showSearch={true}
+                      style={{ width: 200 }}
+                    />
+                  </Space>
+                </Col>
+                <Col __component_name="Col">
+                  <Button
+                    __component_name="Button"
+                    __events={{
+                      eventDataList: [
+                        {
+                          name: 'onClick',
+                          relatedEventName: 'downloadLogs',
+                          type: 'componentEvent',
+                        },
+                      ],
+                      eventList: [
+                        {
+                          disabled: true,
+                          name: 'onClick',
+                          template:
+                            "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                        },
+                      ],
+                    }}
+                    block={false}
+                    danger={false}
+                    disabled={false}
+                    ghost={false}
+                    icon={
+                      <Icon
+                        __component_name="Icon"
+                        size={12}
+                        style={{ marginRight: 3 }}
+                        type="DownloadOutlined"
+                      />
+                    }
+                    loading={false}
+                    onClick={function () {
+                      return this.downloadLogs.apply(
+                        this,
+                        Array.prototype.slice.call(arguments).concat([])
+                      );
+                    }.bind(this)}
+                    shape="default"
+                    type="primary"
+                  >
+                    {this.i18n('i18n-xcgopsty') /* 下载日志 */}
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+            <Col __component_name="Col" span={24}>
+              <Logs
+                __component_name="Logs"
+                filterColorCharacters={true}
+                getComponentRef={function () {
+                  return this.getComponentRef.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
+                header=""
+                logs=""
+                scrollToBottom={true}
+              />
+            </Col>
+          </Row>
+        </Modal>
+        <Modal
+          __component_name="Modal"
+          __events={{
+            eventDataList: [
+              {
+                name: 'onCancel',
+                relatedEventName: 'closeModal',
+                type: 'componentEvent',
+              },
               {
                 name: 'onOk',
                 relatedEventName: 'confirmCreateModal',
@@ -1907,7 +2283,7 @@ class OrganizationDetail$$Page extends React.Component {
                     message:
                       this.i18n(
                         'i18n-ch5wgxkhdhs'
-                      ) /* 用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
+                      ) /* 用户名称由 3 ~ 20 个小写字母, 数字, 下划线组成 */,
                     pattern: '^[a-z0-9_]{3,20}$',
                     required: true,
                     whitespace: true,
@@ -2027,7 +2403,7 @@ class OrganizationDetail$$Page extends React.Component {
                     message:
                       this.i18n(
                         'i18n-ch5wgxkhdhs'
-                      ) /* 用户名称由 3 ~ 20 个大小写字母, 数字, 下划线组成 */,
+                      ) /* 用户名称由 3 ~ 20 个小写字母, 数字, 下划线组成 */,
                     pattern: '^[a-z0-9_]{3,20}$',
                     required: true,
                     whitespace: true,
