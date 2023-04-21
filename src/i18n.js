@@ -1,5 +1,6 @@
 const i18nConfig = {
   'en-US': {
+    'i18n-02wcme9f': 'Automatic refresh',
     'i18n-03e0p0acqmaf': 'Network name',
     'i18n-06oayifb': 'Please enter the block number to search',
     'i18n-08rsz7n9sruo': 'Deleting a federation succeeded',
@@ -41,6 +42,7 @@ const i18nConfig = {
     'i18n-2hz9pwzp': 'Channel invitation organization failed',
     'i18n-2ielocre':
       'The contract version is for identification and maintenance. The recommended format is v1.0',
+    'i18n-2qmyluwa': 'Please select the number of items',
     'i18n-2rczbtzx': 'New contract',
     'i18n-2rnclk3j': 'Deployment, please wait for the vote',
     'i18n-2scieorh': 'Time stamp',
@@ -270,6 +272,7 @@ const i18nConfig = {
     'i18n-fpx7c35bovp': 'Please select a proposed voting strategy',
     'i18n-frfw3d7j': 'Network overview',
     'i18n-fvcps4edx44': 'name',
+    'i18n-fvjc99uh': 'Please select container',
     'i18n-fwad0qrg': 'Smart contract',
     'i18n-g2ktwfqaf0g': 'duration',
     'i18n-g8rbmvh04cd': 'Proposal strategy',
@@ -405,6 +408,7 @@ const i18nConfig = {
     'i18n-ppwtxqzo': 'Policy deletion',
     'i18n-pra1gymtjol': 'Maturity time',
     'i18n-q2lrt9kq': 'Transaction details',
+    'i18n-qbsph9pa': 'Node log',
     'i18n-qg8otk6r': 'Application contract',
     'i18n-qsff6zya': 'Blockchain browser',
     'i18n-qsvtbgvf': 'The network description consists of 0 to 200 characters',
@@ -495,6 +499,7 @@ const i18nConfig = {
     'i18n-x40a97na': 'Enter the node name to search',
     'i18n-x6icsntt': 'The new alliance proposal has been sent',
     'i18n-xb2o10tue1m': 'network',
+    'i18n-xcgopsty': 'Download log',
     'i18n-xcopya8d': 'Please select Join channel',
     'i18n-xf6wcwuc':
       'If there are other user organizations in a channel, other users must vote to join the channel',
@@ -529,6 +534,7 @@ const i18nConfig = {
     'i18n-zzu9mo73zo': 'Description Failed to transfer administrator rights',
   },
   'zh-CN': {
+    'i18n-02wcme9f': '自动刷新',
     'i18n-03e0p0acqmaf': '网络名称',
     'i18n-06oayifb': '请输入区块号搜索',
     'i18n-08rsz7n9sruo': '删除联盟成功',
@@ -566,6 +572,7 @@ const i18nConfig = {
     'i18n-2b4dhrz51wu': '更多',
     'i18n-2hz9pwzp': '通道邀请组织失败',
     'i18n-2ielocre': '合约版本供识别与维护使用，建议格式： v1.0',
+    'i18n-2qmyluwa': '请选择条数',
     'i18n-2rczbtzx': '新建合约',
     'i18n-2rnclk3j': '部署中，请等待投票',
     'i18n-2scieorh': '时间戳',
@@ -783,6 +790,7 @@ const i18nConfig = {
     'i18n-fpx7c35bovp': '请选择提议投票策略',
     'i18n-frfw3d7j': '网络概览',
     'i18n-fvcps4edx44': '联盟名称',
+    'i18n-fvjc99uh': '请选择容器',
     'i18n-fwad0qrg': '智能合约',
     'i18n-g2ktwfqaf0g': '时长',
     'i18n-g8rbmvh04cd': '提议策略',
@@ -912,6 +920,7 @@ const i18nConfig = {
     'i18n-ppwtxqzo': '策略删除',
     'i18n-pra1gymtjol': '到期时间',
     'i18n-q2lrt9kq': '交易详情',
+    'i18n-qbsph9pa': '节点的日志',
     'i18n-qg8otk6r': '应用合约',
     'i18n-qsff6zya': '区块链浏览器',
     'i18n-qsvtbgvf': '网络描述由 0 ~ 200 字符组成',
@@ -1000,6 +1009,7 @@ const i18nConfig = {
     'i18n-x40a97na': '输入节点名搜索',
     'i18n-x6icsntt': '新建联盟提议已发送',
     'i18n-xb2o10tue1m': '网络',
+    'i18n-xcgopsty': '下载日志',
     'i18n-xcopya8d': '请选择加入通道',
     'i18n-xf6wcwuc':
       '当通道中有其他用户组织时，需要其他用户投票同意，才能加入成功',
