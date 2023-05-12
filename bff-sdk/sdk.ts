@@ -127,6 +127,43 @@ export type ChannelPeer = {
   namespace: Scalars['String'];
 };
 
+/** 智能合约 */
+export type Contract = {
+  __typename?: 'Contract';
+  /** 发布时间 */
+  createdAt: Scalars['String'];
+  /** 描述 */
+  description: Scalars['String'];
+  /** 来源 */
+  from: Scalars['String'];
+  /** 接口 */
+  interfaces?: Maybe<Array<ContractInterface>>;
+  /** 语言 */
+  language: Scalars['String'];
+  /** name */
+  name: Scalars['ID'];
+  /** 项目 */
+  package: Scalars['String'];
+  /** 状态 */
+  status: Scalars['String'];
+  /** 更新时间 */
+  updatedAt: Scalars['String'];
+  /** 版本 */
+  version: Scalars['String'];
+};
+
+export type ContractInterface = {
+  __typename?: 'ContractInterface';
+  /** 参数 */
+  args: Array<Scalars['String']>;
+  /** 条件 */
+  condition: Scalars['String'];
+  /** 简介 */
+  description: Scalars['String'];
+  /** 名称 */
+  name: Scalars['String'];
+};
+
 /** IBPCR 状态 */
 export enum CrdStatusType {
   /** ChannelArchived */
@@ -246,6 +283,14 @@ export type K8sV1StatusDetails = {
   uid?: Maybe<Scalars['String']>;
 };
 
+/** 可切换的语言 */
+export enum Lang {
+  /** 英文 */
+  En = 'en',
+  /** 中文 */
+  Zh = 'zh',
+}
+
 export type MinIo = {
   __typename?: 'MinIO';
   bucket?: Maybe<Scalars['String']>;
@@ -268,6 +313,8 @@ export type Mutation = {
   channelMemberUpdate: Scalars['Boolean'];
   /** 加入/去除Peer节点 */
   channelUpdate: Channel;
+  /** 导入官方合约到网络 */
+  contractImport?: Maybe<Scalars['Boolean']>;
   /** 创建策略 */
   epolicyCreate: Epolicy;
   /** 删除策略 */
@@ -329,6 +376,11 @@ export type MutationChannelMemberUpdateArgs = {
 export type MutationChannelUpdateArgs = {
   channel: UpdateChannel;
   name: Scalars['String'];
+};
+
+export type MutationContractImportArgs = {
+  name: Scalars['String'];
+  network: Scalars['String'];
 };
 
 export type MutationEpolicyCreateArgs = {
@@ -685,6 +737,10 @@ export type Query = {
   channels?: Maybe<Array<Channel>>;
   /** 创建策略时，可选的通道 */
   channelsForCreateEpolicy: Array<Channel>;
+  /** 官方合约详情 */
+  contract?: Maybe<Contract>;
+  /** 官方合约列表 */
+  contracts?: Maybe<Array<Contract>>;
   /** 策略列表 */
   epolicies: Array<Epolicy>;
   /** 联盟详情 */
@@ -731,6 +787,15 @@ export type QueryChannelProfileArgs = {
 
 export type QueryChannelsForCreateEpolicyArgs = {
   network: Scalars['String'];
+};
+
+export type QueryContractArgs = {
+  lang?: InputMaybe<Lang>;
+  name: Scalars['String'];
+};
+
+export type QueryContractsArgs = {
+  lang?: InputMaybe<Lang>;
 };
 
 export type QueryEpoliciesArgs = {
@@ -1163,6 +1228,71 @@ export type GetMyChannelsQuery = {
     }> | null;
     chaincode?: Array<{ __typename?: 'Chaincode'; name: string }> | null;
   }> | null;
+};
+
+export type GetContractsQueryVariables = Exact<{
+  lang?: InputMaybe<Lang>;
+}>;
+
+export type GetContractsQuery = {
+  __typename?: 'Query';
+  contracts?: Array<{
+    __typename?: 'Contract';
+    name: string;
+    version: string;
+    from: string;
+    language: string;
+    createdAt: string;
+    updatedAt: string;
+    description: string;
+    package: string;
+    status: string;
+    interfaces?: Array<{
+      __typename?: 'ContractInterface';
+      name: string;
+      args: Array<string>;
+      description: string;
+      condition: string;
+    }> | null;
+  }> | null;
+};
+
+export type GetContractQueryVariables = Exact<{
+  name: Scalars['String'];
+  lang?: InputMaybe<Lang>;
+}>;
+
+export type GetContractQuery = {
+  __typename?: 'Query';
+  contract?: {
+    __typename?: 'Contract';
+    name: string;
+    version: string;
+    from: string;
+    language: string;
+    createdAt: string;
+    updatedAt: string;
+    description: string;
+    package: string;
+    status: string;
+    interfaces?: Array<{
+      __typename?: 'ContractInterface';
+      name: string;
+      args: Array<string>;
+      description: string;
+      condition: string;
+    }> | null;
+  } | null;
+};
+
+export type ImportContractMutationVariables = Exact<{
+  name: Scalars['String'];
+  network: Scalars['String'];
+}>;
+
+export type ImportContractMutation = {
+  __typename?: 'Mutation';
+  contractImport?: boolean | null;
 };
 
 export type GetEpoliciesQueryVariables = Exact<{
@@ -2038,6 +2168,53 @@ export const GetMyChannelsDocument = gql`
     }
   }
 `;
+export const GetContractsDocument = gql`
+  query getContracts($lang: Lang) {
+    contracts(lang: $lang) {
+      name
+      version
+      from
+      language
+      createdAt
+      updatedAt
+      description
+      package
+      status
+      interfaces {
+        name
+        args
+        description
+        condition
+      }
+    }
+  }
+`;
+export const GetContractDocument = gql`
+  query getContract($name: String!, $lang: Lang) {
+    contract(name: $name, lang: $lang) {
+      name
+      version
+      from
+      language
+      createdAt
+      updatedAt
+      description
+      package
+      status
+      interfaces {
+        name
+        args
+        description
+        condition
+      }
+    }
+  }
+`;
+export const ImportContractDocument = gql`
+  mutation importContract($name: String!, $network: String!) {
+    contractImport(name: $name, network: $network)
+  }
+`;
 export const GetEpoliciesDocument = gql`
   query getEpolicies($network: String) {
     epolicies(network: $network) {
@@ -2728,6 +2905,48 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
         'query'
       );
     },
+    getContracts(
+      variables?: GetContractsQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetContractsQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetContractsQuery>(GetContractsDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getContracts',
+        'query'
+      );
+    },
+    getContract(
+      variables: GetContractQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetContractQuery> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<GetContractQuery>(GetContractDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'getContract',
+        'query'
+      );
+    },
+    importContract(
+      variables: ImportContractMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<ImportContractMutation> {
+      return withWrapper(
+        wrappedRequestHeaders =>
+          client.request<ImportContractMutation>(ImportContractDocument, variables, {
+            ...requestHeaders,
+            ...wrappedRequestHeaders,
+          }),
+        'importContract',
+        'mutation'
+      );
+    },
     getEpolicies(
       variables?: GetEpoliciesQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
@@ -3203,6 +3422,26 @@ export function getSdkWithHooks(
       return useSWR<GetMyChannelsQuery, ClientError>(
         genKey<GetMyChannelsQueryVariables>('GetMyChannels', variables),
         () => sdk.getMyChannels(variables),
+        config
+      );
+    },
+    useGetContracts(
+      variables?: GetContractsQueryVariables,
+      config?: SWRConfigInterface<GetContractsQuery, ClientError>
+    ) {
+      return useSWR<GetContractsQuery, ClientError>(
+        genKey<GetContractsQueryVariables>('GetContracts', variables),
+        () => sdk.getContracts(variables),
+        config
+      );
+    },
+    useGetContract(
+      variables: GetContractQueryVariables,
+      config?: SWRConfigInterface<GetContractQuery, ClientError>
+    ) {
+      return useSWR<GetContractQuery, ClientError>(
+        genKey<GetContractQueryVariables>('GetContract', variables),
+        () => sdk.getContract(variables),
         config
       );
     },

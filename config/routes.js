@@ -67,6 +67,16 @@ const routes = [
         path: '/browser',
         component: '@/pages/Browser',
       },
+      {
+        name: '合约商店',
+        path: '/contract',
+        component: '@/pages/Contract',
+      },
+      {
+        // name: "合约商店-详情",
+        path: '/contract/:id',
+        component: '@/pages/ContractDetail',
+      },
     ],
   },
 ];
