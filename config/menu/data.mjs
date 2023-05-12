@@ -7,6 +7,7 @@ import BaasProposal from "@tenx-ui/icon/lib/BaasProposal.js";
 import BaasNetwork from "@tenx-ui/icon/lib/BaasNetwork.js";
 import ChromeFilled from "@tenx-ui/icon/lib/ChromeFilled.js";
 import BaasOverview from "@tenx-ui/icon/lib/BaasOverview.js";
+import BaasContract from "@tenx-ui/icon/lib/BaasContract.js";
 
 export const User = 'User'
 export const TENANT_ADMIN = 'TenantAdmin'
@@ -73,6 +74,14 @@ const data = [
             textEn: 'Browser',
             icon: ChromeFilled,
             pathname: '/browser',
+            tenant: false,
+          },
+          {
+            id: 'baas-contract',
+            text: '合约商店',
+            textEn: 'Contract',
+            icon: BaasContract,
+            pathname: '/contract',
             tenant: false,
           },
         ]

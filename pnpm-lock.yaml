@@ -26,8 +26,8 @@ dependencies:
     specifier: 1.1.2
     version: 1.1.2(@babel/core@7.20.12)(antd@5.3.0)(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
   '@tenx-ui/icon':
-    specifier: ^2.4.18
-    version: 2.4.18(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
+    specifier: ^2.4.21
+    version: 2.4.21(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
   '@tenx-ui/logs':
     specifier: 3.0.3
     version: 3.0.3(antd@5.3.0)(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
@@ -3809,8 +3809,8 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@tenx-ui/icon@2.4.18(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-JDz7yfKNG5Qa551jyYdc2LZpK5HCCFKZh9cba0BPOClTukCwMzFw/6zNtAOmDeghmZc7YvS4o8ZEGa2hgGryhQ==}
+  /@tenx-ui/icon@2.4.21(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-Xxi3hwPfsTx/LC7wrwifvHFRjGHyJhVg4wEkI4T8kVqw9ra90z0itsvSR8d6adyec2u0KDedVPSuItYQmPgeYw==}
     peerDependencies:
       classnames: '>=2.2.5'
       prop-types: '>=15.6.1'
@@ -3852,7 +3852,7 @@ packages:
     peerDependencies:
       antd: ^5.1.5
     dependencies:
-      '@tenx-ui/icon': 2.4.18(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
+      '@tenx-ui/icon': 2.4.21(classnames@2.3.2)(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@tenx-ui/utils': 2.3.1(lodash@4.17.21)(moment@2.29.4)(prop-types@15.8.1)(react-dom@18.2.0)(react-router-dom@6.3.0)(react@18.2.0)
       antd: 5.3.0(moment@2.29.4)(react-dom@18.2.0)(react@18.2.0)
     transitivePeerDependencies:
