@@ -87,6 +87,15 @@ class Browser$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      isOpenModal: false,
+      modalType: 'create',
+      filter: 'ALL',
+      searchValue: undefined,
+      searchKey: 'name',
+      network: '',
+      tab: 'overview',
+      myChannels: [],
+      overview: {},
       block: {
         time: null,
         size: 10,
@@ -95,15 +104,6 @@ class Browser$$Page extends React.Component {
         list: [],
         loading: false,
       },
-      filter: 'ALL',
-      isOpenModal: false,
-      modalType: 'create',
-      myChannels: [],
-      network: '',
-      overview: {},
-      searchKey: 'name',
-      searchValue: undefined,
-      tab: 'overview',
       transaction: {
         time: null,
         size: 10,
@@ -235,79 +235,39 @@ class Browser$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  formatTimeParams(v) {
+    return v ? parseInt(new Date(v).getTime() / 1000) : undefined;
+  }
+
+  async getMyChannels() {
+    try {
+      const res = await this.props.appHelper.utils.bff.getMyChannels();
+      const myChannels =
+        []?.concat(res?.channels)?.map((item) => ({
+          ...item,
+          value: `${item.network}_${item.displayName}`,
+          label: `${item.network}_${item.displayName}`,
+        })) || [];
+      this.setState(
+        {
+          myChannels,
+          network: myChannels?.[0]?.value,
+        },
+        () => {
+          this.loadData();
+        }
+      );
+    } catch (error) {}
+  }
+
   closeModal() {
     this.setState({
       isOpenModal: false,
     });
   }
 
-  formatTimeParams(v) {
-    return v ? parseInt(new Date(v).getTime() / 1000) : undefined;
-  }
-
-  formateTransactionsCount(text, item, index) {
-    const percent =
-      parseFloat(
-        item.data?.angleField / this.state.overview?.transactionsCountTotal
-      )?.toFixed(2) * 100;
-    return (
-      <span>
-        <span
-          style={{
-            display: 'inline-block',
-            width: '100px',
-          }}
-        >
-          {text}
-        </span>
-        <span
-          style={{
-            float: 'right',
-          }}
-        >
-          {percent} %
-        </span>
-      </span>
-    );
-  }
-
-  getAllQueryBySeg() {
-    this.getQueryBySeg({
-      type: 'blockH',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
-        interval: 3600,
-        number: 24,
-        type: 'blocks',
-      },
-    });
-    this.getQueryBySeg({
-      type: 'transactionH',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
-        interval: 3600,
-        number: 24,
-        type: 'transactions',
-      },
-    });
-    this.getQueryBySeg({
-      type: 'blockM',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
-        interval: 60,
-        number: 60,
-        type: 'blocks',
-      },
-    });
-    this.getQueryBySeg({
-      type: 'transactionM',
-      query: {
-        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
-        interval: 60,
-        number: 60,
-        type: 'transactions',
-      },
-    });
+  paginationShowTotal(a, b) {
+    return this.utils.paginationShowTotal(a, b, this);
   }
 
   getBrowserBlocks() {
@@ -372,27 +332,6 @@ class Browser$$Page extends React.Component {
       });
   }
 
-  async getMyChannels() {
-    try {
-      const res = await this.props.appHelper.utils.bff.getMyChannels();
-      const myChannels =
-        []?.concat(res?.channels)?.map((item) => ({
-          ...item,
-          value: `${item.network}_${item.displayName}`,
-          label: `${item.network}_${item.displayName}`,
-        })) || [];
-      this.setState(
-        {
-          myChannels,
-          network: myChannels?.[0]?.value,
-        },
-        () => {
-          this.loadData();
-        }
-      );
-    } catch (error) {}
-  }
-
   getOverview() {
     this.setState({
       overview: {
@@ -416,39 +355,6 @@ class Browser$$Page extends React.Component {
           overview: {
             ...this.state.overview,
             data: {},
-            loading: false,
-          },
-        });
-      });
-  }
-
-  getQueryBySeg({ type, query }) {
-    this.setState({
-      overview: {
-        ...this.state.overview,
-        loading: true,
-      },
-    });
-    this.dataSourceMap.getQueryBySeg
-      .load(query)
-      .then((res) => {
-        this.setState({
-          overview: {
-            ...this.state.overview,
-            [type]: res?.map((item) => ({
-              seriesField: this.i18n('i18n-1pf627eu'),
-              xField: item.end * 1000,
-              yField: item.count,
-            })),
-            loading: false,
-          },
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          overview: {
-            ...this.state.overview,
-            [type]: [],
             loading: false,
           },
         });
@@ -494,171 +400,102 @@ class Browser$$Page extends React.Component {
       });
   }
 
-  handleBlockPaginationChange(c, s) {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          size: s,
-          current: c,
-        },
-      },
-      this.loadData
+  formateTransactionsCount(text, item, index) {
+    const percent =
+      parseFloat(
+        item.data?.angleField / this.state.overview?.transactionsCountTotal
+      )?.toFixed(2) * 100;
+    return (
+      <span>
+        <span
+          style={{
+            display: 'inline-block',
+            width: '100px',
+          }}
+        >
+          {text}
+        </span>
+        <span
+          style={{
+            float: 'right',
+          }}
+        >
+          {percent} %
+        </span>
+      </span>
     );
   }
 
-  handleBlockReset() {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          time: null,
-          current: 1,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleBlockSearch() {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          current: 1,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleBlockTableChange(pagination, filters, sorter, extra) {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          pagination,
-          filters,
-          sorter,
-          size: pagination.pageSize,
-          current: pagination.current,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleBlockTimeChange(v) {
-    this.setState(
-      {
-        block: {
-          ...this.state.block,
-          time: v,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleNetworkChannelChange(v) {
-    this.setState(
-      {
-        network: v,
-        current: 1,
-      },
-      this.loadData
-    );
-  }
-
-  handleSearch(value, event) {
-    this.setState(
-      {
-        current: 1,
-      },
-      this.loadData
-    );
-  }
-
-  handleSearchValueChange(e) {
+  getQueryBySeg({ type, query }) {
     this.setState({
-      searchValue: e.target.value,
+      overview: {
+        ...this.state.overview,
+        loading: true,
+      },
     });
+    this.dataSourceMap.getQueryBySeg
+      .load(query)
+      .then((res) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            [type]: res?.map((item) => ({
+              seriesField: this.i18n('i18n-1pf627eu'),
+              xField: item.end * 1000,
+              yField: item.count,
+            })),
+            loading: false,
+          },
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          overview: {
+            ...this.state.overview,
+            [type]: [],
+            loading: false,
+          },
+        });
+      });
   }
 
-  handleTabChange(v) {
-    this.setState(
-      {
-        tab: v,
-        current: 1,
+  getAllQueryBySeg() {
+    this.getQueryBySeg({
+      type: 'blockH',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
+        interval: 3600,
+        number: 24,
+        type: 'blocks',
       },
-      this.loadData
-    );
-  }
-
-  handleTransactionPaginationChange(c, s) {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          size: s,
-          current: c,
-        },
+    });
+    this.getQueryBySeg({
+      type: 'transactionH',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 3600 * 24),
+        interval: 3600,
+        number: 24,
+        type: 'transactions',
       },
-      this.loadData
-    );
-  }
-
-  handleTransactionReset() {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          time: null,
-          current: 1,
-        },
+    });
+    this.getQueryBySeg({
+      type: 'blockM',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
+        interval: 60,
+        number: 60,
+        type: 'blocks',
       },
-      this.loadData
-    );
-  }
-
-  handleTransactionSearch() {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          current: 1,
-        },
+    });
+    this.getQueryBySeg({
+      type: 'transactionM',
+      query: {
+        from: parseInt(new Date().getTime() / 1000 - 60 * 60),
+        interval: 60,
+        number: 60,
+        type: 'transactions',
       },
-      this.loadData
-    );
-  }
-
-  handleTransactionTableChange(pagination, filters, sorter, extra) {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          pagination,
-          filters,
-          sorter,
-          size: pagination.pageSize,
-          current: pagination.current,
-        },
-      },
-      this.loadData
-    );
-  }
-
-  handleTransactionTimeChange(v) {
-    this.setState(
-      {
-        transaction: {
-          ...this.state.transaction,
-          time: v,
-        },
-      },
-      this.loadData
-    );
+    });
   }
 
   loadData() {
@@ -690,6 +527,41 @@ class Browser$$Page extends React.Component {
     }
   }
 
+  handleNetworkChannelChange(v) {
+    this.setState(
+      {
+        network: v,
+        current: 1,
+      },
+      this.loadData
+    );
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+    });
+  }
+
+  handleSearch(value, event) {
+    this.setState(
+      {
+        current: 1,
+      },
+      this.loadData
+    );
+  }
+
+  handleTabChange(v) {
+    this.setState(
+      {
+        tab: v,
+        current: 1,
+      },
+      this.loadData
+    );
+  }
+
   openBlockDetailModal(e, { record }) {
     this.setState({
       isOpenModal: true,
@@ -705,6 +577,109 @@ class Browser$$Page extends React.Component {
     });
   }
 
+  handleBlockPaginationChange(c, s) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          size: s,
+          current: c,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          pagination,
+          filters,
+          sorter,
+          size: pagination.pageSize,
+          current: pagination.current,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockSearch() {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockReset() {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          time: null,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleBlockTimeChange(v) {
+    this.setState(
+      {
+        block: {
+          ...this.state.block,
+          time: v,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionSearch() {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionReset() {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          time: null,
+          current: 1,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionTimeChange(v) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          time: v,
+        },
+      },
+      this.loadData
+    );
+  }
+
   openTransactionDetailModal(e, { record }) {
     this.setState({
       isOpenModal: true,
@@ -716,8 +691,33 @@ class Browser$$Page extends React.Component {
     });
   }
 
-  paginationShowTotal(a, b) {
-    return this.utils.paginationShowTotal(a, b, this);
+  handleTransactionPaginationChange(c, s) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          size: s,
+          current: c,
+        },
+      },
+      this.loadData
+    );
+  }
+
+  handleTransactionTableChange(pagination, filters, sorter, extra) {
+    this.setState(
+      {
+        transaction: {
+          ...this.state.transaction,
+          pagination,
+          filters,
+          sorter,
+          size: pagination.pageSize,
+          current: pagination.current,
+        },
+      },
+      this.loadData
+    );
   }
 
   componentDidMount() {
@@ -1143,6 +1143,9 @@ class Browser$$Page extends React.Component {
             column={1}
             items={[
               {
+                key: 'h495bbtwdkj',
+                label: this.i18n('i18n-8bfjic36') /* 交易 ID */,
+                span: 1,
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
@@ -1154,11 +1157,37 @@ class Browser$$Page extends React.Component {
                     {__$$eval(() => this.state.transaction?.record?.id || '-')}
                   </Typography.Text>
                 ),
-                key: 'h495bbtwdkj',
-                label: this.i18n('i18n-8bfjic36') /* 交易 ID */,
-                span: 1,
               },
               {
+                key: '4e7ym9ip9f9',
+                label: this.i18n('i18n-4dh77hfc') /* 区块高度 */,
+                span: 1,
+                children: __$$eval(
+                  () => this.state.transaction?.record?.blockNumber || '-'
+                ),
+              },
+              {
+                key: 'ns3ahlga1n',
+                label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
+                span: 1,
+                children: (
+                  <Typography.Time
+                    __component_name="Typography.Time"
+                    format=""
+                    ref={this._refsManager.linkRef('typography.time-a1872598')}
+                    relativeTime={false}
+                    time={__$$eval(
+                      () =>
+                        this.state.transaction?.record?.createdAt &&
+                        this.state.transaction.record.createdAt * 1000
+                    )}
+                  />
+                ),
+              },
+              {
+                key: '5rk3nsekwj',
+                label: this.i18n('i18n-53j00k4p') /* 交易验证码 */,
+                span: 1,
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
@@ -1169,16 +1198,16 @@ class Browser$$Page extends React.Component {
                   >
                     {__$$eval(
                       () =>
-                        this.state.transaction?.record?.validationCode + '' ||
-                        '-'
+                        (this.state.transaction?.record?.validationCode ||
+                          '-') + ''
                     )}
                   </Typography.Text>
                 ),
-                key: '5rk3nsekwj',
-                label: this.i18n('i18n-53j00k4p') /* 交易验证码 */,
-                span: 1,
               },
               {
+                key: 'k2dbheu2dj',
+                label: 'Result',
+                span: 1,
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
@@ -1192,7 +1221,7 @@ class Browser$$Page extends React.Component {
                         title: __$$eval(
                           () =>
                             this.utils.decodeBase64(
-                              this.state.transaction?.record?.Payload || ''
+                              this.state.transaction?.record?.payload || ''
                             ) || '-'
                         ),
                       },
@@ -1208,11 +1237,11 @@ class Browser$$Page extends React.Component {
                     )}
                   </Typography.Text>
                 ),
-                key: 'k2dbheu2dj',
-                label: this.i18n('i18n-9ze7q50s') /* Payload Proposal Hash */,
-                span: 1,
               },
               {
+                key: 'xydm638gnyc',
+                label: this.i18n('i18n-wctt13ld2x') /* 发起者 */,
+                span: 1,
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
@@ -1226,11 +1255,11 @@ class Browser$$Page extends React.Component {
                     )}
                   </Typography.Text>
                 ),
-                key: 'xydm638gnyc',
-                label: this.i18n('i18n-wctt13ld2x') /* 发起者 */,
-                span: 1,
               },
               {
+                key: 'opwcrxxtic',
+                label: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
+                span: 1,
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
@@ -1244,11 +1273,11 @@ class Browser$$Page extends React.Component {
                     )}
                   </Typography.Text>
                 ),
-                key: 'opwcrxxtic',
-                label: this.i18n('i18n-7ws2ncyb') /* 合约名称 */,
-                span: 1,
               },
               {
+                key: 'kna2s8u4hyp',
+                label: this.i18n('i18n-9v85anpj') /* 交易类型 */,
+                span: 1,
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
@@ -1262,29 +1291,11 @@ class Browser$$Page extends React.Component {
                     )}
                   </Typography.Text>
                 ),
-                key: 'kna2s8u4hyp',
-                label: this.i18n('i18n-9v85anpj') /* 交易类型 */,
-                span: 1,
               },
               {
-                children: (
-                  <Typography.Time
-                    __component_name="Typography.Time"
-                    format=""
-                    ref={this._refsManager.linkRef('typography.time-a1872598')}
-                    relativeTime={false}
-                    time={__$$eval(
-                      () =>
-                        this.state.transaction?.record?.createdAt &&
-                        this.state.transaction.record.createdAt * 1000
-                    )}
-                  />
-                ),
-                key: 'ns3ahlga1n',
-                label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
+                key: '94ini0nyz0i',
+                label: this.i18n('i18n-b6wgc83l') /* 合约调用函数 */,
                 span: 1,
-              },
-              {
                 children: (
                   <Typography.Text
                     __component_name="Typography.Text"
@@ -1294,13 +1305,31 @@ class Browser$$Page extends React.Component {
                     style={{ fontSize: '' }}
                   >
                     {__$$eval(
-                      () => this.state.transaction?.record?.name || '-'
+                      () => this.state.transaction?.record?.method || '-'
                     )}
                   </Typography.Text>
                 ),
-                key: '94ini0nyz0i',
-                label: this.i18n('i18n-9bnr95km') /* 链接 */,
+              },
+              {
+                key: 'thwspi2mv2',
+                label: this.i18n('i18n-7sg7zuzd') /* 合约调用参数 */,
                 span: 1,
+                children: (
+                  <Typography.Text
+                    __component_name="Typography.Text"
+                    disabled={false}
+                    ellipsis={true}
+                    strong={false}
+                    style={{ fontSize: '' }}
+                  >
+                    {__$$eval(
+                      () =>
+                        `[${(
+                          this.state.transaction?.record?.args || []
+                        ).toString()}]`
+                    )}
+                  </Typography.Text>
+                ),
               },
             ]}
             labelStyle={{ width: 170 }}
@@ -1327,6 +1356,34 @@ class Browser$$Page extends React.Component {
               }
             </Descriptions.Item>
             <Descriptions.Item
+              key="4e7ym9ip9f9"
+              label={this.i18n('i18n-4dh77hfc') /* 区块高度 */}
+              span={1}
+            >
+              {__$$eval(
+                () => this.state.transaction?.record?.blockNumber || '-'
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item
+              key="ns3ahlga1n"
+              label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
+              span={1}
+            >
+              {
+                <Typography.Time
+                  __component_name="Typography.Time"
+                  format=""
+                  ref={this._refsManager.linkRef('typography.time-a1872598')}
+                  relativeTime={false}
+                  time={__$$eval(
+                    () =>
+                      this.state.transaction?.record?.createdAt &&
+                      this.state.transaction.record.createdAt * 1000
+                  )}
+                />
+              }
+            </Descriptions.Item>
+            <Descriptions.Item
               key="5rk3nsekwj"
               label={this.i18n('i18n-53j00k4p') /* 交易验证码 */}
               span={1}
@@ -1346,11 +1403,7 @@ class Browser$$Page extends React.Component {
                 </Typography.Text>
               }
             </Descriptions.Item>
-            <Descriptions.Item
-              key="k2dbheu2dj"
-              label={this.i18n('i18n-9ze7q50s') /* Payload Proposal Hash */}
-              span={1}
-            >
+            <Descriptions.Item key="k2dbheu2dj" label="Result" span={1}>
               {
                 <Typography.Text
                   __component_name="Typography.Text"
@@ -1437,27 +1490,8 @@ class Browser$$Page extends React.Component {
               }
             </Descriptions.Item>
             <Descriptions.Item
-              key="ns3ahlga1n"
-              label={this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */}
-              span={1}
-            >
-              {
-                <Typography.Time
-                  __component_name="Typography.Time"
-                  format=""
-                  ref={this._refsManager.linkRef('typography.time-a1872598')}
-                  relativeTime={false}
-                  time={__$$eval(
-                    () =>
-                      this.state.transaction?.record?.createdAt &&
-                      this.state.transaction.record.createdAt * 1000
-                  )}
-                />
-              }
-            </Descriptions.Item>
-            <Descriptions.Item
               key="94ini0nyz0i"
-              label={this.i18n('i18n-9bnr95km') /* 链接 */}
+              label={this.i18n('i18n-b6wgc83l') /* 合约调用函数 */}
               span={1}
             >
               {
@@ -1468,7 +1502,44 @@ class Browser$$Page extends React.Component {
                   strong={false}
                   style={{ fontSize: '' }}
                 >
-                  {__$$eval(() => this.state.transaction?.record?.name || '-')}
+                  {__$$eval(
+                    () => this.state.transaction?.record?.method || '-'
+                  )}
+                </Typography.Text>
+              }
+            </Descriptions.Item>
+            <Descriptions.Item
+              key="thwspi2mv2"
+              label={this.i18n('i18n-7sg7zuzd') /* 合约调用参数 */}
+              span={1}
+            >
+              {
+                <Typography.Text
+                  __component_name="Typography.Text"
+                  copyable={false}
+                  disabled={false}
+                  ellipsis={{
+                    expandable: true,
+                    rows: 4,
+                    tooltip: {
+                      _unsafe_MixedSetter_title_select: 'VariableSetter',
+                      title: __$$eval(
+                        () =>
+                          `[${(
+                            this.state.transaction?.record?.args || []
+                          ).toString()}]`
+                      ),
+                    },
+                  }}
+                  strong={false}
+                  style={{ fontSize: '', width: '270px' }}
+                >
+                  {__$$eval(
+                    () =>
+                      `[${(
+                        this.state.transaction?.record?.args || []
+                      ).toString()}]`
+                  )}
                 </Typography.Text>
               }
             </Descriptions.Item>
