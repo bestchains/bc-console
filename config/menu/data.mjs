@@ -88,6 +88,47 @@ const data = [
       }
     ]
   },
+  {
+    id: 'depository',
+    type: 'all-product',
+    text: 'Depository',
+    textEn: 'Depository',
+    icon: BaasMain,
+    column: 2,
+    children: [
+      {
+        id: 'depository-index',
+        text: '可信存证平台',
+        textEn: 'Depository',
+        children: [
+          {
+            id: 'depository-overview',
+            text: '总览',
+            textEn: 'Overview',
+            icon: BaasOverview,
+            pathname: '/depository/overview',
+            tenant: false,
+          },
+          {
+            id: 'depository-management',
+            text: '存证管理',
+            textEn: 'Management',
+            icon: BaasFederation,
+            pathname: '/depository/management',
+            tenant: false,
+          },
+          {
+            id: 'depository-verification',
+            text: '验证中心',
+            textEn: 'Verification',
+            icon: BaasNetwork,
+            pathname: '/depository/verification',
+            tenant: false,
+          },
+        ]
+      }
+    ]
+  },
 ]
 
 export default data;

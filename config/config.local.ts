@@ -24,5 +24,15 @@ export default defineConfig({
       changeOrigin: true,
       secure: false,
     },
+    '/bc-saas': {
+      target: 'https://portal.172.22.96.209.nip.io',
+      changeOrigin: true,
+      secure: false,
+    },
+    '/bc-apis': {
+      target: 'https://portal.172.22.96.209.nip.io',
+      changeOrigin: true,
+      secure: false,
+    },
   },
 });

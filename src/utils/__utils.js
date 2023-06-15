@@ -171,6 +171,41 @@ utils.encodeBase64 = function __encodeBase64() {
 }.apply(utils);
 export const encodeBase64 = utils.encodeBase64;
 
+/** 字节单位格式化 */
+utils.formatBitUnit = function __formatBitUnit() {
+  return (bit = 0, fixed = 2) => {
+    if (bit > 1024) {
+      return {
+        unit: 'KB',
+        size: (bit / 1024).toFixed(fixed),
+      };
+    }
+    if (bit > 1024 * 1024) {
+      return {
+        unit: 'MB',
+        size: (bit / 1024 / 1024).toFixed(fixed),
+      };
+    }
+    if (bit > 1024 * 1024 * 1024) {
+      return {
+        unit: 'GB',
+        size: (bit / 1024 / 1024 / 1024).toFixed(fixed),
+      };
+    }
+    if (bit > 1024 * 1024 * 1024 * 1024) {
+      return {
+        unit: 'TB',
+        size: (bit / 1024 / 1024 / 1024 / 1024).toFixed(fixed),
+      };
+    }
+    return {
+      unit: 'B',
+      size: (bit || 0).toFixed(fixed),
+    };
+  };
+}.apply(utils);
+export const formatBitUnit = utils.formatBitUnit;
+
 export class RefsManager {
   constructor() {
     this.refInsStore = {};
@@ -250,4 +285,6 @@ export default {
   decodeBase64,
 
   encodeBase64,
+
+  formatBitUnit,
 };

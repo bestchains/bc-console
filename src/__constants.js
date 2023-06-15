@@ -12,6 +12,12 @@ constants.BC_EXPLORER_API_PREFIX = function applyThis() {
 }.apply(constants);
 export const BC_EXPLORER_API_PREFIX = constants.BC_EXPLORER_API_PREFIX;
 
+/** saas api 前缀 */
+constants.BC_SAAS_API_URL = function applyThis() {
+  return '/bc-saas';
+}.apply(constants);
+export const BC_SAAS_API_URL = constants.BC_SAAS_API_URL;
+
 /** 日志 */
 constants.BC_WS_LOGS_API_URL = function applyThis() {
   return '/bc-ws/k8s/logs';

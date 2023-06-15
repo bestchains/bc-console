@@ -62,7 +62,7 @@
     "@tenx-ui/charts": "1.1.2",
     "@tenx-ui/icon": "^2.4.21",
     "@tenx-ui/logs": "3.0.3",
-    "@tenx-ui/materials": "1.1.4",
+    "@tenx-ui/materials": "1.4.2",
     "@tenx-ui/utils": "^2.3.1",
     "@umijs/max": "^4.0.42",
     "@yunti/lowcode-datasource-axios-handler": "^1.0.0",
@@ -73,10 +73,10 @@
     "graphql": "^16.6.0",
     "graphql-request": "^5.1.0",
     "graphql-tag": "^2.12.6",
+    "query-string": "^6.14.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "swr": "^2.0.0",
-    "query-string": "^6.14.1"
+    "swr": "^2.0.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
