@@ -77,6 +77,29 @@ const routes = [
         path: '/contract/:id',
         component: '@/pages/ContractDetail',
       },
+      {
+        name: '可信存证平台-总览',
+        path: '/depository/overview',
+        component: '@/pages/DepositoryOverview',
+      },
+      {
+        name: '可信存证平台-存证管理',
+        path: '/depository/management',
+        component: '@/pages/DepositoryManagement',
+      },
+      {
+        path: '/depository/management/create',
+        component: '@/pages/DepositoryManagementCreate',
+      },
+      {
+        path: '/depository/management/detail/:id',
+        component: '@/pages/DepositoryManagementDetail',
+      },
+      {
+        name: '可信存证平台-验证中心',
+        path: '/depository/verification',
+        component: '@/pages/DepositoryVerification',
+      },
     ],
   },
 ];
