@@ -114,6 +114,30 @@ class DepositoryManagement$$Page extends React.Component {
           }.bind(_this),
           type: 'axios',
         },
+        {
+          id: 'downloadDepository',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              headers: {},
+              isCors: true,
+              method: 'GET',
+              params: {},
+              timeout: 15000,
+              uri: `${this.constants?.BC_SAAS_API_URL}/basic/depositories/certificate/${this.state.record?.kid}`,
+            };
+          }.bind(_this),
+          shouldFetch: function () {
+            return true;
+          },
+          type: 'axios',
+          willFetch: function (options) {
+            options.responseType = 'blob';
+            return options;
+          },
+        },
       ],
     };
   }
@@ -217,6 +241,43 @@ class DepositoryManagement$$Page extends React.Component {
         sorter,
       },
       this.getDepositoryList
+    );
+  }
+
+  async downLoadFile(e, { record }) {
+    this.setState(
+      {
+        record,
+        downLoadloading: true,
+      },
+      () => {
+        this.utils.notification.success({
+          message: this.i18n('i18n-aa961tbp'),
+        });
+        this.dataSourceMap.downloadDepository
+          .load()
+          .then((res) => {
+            this.utils.downloadFile(
+              res,
+              record?.kid + '.pdf',
+              'application/octet-stream',
+              true
+            );
+            this.setState({
+              downLoadloading: false,
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setState({
+              downLoadloading: false,
+            });
+            this.utils.notification.warning({
+              message: this.i18n('i18n-62p13m1r'),
+              description: error?.message,
+            });
+          });
+      }
     );
   }
 
@@ -943,13 +1004,42 @@ class DepositoryManagement$$Page extends React.Component {
                           </Button>
                           <Button
                             __component_name="Button"
+                            __events={{
+                              eventDataList: [
+                                {
+                                  name: 'onClick',
+                                  paramStr: '{\n \t "record":this.record \n}',
+                                  relatedEventName: 'downLoadFile',
+                                  type: 'componentEvent',
+                                },
+                              ],
+                              eventList: [
+                                {
+                                  disabled: true,
+                                  name: 'onClick',
+                                  template:
+                                    "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                },
+                              ],
+                            }}
                             block={false}
                             danger={false}
                             disabled={false}
                             ghost={false}
                             href=""
                             icon=""
+                            onClick={function () {
+                              return this.downLoadFile.apply(
+                                this,
+                                Array.prototype.slice.call(arguments).concat([
+                                  {
+                                    record: record,
+                                  },
+                                ])
+                              );
+                            }.bind(__$$context)}
                             shape="default"
+                            target="_blank"
                             type="link"
                           >
                             {this.i18n('i18n-53sb33cw') /* - */}

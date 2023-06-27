@@ -137,8 +137,8 @@ export const formatCpu = utils.formatCpu;
 
 /** 下载文件 */
 utils.downloadFile = function __downloadFile() {
-  return (data, filename = 'profile.json', type = 'text/json') => {
-    if (typeof data === 'object') {
+  return (data, filename = 'profile.json', type = 'text/json', isblob) => {
+    if (typeof data === 'object' && !isblob) {
       data = JSON.stringify(data, undefined, 4);
     }
     const blob = new Blob([data], { type }),

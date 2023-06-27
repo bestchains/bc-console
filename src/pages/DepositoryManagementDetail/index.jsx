@@ -75,7 +75,7 @@ class DepositoryManagementDetail$$Page extends React.Component {
 
     __$$i18n._inject2(this);
 
-    this.state = { data: undefined, loading: false };
+    this.state = { loading: false, data: undefined };
   }
 
   $ = (refName) => {
@@ -107,11 +107,67 @@ class DepositoryManagementDetail$$Page extends React.Component {
           }.bind(_this),
           type: 'axios',
         },
+        {
+          id: 'downloadDepository',
+          isInit: function () {
+            return false;
+          }.bind(_this),
+          options: function () {
+            return {
+              headers: {},
+              isCors: true,
+              method: 'GET',
+              params: {},
+              timeout: 15000,
+              uri: `${this.constants?.BC_SAAS_API_URL}/basic/depositories/certificate/${this.state.data?.kid}`,
+            };
+          }.bind(_this),
+          type: 'axios',
+          willFetch: function (options) {
+            options.responseType = 'blob';
+            return options;
+          },
+        },
       ],
     };
   }
 
   componentWillUnmount() {}
+
+  async downLoadFile(e) {
+    this.setState(
+      {
+        downLoadloading: true,
+      },
+      () => {
+        this.utils.notification.success({
+          message: this.i18n('i18n-aa961tbp'),
+        });
+        this.dataSourceMap.downloadDepository
+          .load()
+          .then((res) => {
+            this.utils.downloadFile(
+              res,
+              this.state.data?.kid + '.pdf',
+              'application/octet-stream',
+              true
+            );
+            this.setState({
+              downLoadloading: false,
+            });
+          })
+          .catch((error) => {
+            this.setState({
+              downLoadloading: false,
+            });
+            this.utils.notification.warning({
+              message: this.i18n('i18n-62p13m1r'),
+              description: error?.message,
+            });
+          });
+      }
+    );
+  }
 
   getDepositoryDetail() {
     this.setState({
@@ -143,7 +199,7 @@ class DepositoryManagementDetail$$Page extends React.Component {
     const __$$context = this._context || this;
     const { state } = __$$context;
     return (
-      <Page>
+      <Page style={{ paddingTop: '10px' }}>
         <Row __component_name="Row" wrap={true}>
           <Col
             __component_name="Col"
@@ -160,11 +216,35 @@ class DepositoryManagementDetail$$Page extends React.Component {
             <Space align="center" direction="horizontal" size="middle">
               <Button
                 __component_name="Button"
+                __events={{
+                  eventDataList: [
+                    {
+                      name: 'onClick',
+                      relatedEventName: 'downLoadFile',
+                      type: 'componentEvent',
+                    },
+                  ],
+                  eventList: [
+                    {
+                      disabled: true,
+                      name: 'onClick',
+                      template:
+                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                    },
+                  ],
+                }}
                 block={false}
                 danger={false}
                 disabled={false}
                 ghost={false}
+                onClick={function () {
+                  return this.downLoadFile.apply(
+                    this,
+                    Array.prototype.slice.call(arguments).concat([])
+                  );
+                }.bind(this)}
                 shape="default"
+                target="_blank"
                 type="primary"
               >
                 {this.i18n('i18n-53sb33cw') /* 下载证书 */}
@@ -275,6 +355,9 @@ class DepositoryManagementDetail$$Page extends React.Component {
                                 __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
+                                ref={this._refsManager.linkRef(
+                                  'typography.text-7b417135'
+                                )}
                                 strong={false}
                                 style={{ fontSize: '' }}
                               >
@@ -293,10 +376,23 @@ class DepositoryManagementDetail$$Page extends React.Component {
                                 __component_name="Typography.Text"
                                 disabled={false}
                                 ellipsis={true}
+                                ref={this._refsManager.linkRef(
+                                  'typography.text-97366e0f'
+                                )}
                                 strong={false}
                                 style={{ fontSize: '' }}
                               >
-                                text
+                                {__$$eval(() =>
+                                  this.state.data?.contentSize ||
+                                  this.state.data?.contentSize === 0
+                                    ? this.utils.formatBitUnit(
+                                        this.state.data?.contentSize
+                                      )?.size +
+                                      this.utils.formatBitUnit(
+                                        this.state.data?.contentSize
+                                      )?.unit
+                                    : '-'
+                                )}
                               </Typography.Text>
                             ),
                             key: '6vs6wn94x0a',
