@@ -22,7 +22,7 @@ import {
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -216,7 +216,6 @@ class NetworkCreate$$Page extends React.Component {
                         'x-validator': [
                           {
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
                             id: 'disabled',
                             message:
                               this.i18n(
@@ -229,7 +228,6 @@ class NetworkCreate$$Page extends React.Component {
                           },
                           {
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
                             id: 'disabled',
                             message:
                               this.i18n(
@@ -242,7 +240,6 @@ class NetworkCreate$$Page extends React.Component {
                           },
                           {
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
                             id: 'disabled',
                             type: 'disabled',
                             validator: function () {
@@ -369,7 +366,7 @@ class NetworkCreate$$Page extends React.Component {
                               {
                                 this.i18n(
                                   'i18n-b3i37ksj9vv'
-                                ) /* 节点默认配置为 4核CPU 8G内存 200G磁盘，详见 */
+                                ) /* 节点默认配置为 4核CPU 8G内存 200G磁盘 */
                               }
                             </Typography.Text>
                           </Space>
@@ -476,7 +473,6 @@ class NetworkCreate$$Page extends React.Component {
                           {
                             _unsafe_MixedSetter_label_select: 'StringSetter',
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
                             id: 'disabled',
                             label: 'etcdraft',
                             type: 'disabled',
@@ -540,7 +536,6 @@ class NetworkCreate$$Page extends React.Component {
                         'x-validator': [
                           {
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
                             id: 'disabled',
                             message:
                               this.i18n(
@@ -669,6 +664,11 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetNetworks',

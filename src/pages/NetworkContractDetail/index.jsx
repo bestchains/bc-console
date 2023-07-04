@@ -10,10 +10,11 @@ import {
   Card,
   Typography,
   Descriptions,
-  UnifiedLink,
   Table,
   Status,
 } from '@tenx-ui/materials';
+
+import { TenxIconCircle } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -131,6 +132,8 @@ class NetworkContractDetail$$Page extends React.Component {
                       <Descriptions
                         __component_name="Descriptions"
                         bordered={false}
+                        borderedBottom={false}
+                        borderedBottomDashed={false}
                         colon={false}
                         column={2}
                         items={[
@@ -145,8 +148,13 @@ class NetworkContractDetail$$Page extends React.Component {
                               >
                                 {__$$eval(
                                   () =>
-                                    this.props.useGetChaincodebuild?.data
-                                      ?.chaincodebuild?.name
+                                    `${
+                                      this.props.useGetChaincodebuild?.data
+                                        ?.chaincodebuild?.displayName || '-'
+                                    }(${
+                                      this.props.useGetChaincodebuild?.data
+                                        ?.chaincodebuild?.name || '-'
+                                    })`
                                 )}
                               </Typography.Text>
                             ),
@@ -230,18 +238,47 @@ class NetworkContractDetail$$Page extends React.Component {
                           },
                           {
                             children: (
-                              <UnifiedLink
-                                __component_name="UnifiedLink"
-                                target="_blank"
-                                to={__$$eval(
-                                  () =>
-                                    this.props.appHelper?.constants
-                                      ?.downloadMinioUrl +
-                                    `bucket=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.bucket}&object=${this.props.useGetChaincodebuild?.data?.chaincodebuild?.minio?.object}`
-                                )}
+                              <Button
+                                __component_name="Button"
+                                __events={{
+                                  eventDataList: [
+                                    {
+                                      name: 'onClick',
+                                      relatedEventName: 'download',
+                                      type: 'componentEvent',
+                                    },
+                                  ],
+                                  eventList: [
+                                    {
+                                      disabled: true,
+                                      name: 'onClick',
+                                      template:
+                                        "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
+                                    },
+                                  ],
+                                }}
+                                block={false}
+                                danger={false}
+                                disabled={false}
+                                ghost={false}
+                                icon=""
+                                onClick={function () {
+                                  return this.download.apply(
+                                    this,
+                                    Array.prototype.slice
+                                      .call(arguments)
+                                      .concat([])
+                                  );
+                                }.bind(this)}
+                                shape="default"
+                                style={{
+                                  marginLeft: '-18px',
+                                  marginTop: '-6px',
+                                }}
+                                type="link"
                               >
                                 {this.i18n('i18n-r1gt8gfi') /* 下载 */}
-                              </UnifiedLink>
+                              </Button>
                             ),
                             key: 'd5nxvp29i',
                             label: this.i18n('i18n-gp8gule7') /* 正文 */,
@@ -543,7 +580,9 @@ class NetworkContractDetail$$Page extends React.Component {
                                   types={[
                                     {
                                       children: '未知',
-                                      icon: 'tenx-ui-icon:Circle',
+                                      icon: (
+                                        <TenxIconCircle __component_name="TenxIconCircle" />
+                                      ),
                                       id: 'disabled',
                                       type: 'disabled',
                                     },
@@ -686,12 +725,19 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetChaincodebuild',
-          params: {
-            name: self.match?.params?.contractId,
-          },
+          params: function applyThis() {
+            return {
+              name: this.match?.params?.contractId,
+            };
+          }.apply(self),
         },
       ]}
       render={(dataProps) => (

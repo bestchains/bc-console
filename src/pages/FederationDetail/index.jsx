@@ -12,7 +12,6 @@ import {
   Card,
   Descriptions,
   Typography,
-  Icon,
   Table,
   Space,
   Input,
@@ -24,9 +23,15 @@ import {
   Alert,
 } from '@tenx-ui/materials';
 
+import {
+  AntdIconPlusOutlined,
+  AntdIconCheckCircleFilled,
+  AntdIconCloseCircleFilled,
+} from '@tenx-ui/icon-materials';
+
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -257,6 +262,7 @@ class FederationDetail$$Page extends React.Component {
           <Col __component_name="Col" span={24}>
             <Tabs
               __component_name="Tabs"
+              activeKey=""
               destroyInactiveTabPane="true"
               items={[
                 {
@@ -373,8 +379,7 @@ class FederationDetail$$Page extends React.Component {
                                     ?.description || '-'
                               ),
                               key: 'r4gchd14zz',
-                              label:
-                                this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */,
+                              label: this.i18n('i18n-8weq4mfy9lf') /* 描述 */,
                               span: 1,
                             },
                             {
@@ -491,7 +496,7 @@ class FederationDetail$$Page extends React.Component {
                           <Descriptions.Item
                             __component_name="Descriptions.Item"
                             key="r4gchd14zz"
-                            label={this.i18n('i18n-8weq4mfy9lf') /* 联盟描述 */}
+                            label={this.i18n('i18n-8weq4mfy9lf') /* 描述 */}
                             span={1}
                             tab=""
                           >
@@ -563,11 +568,9 @@ class FederationDetail$$Page extends React.Component {
                               disabled={false}
                               ghost={false}
                               icon={
-                                <Icon
-                                  __component_name="Icon"
-                                  size={12}
-                                  style={{ marginRight: 3 }}
-                                  type="PlusOutlined"
+                                <AntdIconPlusOutlined
+                                  __component_name="AntdIconPlusOutlined"
+                                  style={{ marginRight: '3px' }}
                                 />
                               }
                               onClick={function () {
@@ -883,11 +886,9 @@ class FederationDetail$$Page extends React.Component {
                   ghost={false}
                   href="/network/create"
                   icon={
-                    <Icon
-                      __component_name="Icon"
-                      size={12}
-                      style={{ marginRight: 3 }}
-                      type="PlusOutlined"
+                    <AntdIconPlusOutlined
+                      __component_name="AntdIconPlusOutlined"
+                      style={{ marginRight: '3px' }}
                     />
                   }
                   shape="default"
@@ -1173,35 +1174,45 @@ class FederationDetail$$Page extends React.Component {
                           types={[
                             {
                               children: this.i18n('i18n-zrowlr7zwx') /* 正常 */,
-                              icon: 'CheckCircleFilled',
+                              icon: (
+                                <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                              ),
                               id: 'NetworkCreated',
                               type: 'success',
                             },
                             {
                               children:
                                 this.i18n('i18n-j3czm9su41') /* 已解散 */,
-                              icon: 'CloseCircleFilled',
+                              icon: (
+                                <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                              ),
                               id: 'NetworkDissolved',
                               type: 'error',
                             },
                             {
                               children:
                                 this.i18n('i18n-xtno2l9qqog') /* 异常 */,
-                              icon: 'CloseCircleFilled',
+                              icon: (
+                                <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                              ),
                               id: 'Error',
                               type: 'error',
                             },
                             {
                               children:
                                 this.i18n('i18n-1vangoko4yf') /* 正常 */,
-                              icon: 'CheckCircleFilled',
+                              icon: (
+                                <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                              ),
                               id: 'Created',
                               type: 'success',
                             },
                             {
                               children:
                                 this.i18n('i18n-1vangoko4yf') /* 正常 */,
-                              icon: 'CheckCircleFilled',
+                              icon: (
+                                <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                              ),
                               id: 'Deployed',
                               type: 'success',
                             },
@@ -1495,7 +1506,10 @@ class FederationDetail$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -1614,7 +1628,10 @@ class FederationDetail$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -1744,12 +1761,19 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetFederation',
-          params: {
-            name: self.match?.params?.id,
-          },
+          params: function applyThis() {
+            return {
+              name: this.match?.params?.id,
+            };
+          }.apply(self),
         },
       ]}
       render={(dataProps) => (

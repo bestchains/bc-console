@@ -10,11 +10,12 @@ import {
   Space,
   Input,
   Button,
-  Icon,
   DatePicker,
   Card,
   Table,
 } from '@tenx-ui/materials';
+
+import { AntdIconPlusOutlined } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -77,15 +78,15 @@ class DepositoryManagement$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
-      isOpenModal: false,
-      modalType: 'create',
-      filter: 'ALL',
-      searchValue: undefined,
-      searchKey: 'name',
-      size: 10,
       current: 1,
+      filter: 'ALL',
+      isOpenModal: false,
       list: [],
       loading: false,
+      modalType: 'create',
+      searchKey: 'name',
+      searchValue: undefined,
+      size: 10,
     };
   }
 
@@ -144,6 +145,43 @@ class DepositoryManagement$$Page extends React.Component {
 
   componentWillUnmount() {}
 
+  async downLoadFile(e, { record }) {
+    this.setState(
+      {
+        record,
+        downLoadloading: true,
+      },
+      () => {
+        this.utils.notification.success({
+          message: this.i18n('i18n-aa961tbp'),
+        });
+        this.dataSourceMap.downloadDepository
+          .load()
+          .then((res) => {
+            this.utils.downloadFile(
+              res,
+              record?.kid + '.pdf',
+              'application/octet-stream',
+              true
+            );
+            this.setState({
+              downLoadloading: false,
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setState({
+              downLoadloading: false,
+            });
+            this.utils.notification.warning({
+              message: this.i18n('i18n-62p13m1r'),
+              description: error?.message,
+            });
+          });
+      }
+    );
+  }
+
   formatTimeParams(v) {
     return v ? parseInt(new Date(v).getTime() / 1000) : undefined;
   }
@@ -186,28 +224,14 @@ class DepositoryManagement$$Page extends React.Component {
     });
   }
 
-  handleSearchValueChange(e, { searchKey }) {
-    this.setState({
-      [`temp-searchValue-` + searchKey]: e.target.value,
-    });
-  }
-
-  handleTimeValueChange(v) {
-    this.setState({
-      [`temp-searchValue-time`]: v,
-    });
-  }
-
-  handleSearch(v) {
-    const search = {
-      current: 1,
-    };
-    Object.keys(this.state).forEach((key) => {
-      if (key.includes('temp-searchValue')) {
-        search[key.slice(5)] = this.state[key];
-      }
-    });
-    this.setState(search, this.getDepositoryList);
+  handlePaginationChange(c, s) {
+    this.setState(
+      {
+        size: s,
+        current: c,
+      },
+      this.getDepositoryList
+    );
   }
 
   handleReset(v) {
@@ -223,14 +247,22 @@ class DepositoryManagement$$Page extends React.Component {
     this.setState(reset, this.getDepositoryList);
   }
 
-  handlePaginationChange(c, s) {
-    this.setState(
-      {
-        size: s,
-        current: c,
-      },
-      this.getDepositoryList
-    );
+  handleSearch(v) {
+    const search = {
+      current: 1,
+    };
+    Object.keys(this.state).forEach((key) => {
+      if (key.includes('temp-searchValue')) {
+        search[key.slice(5)] = this.state[key];
+      }
+    });
+    this.setState(search, this.getDepositoryList);
+  }
+
+  handleSearchValueChange(e, { searchKey }) {
+    this.setState({
+      [`temp-searchValue-` + searchKey]: e.target.value,
+    });
   }
 
   handleTableChange(pagination, filters, sorter, extra) {
@@ -244,59 +276,10 @@ class DepositoryManagement$$Page extends React.Component {
     );
   }
 
-  async downLoadFile(e, { record }) {
-    this.setState(
-      {
-        record,
-        downLoadloading: true,
-      },
-      () => {
-        this.utils.notification.success({
-          message: this.i18n('i18n-aa961tbp'),
-        });
-        this.dataSourceMap.downloadDepository
-          .load()
-          .then((res) => {
-            this.utils.downloadFile(
-              res,
-              record?.kid + '.pdf',
-              'application/octet-stream',
-              true
-            );
-            this.setState({
-              downLoadloading: false,
-            });
-          })
-          .catch((error) => {
-            console.log(error);
-            this.setState({
-              downLoadloading: false,
-            });
-            this.utils.notification.warning({
-              message: this.i18n('i18n-62p13m1r'),
-              description: error?.message,
-            });
-          });
-      }
-    );
-  }
-
-  getType(id, payload) {
-    if (payload?.id === 'Error') {
-      return {
-        children: this.i18n('i18n-xtno2l9qqog'),
-        icon: 'CloseCircleFilled',
-        tooltip: payload.tooltip,
-        id,
-        type: 'error',
-      };
-    }
-    return {
-      children: this.i18n('i18n-fifkprltibf'),
-      icon: 'CheckCircleFilled',
-      id,
-      type: 'success',
-    };
+  handleTimeValueChange(v) {
+    this.setState({
+      [`temp-searchValue-time`]: v,
+    });
   }
 
   paginationShowTotal(total, range) {
@@ -648,11 +631,9 @@ class DepositoryManagement$$Page extends React.Component {
                   ghost={false}
                   href="/depository/management/create"
                   icon={
-                    <Icon
-                      __component_name="Icon"
-                      size={12}
-                      style={{ marginRight: 3 }}
-                      type="PlusOutlined"
+                    <AntdIconPlusOutlined
+                      __component_name="AntdIconPlusOutlined"
+                      style={{ marginRight: '3px' }}
                     />
                   }
                   shape="default"
@@ -1000,7 +981,7 @@ class DepositoryManagement$$Page extends React.Component {
                             shape="default"
                             type="link"
                           >
-                            {this.i18n('i18n-m6n5fnxybu') /* - */}
+                            {this.i18n('i18n-m6n5fnxybu') /* 详情 */}
                           </Button>
                           <Button
                             __component_name="Button"
@@ -1042,7 +1023,7 @@ class DepositoryManagement$$Page extends React.Component {
                             target="_blank"
                             type="link"
                           >
-                            {this.i18n('i18n-53sb33cw') /* - */}
+                            {this.i18n('i18n-53sb33cw') /* 下载证书 */}
                           </Button>
                         </Space>
                       ))(
@@ -1127,6 +1108,11 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[]}
       render={(dataProps) => (
         <DepositoryManagement$$Page

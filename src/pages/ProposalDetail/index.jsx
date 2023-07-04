@@ -22,9 +22,15 @@ import {
   FormilyTextArea,
 } from '@tenx-ui/materials';
 
+import {
+  AntdIconClockCircleFilled,
+  AntdIconCheckCircleFilled,
+  AntdIconCloseCircleFilled,
+} from '@tenx-ui/icon-materials';
+
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -219,6 +225,8 @@ class ProposalDetail$$Page extends React.Component {
               <Descriptions
                 __component_name="Descriptions"
                 bordered={false}
+                borderedBottom={false}
+                borderedBottomDashed={false}
                 colon={false}
                 column={1}
                 items={[
@@ -314,42 +322,54 @@ class ProposalDetail$$Page extends React.Component {
                           {
                             children:
                               this.i18n('i18n-pmpcxrn4hxn') /* 等待中 */,
-                            icon: 'ClockCircleFilled',
+                            icon: (
+                              <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                            ),
                             id: 'Pending',
                             type: 'warning',
                           },
                           {
                             children:
                               this.i18n('i18n-cj4k368h6p9') /* 投票中 */,
-                            icon: 'CheckCircleFilled',
+                            icon: (
+                              <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                            ),
                             id: 'Voting',
                             type: 'success',
                           },
                           {
                             children:
                               this.i18n('i18n-6sh24mree') /* 提议成功 */,
-                            icon: 'CheckCircleFilled',
+                            icon: (
+                              <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                            ),
                             id: 'Succeeded',
                             type: 'success',
                           },
                           {
                             children:
                               this.i18n('i18n-i94pxfwl0cb') /* 提议失败 */,
-                            icon: 'CloseCircleFilled',
+                            icon: (
+                              <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                            ),
                             id: 'Failed',
                             type: 'error',
                           },
                           {
                             children:
                               this.i18n('i18n-6ojbq0y628y') /* 提议超时 */,
-                            icon: 'CloseCircleFilled',
+                            icon: (
+                              <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                            ),
                             id: 'Expired',
                             type: 'error',
                           },
                           {
                             children:
                               this.i18n('i18n-ibaeqidf0n') /* 提议异常 */,
-                            icon: 'CloseCircleFilled',
+                            icon: (
+                              <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                            ),
                             id: 'Error',
                             type: 'error',
                           },
@@ -361,8 +381,22 @@ class ProposalDetail$$Page extends React.Component {
                     span: 1,
                   },
                   {
-                    _unsafe_MixedSetter_children_select: 'SlotSetter',
-                    children: null,
+                    children: (
+                      <Typography.Text
+                        __component_name="Typography.Text"
+                        disabled={false}
+                        ellipsis={true}
+                        strong={false}
+                        style={{ fontSize: '' }}
+                      >
+                        {__$$eval(() =>
+                          JSON.stringify(
+                            this.props.useGetProposal?.data?.proposal
+                              ?.information || {}
+                          )
+                        )}
+                      </Typography.Text>
+                    ),
                     key: 'h44w5btrr16',
                     label: this.i18n('i18n-pair5ijzb3j') /* 内容 */,
                     span: 1,
@@ -479,39 +513,51 @@ class ProposalDetail$$Page extends React.Component {
                       types={[
                         {
                           children: this.i18n('i18n-pmpcxrn4hxn') /* 等待中 */,
-                          icon: 'ClockCircleFilled',
+                          icon: (
+                            <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                          ),
                           id: 'Pending',
                           type: 'warning',
                         },
                         {
                           children: this.i18n('i18n-cj4k368h6p9') /* 投票中 */,
-                          icon: 'CheckCircleFilled',
+                          icon: (
+                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                          ),
                           id: 'Voting',
                           type: 'success',
                         },
                         {
                           children: this.i18n('i18n-6sh24mree') /* 提议成功 */,
-                          icon: 'CheckCircleFilled',
+                          icon: (
+                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                          ),
                           id: 'Succeeded',
                           type: 'success',
                         },
                         {
                           children:
                             this.i18n('i18n-i94pxfwl0cb') /* 提议失败 */,
-                          icon: 'CloseCircleFilled',
+                          icon: (
+                            <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                          ),
                           id: 'Failed',
                           type: 'error',
                         },
                         {
                           children:
                             this.i18n('i18n-6ojbq0y628y') /* 提议超时 */,
-                          icon: 'CloseCircleFilled',
+                          icon: (
+                            <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                          ),
                           id: 'Expired',
                           type: 'error',
                         },
                         {
                           children: this.i18n('i18n-ibaeqidf0n') /* 提议异常 */,
-                          icon: 'CloseCircleFilled',
+                          icon: (
+                            <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                          ),
                           id: 'Error',
                           type: 'error',
                         },
@@ -879,7 +925,7 @@ class ProposalDetail$$Page extends React.Component {
                           shape="default"
                           type="link"
                         >
-                          {this.i18n('i18n-eirr55ndhxk') /* 更新 */}
+                          {this.i18n('i18n-eirr55ndhxk') /* 投票 */}
                         </Button>
                       ))(
                         __$$createChildContext(__$$context, {
@@ -1156,12 +1202,19 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetProposal',
-          params: {
-            name: self.match?.params?.id,
-          },
+          params: function applyThis() {
+            return {
+              name: this.match?.params?.id,
+            };
+          }.apply(self),
         },
       ]}
       render={(dataProps) => (

@@ -8,7 +8,6 @@ import {
   Typography,
   Button,
   Space,
-  Icon,
   Descriptions,
   Row,
   Col,
@@ -22,6 +21,11 @@ import {
   FormilyFormItem,
   Canvas,
 } from '@tenx-ui/materials';
+
+import {
+  AntdIconCloseCircleFilled,
+  AntdIconCheckCircleFilled,
+} from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -512,11 +516,9 @@ class DepositoryVerification$$Page extends React.Component {
           )}
           title={[
             <Space align="center" direction="horizontal">
-              <Icon
-                __component_name="Icon"
-                color="#eb5944"
-                size={12}
-                type="CloseCircleFilled"
+              <AntdIconCloseCircleFilled
+                __component_name="AntdIconCloseCircleFilled"
+                style={{ color: '#eb5944' }}
               />
               <Typography.Text
                 disabled={false}
@@ -630,11 +632,9 @@ class DepositoryVerification$$Page extends React.Component {
           )}
           title={[
             <Space align="center" direction="horizontal">
-              <Icon
-                __component_name="Icon"
-                color="#7ed321"
-                size={12}
-                type="CheckCircleFilled"
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#7ed321' }}
               />
               <Typography.Text
                 disabled={false}
@@ -890,7 +890,6 @@ class DepositoryVerification$$Page extends React.Component {
                     'x-validator': [
                       {
                         children: '未知',
-                        icon: 'tenx-ui-icon:Circle',
                         id: 'disabled',
                         message:
                           this.i18n('i18n-9owanicd') /* 请输入存证编号 */,
@@ -952,7 +951,6 @@ class DepositoryVerification$$Page extends React.Component {
                     'x-validator': [
                       {
                         children: '未知',
-                        icon: 'tenx-ui-icon:Circle',
                         id: 'disabled',
                         message:
                           this.i18n(
@@ -1126,7 +1124,6 @@ class DepositoryVerification$$Page extends React.Component {
                         'x-validator': [
                           {
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
                             id: 'disabled',
                             message:
                               this.i18n('i18n-4bk7zfzd') /* 请输入4位验证码 */,
@@ -1135,7 +1132,6 @@ class DepositoryVerification$$Page extends React.Component {
                           },
                           {
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
                             id: 'disabled',
                             type: 'disabled',
                             validator: function () {
@@ -1269,6 +1265,11 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[]}
       render={(dataProps) => (
         <DepositoryVerification$$Page

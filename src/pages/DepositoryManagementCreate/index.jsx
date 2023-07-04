@@ -329,7 +329,6 @@ class DepositoryManagementCreate$$Page extends React.Component {
                       'x-validator': [
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           message:
                             this.i18n('i18n-7ngnbed5') /* 请输入存证名称 */,
@@ -338,7 +337,6 @@ class DepositoryManagementCreate$$Page extends React.Component {
                         },
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           message:
                             this.i18n(
@@ -377,7 +375,6 @@ class DepositoryManagementCreate$$Page extends React.Component {
                       'x-validator': [
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           message: this.i18n('i18n-9nvgrvip') /* 请上传文件 */,
                           required: true,
@@ -385,7 +382,6 @@ class DepositoryManagementCreate$$Page extends React.Component {
                         },
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           message:
                             this.i18n(
@@ -541,7 +537,6 @@ class DepositoryManagementCreate$$Page extends React.Component {
                       'x-validator': [
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           message:
                             this.i18n(
@@ -639,6 +634,11 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[]}
       render={(dataProps) => (
         <DepositoryManagementCreate$$Page

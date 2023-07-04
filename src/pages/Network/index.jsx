@@ -9,7 +9,6 @@ import {
   Typography,
   Space,
   Button,
-  Icon,
   Input,
   List,
   Card,
@@ -19,6 +18,14 @@ import {
   Alert,
   UnifiedLink,
 } from '@tenx-ui/materials';
+
+import {
+  AntdIconPlusOutlined,
+  AntdIconReloadOutlined,
+  AntdIconCheckCircleFilled,
+  AntdIconCloseCircleFilled,
+  AntdIconClockCircleFilled,
+} from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -63,15 +70,15 @@ class Network$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      current: 1,
+      filter: 'ALL',
       isOpenModal: false,
       modalType: 'create',
-      filter: 'ALL',
-      searchValue: undefined,
-      searchKey: 'name',
-      size: 10,
-      current: 1,
       organizations: [],
       record: {},
+      searchKey: 'name',
+      searchValue: undefined,
+      size: 10,
     };
   }
 
@@ -85,47 +92,28 @@ class Network$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  onMenuClick(e, payload) {
-    const { key } = payload;
-    this.setState({
-      record: payload?.record,
-    });
-    if (key === 'dissolve') {
-      this.openDissolveModal();
-    }
-    if (key === 'delete') {
-      this.openDeleteModal();
-    }
-    if (key === 'detail') {
-      this.history?.push(`/network/detail/${payload?.record?.name}`);
-    }
-  }
-
-  openDissolveModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'dissolve',
-    });
-  }
-
-  openDissolveSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'dissolvesuccess',
-    });
-  }
-
-  openDeleteModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'delete',
-    });
-  }
-
   closeModal() {
     this.setState({
       isOpenModal: false,
     });
+  }
+
+  async confirmDeleteModal(e, payload) {
+    try {
+      await this.props.appHelper.utils.bff.deleteNetwork({
+        name: this.state.record?.name,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-wm7zxvqr'),
+      });
+      this.props.useGetNetworks.mutate();
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-8kpvya3f'),
+        errors: error?.response?.errors,
+      });
+    }
   }
 
   async confirmDissolveModal(e, payload) {
@@ -147,34 +135,9 @@ class Network$$Page extends React.Component {
     }
   }
 
-  async confirmDeleteModal(e, payload) {
-    try {
-      await this.props.appHelper.utils.bff.deleteNetwork({
-        name: this.state.record?.name,
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-wm7zxvqr'),
-      });
-      this.props.useGetNetworks.mutate();
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-8kpvya3f'),
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
   handleFilterChange(e) {
     this.setState({
       filter: e.target.value,
-      current: 1,
-    });
-  }
-
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
       current: 1,
     });
   }
@@ -186,6 +149,17 @@ class Network$$Page extends React.Component {
     });
   }
 
+  handleRefresh(event) {
+    this.props.useGetNetworks?.mutate();
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+      current: 1,
+    });
+  }
+
   handleTableChange(pagination, filters, sorter, extra) {
     this.setState({
       pagination,
@@ -194,8 +168,41 @@ class Network$$Page extends React.Component {
     });
   }
 
-  handleRefresh(event) {
-    this.props.utils.bff.useGetNetworks?.mute();
+  onMenuClick(e, payload) {
+    const { key } = payload;
+    this.setState({
+      record: payload?.record,
+    });
+    if (key === 'dissolve') {
+      this.openDissolveModal();
+    }
+    if (key === 'delete') {
+      this.openDeleteModal();
+    }
+    if (key === 'detail') {
+      this.history?.push(`/network/detail/${payload?.record?.name}`);
+    }
+  }
+
+  openDeleteModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+    });
+  }
+
+  openDissolveModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'dissolve',
+    });
+  }
+
+  openDissolveSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'dissolvesuccess',
+    });
   }
 
   componentDidMount() {}
@@ -248,11 +255,9 @@ class Network$$Page extends React.Component {
                     ghost={false}
                     href="/network/create"
                     icon={
-                      <Icon
-                        __component_name="Icon"
-                        size={12}
-                        style={{ marginRight: 3 }}
-                        type="PlusOutlined"
+                      <AntdIconPlusOutlined
+                        __component_name="AntdIconPlusOutlined"
+                        style={{ marginRight: '3px' }}
                       />
                     }
                     shape="default"
@@ -356,11 +361,9 @@ class Network$$Page extends React.Component {
                     disabled={false}
                     ghost={false}
                     icon={
-                      <Icon
-                        __component_name="Icon"
-                        size={12}
-                        style={{ marginRight: 3 }}
-                        type="ReloadOutlined"
+                      <AntdIconReloadOutlined
+                        __component_name="AntdIconReloadOutlined"
+                        style={{ marginRight: '3px' }}
                       />
                     }
                     onClick={function () {
@@ -922,36 +925,46 @@ class Network$$Page extends React.Component {
                                 types={[
                                   {
                                     children:
-                                      this.i18n('i18n-zrowlr7zwx') /* 运行中 */,
-                                    icon: 'CheckCircleFilled',
+                                      this.i18n('i18n-zrowlr7zwx') /* 正常 */,
+                                    icon: (
+                                      <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                    ),
                                     id: 'NetworkCreated',
                                     type: 'success',
                                   },
                                   {
                                     children:
                                       this.i18n('i18n-j3czm9su41') /* 已解散 */,
-                                    icon: 'CloseCircleFilled',
+                                    icon: (
+                                      <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                    ),
                                     id: 'NetworkDissolved',
                                     type: 'error',
                                   },
                                   {
                                     children:
                                       this.i18n('i18n-xtno2l9qqog') /* 异常 */,
-                                    icon: 'CloseCircleFilled',
+                                    icon: (
+                                      <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                    ),
                                     id: 'Error',
                                     type: 'error',
                                   },
                                   {
                                     children:
                                       this.i18n('i18n-7xnyzmr7') /* 创建中 */,
-                                    icon: 'ClockCircleFilled',
+                                    icon: (
+                                      <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                                    ),
                                     id: 'Created',
                                     type: 'warning',
                                   },
                                   {
                                     children:
                                       this.i18n('i18n-1vangoko4yf') /* 正常 */,
-                                    icon: 'CheckCircleFilled',
+                                    icon: (
+                                      <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                    ),
                                     id: 'Deployed',
                                     type: 'success',
                                   },
@@ -1260,7 +1273,10 @@ class Network$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -1318,6 +1334,11 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetNetworks',

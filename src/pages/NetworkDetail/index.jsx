@@ -10,7 +10,6 @@ import {
   FormilySelect,
   FormilyUpload,
   Button,
-  Icon,
   FormilyTextArea,
   FormilyFormItem,
   FormilyArrayCards,
@@ -32,6 +31,15 @@ import {
   Dropdown,
   Steps,
 } from '@tenx-ui/materials';
+
+import {
+  AntdIconPlusOutlined,
+  AntdIconCheckCircleFilled,
+  AntdIconEyeInvisibleOutlined,
+  AntdIconCloseCircleFilled,
+  AntdIconClockCircleFilled,
+  AntdIconDownOutlined,
+} from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -76,6 +84,28 @@ class NetworkDetail$$Page extends React.Component {
     __$$i18n._inject2(this);
 
     this.state = {
+      activeKey: 'network',
+      allPeers: [],
+      channel: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+        step: 0,
+      },
+      channelPeers: [],
+      contract: {
+        filter: 'ALL',
+        searchValue: undefined,
+        searchKey: 'name',
+        size: 10,
+        current: 1,
+        record: {},
+        createLoading: false,
+      },
+      contractUpgradeLoading: false,
       isOpenModal: false,
       modalType: 'addchannel',
       organization: {
@@ -86,24 +116,8 @@ class NetworkDetail$$Page extends React.Component {
         current: 1,
         record: {},
       },
-      channel: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-        step: 0,
-      },
-      contract: {
-        filter: 'ALL',
-        searchValue: undefined,
-        searchKey: 'name',
-        size: 10,
-        current: 1,
-        record: {},
-        createLoading: false,
-      },
+      organizations: [],
+      peers: [],
       strategy: {
         filter: 'ALL',
         searchValue: undefined,
@@ -114,12 +128,6 @@ class NetworkDetail$$Page extends React.Component {
         list: [],
         channels: [],
       },
-      organizations: [],
-      peers: [],
-      channelPeers: [],
-      allPeers: [],
-      contractUpgradeLoading: false,
-      activeKey: 'network',
     };
   }
 
@@ -133,162 +141,8 @@ class NetworkDetail$$Page extends React.Component {
 
   componentWillUnmount() {}
 
-  async getChannelsForCreateEpolicy(callback) {
-    const res =
-      await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
-        network: this.match?.params?.id,
-      });
-    this.setState(
-      {
-        strategy: {
-          ...this.state.strategy,
-          channels:
-            res?.channelsForCreateEpolicy?.map((item) => ({
-              value: JSON.stringify(item),
-              label: item.displayName || '-',
-            })) || [],
-        },
-      },
-      callback
-    );
-    const form = this.$('formily_create_strategy')?.formRef?.current?.form;
-    form.setFieldState('channel', {
-      dataSource:
-        res?.channelsForCreateEpolicy?.map((item) => ({
-          value: JSON.stringify(item),
-          label: item.displayName || '-',
-        })) || [],
-    });
-  }
-
-  async getEpolicies() {
-    const res = await this.props.appHelper.utils.bff.getEpolicies({
-      network: this.match?.params?.id,
-    });
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        list: res?.epolicies || [],
-      },
-    });
-  }
-
-  async getPeers(v, callback, usedPeers) {
-    const { initiator, organizations } = v;
-    const res =
-      await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
-        members: [initiator, ...(organizations || [])]?.filter((item) => item),
-      });
-    const allPeers = [];
-    res?.ibppeersForCreateChannel?.forEach((item) => {
-      item.ibppeers?.forEach((peer) => {
-        allPeers.push({
-          name: peer.name,
-          namespace: item.name,
-          key: item.name + peer.name,
-        });
-      });
-    });
-    const peers =
-      res?.ibppeersForCreateChannel
-        ?.map((item) => ({
-          key: item.name,
-          title: item.name,
-          children: item.ibppeers
-            ?.filter((item) => item.status === 'Deployed')
-            ?.map((peer) => ({
-              key: item.name + peer.name,
-              title: peer.name,
-            }))
-            ?.filter((peer) => {
-              return usedPeers?.length
-                ? usedPeers.every(
-                    (used) =>
-                      !(
-                        used.name === peer.title && used.namespace === item.name
-                      )
-                  )
-                : true;
-            }),
-        }))
-        ?.filter((item) => item?.children?.length > 0) || [];
-    this.setState(
-      {
-        peers,
-        allPeers,
-      },
-      callback
-    );
-  }
-
-  formatContract(e, payload) {
-    const list = (this.props.useGetChaincodebuilds?.data?.chaincodebuilds || [])
-      ?.filter((item) => {
-        return this.state.contract.searchValue
-          ? item.displayName?.includes(this.state.contract.searchValue)
-          : true;
-      })
-      ?.sort((a, b) => {
-        if (this.state.sorter?.order !== 'ascend') {
-          return (
-            new Date(b.creationTimestamp).getTime() -
-            new Date(a.creationTimestamp).getTime()
-          );
-        }
-        return (
-          new Date(a.creationTimestamp).getTime() -
-          new Date(b.creationTimestamp).getTime()
-        );
-      });
-    const result = {};
-    const initVersions = {};
-    list.forEach((item) => {
-      if (!result[item.displayName]) {
-        result[item.displayName] = {};
-      }
-      if (!result[item.displayName][item.name]) {
-        result[item.displayName][item.name] = item;
-      }
-    });
-    const formatList = Object.keys(result)?.map((displayName) => {
-      const versions = Object.values(result[displayName])?.sort((a, b) =>
-        b.version.localeCompare(a.version)
-      );
-      initVersions[displayName] = versions?.[0]?.name;
-      const record =
-        versions?.find(
-          (item) => item.name === this.state.initVersions?.[displayName]
-        ) || versions?.[0];
-      return {
-        displayName,
-        ...record,
-        versions: versions?.map((item) => ({
-          ...item,
-          label: item.version,
-          key: item.name,
-        })),
-      };
-    });
-    if (
-      !this.state.initVersions ||
-      Object.keys(this.state.initVersions || {})?.length !==
-        Object.keys(result || {})?.length ||
-      payload?.initVersions
-    ) {
-      this.setState({
-        initVersions,
-      });
-    }
-    return formatList;
-  }
-
-  getContractVersion(record) {
-    const name = this.state.initVersions?.[record?.displayName];
-    return record?.versions?.find((item) => item.name === name)?.version;
-  }
-
-  getContractVersions(record) {
-    return record?.versions || [];
+  beforeUpload() {
+    return false;
   }
 
   changeContractVersion(e, payload) {
@@ -298,186 +152,6 @@ class NetworkDetail$$Page extends React.Component {
         [payload?.record?.displayName]: e.key,
       },
     });
-  }
-
-  closeModal() {
-    this.setState({
-      isOpenModal: false,
-      channelPeers: [],
-    });
-  }
-
-  handleFilterChange(e) {
-    this.setState({
-      filter: e.target.value,
-    });
-  }
-
-  handleSearchValueChange(e) {
-    this.setState({
-      searchValue: e.target.value,
-    });
-  }
-
-  handlePaginationChange(c, s) {
-    this.setState({
-      size: s,
-      current: c,
-    });
-  }
-
-  handleTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      pagination,
-      filters,
-      sorter,
-    });
-  }
-
-  paginationShowTotal(total, range) {
-    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
-      'i18n-v7xu122b9o'
-    )}`;
-  }
-
-  handleOrganizationPaginationChange(c, s) {
-    this.setState({
-      organization: {
-        ...this.state.organization,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleOrganizationTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      organization: {
-        ...this.state.organization,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  async validatorChannelName(value) {
-    try {
-      const res = await this.props?.appHelper?.utils?.bff?.getChannel({
-        name: value,
-      });
-      return this.i18n('i18n-0imredkn');
-    } catch (error) {}
-  }
-
-  handleChannelSearchValueChange(e) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleChannelPaginationChange(c, s) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleChannelTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  openAddChannelModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannel',
-    });
-  }
-
-  openAddChannelSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannelsuccess',
-    });
-  }
-
-  openAddChannelOrganizationModal(e, payload) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'addchannelorganization',
-    });
-  }
-
-  openAddChannelOrganizationSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addchannelorganizationsuccess',
-    });
-  }
-
-  openAddChannelPeerModal(e, payload) {
-    this.setState({
-      channel: {
-        ...this.state.channel,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'addchannelpeer',
-      peers: [],
-    });
-    this.getPeers(
-      {
-        organizations: payload?.record?.members?.map((item) => item.name) || [],
-      },
-      () => {},
-      payload.record.peers || []
-    );
-  }
-
-  channelAddModalNext() {
-    const form = this.$('formily_create_channel')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      this.setState({
-        channel: {
-          ...this.state.channel,
-          addData: v,
-          step: 1,
-        },
-      });
-      this.getPeers(v, () => {});
-    });
-  }
-
-  channelAddModalPre() {
-    this.setState(
-      {
-        channel: {
-          ...this.state.channel,
-          step: 0,
-        },
-      },
-      () => {
-        const form = this.$('formily_create_channel')?.formRef?.current?.form;
-        form.setValues(this.state.channel.addData);
-      }
-    );
   }
 
   async channelAddModalConfirm(e, payload) {
@@ -513,6 +187,35 @@ class NetworkDetail$$Page extends React.Component {
         errors: error?.response?.errors,
       });
     }
+  }
+
+  channelAddModalNext() {
+    const form = this.$('formily_create_channel')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      this.setState({
+        channel: {
+          ...this.state.channel,
+          addData: v,
+          step: 1,
+        },
+      });
+      this.getPeers(v, () => {});
+    });
+  }
+
+  channelAddModalPre() {
+    this.setState(
+      {
+        channel: {
+          ...this.state.channel,
+          step: 0,
+        },
+      },
+      () => {
+        const form = this.$('formily_create_channel')?.formRef?.current?.form;
+        form.setValues(this.state.channel.addData);
+      }
+    );
   }
 
   channelAddOrganizationModalConfirm(e, payload) {
@@ -579,157 +282,10 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  openDeleteChannelModal(e, payload) {
+  closeModal() {
     this.setState({
-      isOpenModal: true,
-      modalType: 'delete',
-      channel: {
-        ...this.state.channel,
-        record: payload?.record,
-      },
-    });
-  }
-
-  async confirmDeleteChannelModal(e, payload) {
-    // const federation = this.props.useGetFederation?.data?.federation || {}
-    // try {
-    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
-    //     name: federation?.name,
-    //     organization: this.state.channelRecord?.name,
-    //     initiator: federation?.initiator?.name
-    //   })
-    //   this.closeModal()
-    //   this.utils.notification.success({
-    //     message: this.i18n('i18n-yy3f9rxigm'),
-    //   })
-    //   this.props.useGetFederation.mutate()
-    // } catch (error) {
-    //   this.utils.notification.warnings({
-    //     message: this.i18n('i18n-p5gea1q7fem'),
-    //     errors: error?.response?.errors
-    //   })
-    // }
-  }
-
-  async validatorContractRepeat(value) {
-    const form = this.$('formily_create_contract')?.formRef?.current?.form;
-    const displayName =
-      this.state.modalType === 'addcontract'
-        ? form.getValuesIn('displayName')
-        : this.state.contract?.record?.displayName;
-    try {
-      const res = await this.props?.appHelper?.utils?.bff?.getChaincodebuilds({
-        network: this.match?.params?.id,
-        version: value,
-        displayName,
-      });
-      if (res?.chaincodebuilds?.length > 0) {
-        return this.i18n('i18n-wc70jk7n');
-      }
-    } catch (error) {}
-  }
-
-  handleContractSearchValueChange(e) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleContractPaginationChange(c, s) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleContractTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  openAddContractModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'addcontract',
-    });
-  }
-
-  openDeploymentContractModal(e, payload) {
-    this.setState(
-      {
-        contract: {
-          ...this.state.contract,
-          record: payload.record,
-        },
-        isOpenModal: true,
-        modalType: 'deploymentcontract',
-      },
-      () => {
-        setTimeout(() => {
-          const form = this.$('formily_contract_deploy')?.formRef?.current
-            ?.form;
-          form.setValues({
-            displayName: payload.record?.displayName,
-            // edit
-            version: payload.record?.version,
-            name: payload.record?.name,
-          });
-        }, 0);
-      }
-    );
-  }
-
-  openDeploymentContractSuccessModal() {
-    this.setState({
-      isOpenModal: true,
-      modalType: 'deploymentcontractsuccess',
-    });
-  }
-
-  openUpgradeContractModal(e, payload) {
-    this.setState(
-      {
-        contract: {
-          ...this.state.contract,
-          record: payload.record,
-        },
-        isOpenModal: true,
-        modalType: 'upgradecontract',
-      },
-      () => {
-        setTimeout(() => {
-          const form = this.$('formily_contract_upgrade')?.formRef?.current
-            ?.form;
-          form.setValues({
-            displayName: payload.record?.displayName,
-            // edit
-            version: payload.record?.version,
-          });
-        }, 0);
-      }
-    );
-  }
-
-  openDeleteContractModal(e, payload) {
-    this.setState({
-      contract: {
-        ...this.state.contract,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'deletecontract',
+      isOpenModal: false,
+      channelPeers: [],
     });
   }
 
@@ -787,201 +343,6 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  confirmUpgradeContractModal(e, payload) {
-    const form = this.$('formily_contract_upgrade')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      this.setState({
-        contractUpgradeLoading: true,
-      });
-      const { versoin, format, files, ...params } = v;
-      try {
-        const query = {
-          ...params,
-          network: this.match?.params?.id,
-        };
-        if (format === 'zip') {
-          query.file = v.files?.fileList?.[0]?.originFileObj;
-        } else {
-          query.files = v.files?.fileList?.map((item) => item.originFileObj);
-          query.fileRelativePaths = v.files?.fileList?.map((item) => {
-            const file = item.originFileObj;
-            return file.webkitRelativePath;
-          });
-        }
-        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild(
-          query
-        );
-        this.closeModal();
-        this.utils.notification.success({
-          message: this.i18n('i18n-a4rcftyd'),
-        });
-        // this.openAddChannelSuccessModal()
-        this.props.useGetChaincodebuilds.mutate();
-        this.setState({
-          contractUpgradeLoading: false,
-        });
-      } catch (error) {
-        this.setState({
-          contractUpgradeLoading: false,
-        });
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-7fxj402s'),
-          errors: error?.response?.errors,
-        });
-      }
-    });
-  }
-
-  confirmDeploymentContractModal(e, payload) {
-    const form = this.$('formily_contract_deploy')?.formRef?.current?.form;
-    form.submit(async (v) => {
-      const chaincode = {
-        channel: JSON.parse(v.channel || '{}')?.name,
-        epolicy: v.epolicy,
-        name: v.name,
-        displayName: v.displayName,
-        // edit
-        // ibppeer: v.ibppeer
-      };
-
-      try {
-        const res = await this.props.appHelper.utils.bff.deployChaincode({
-          chaincode,
-        });
-        // this.closeModal()
-        // this.utils.notification.success({
-        //   message: this.i18n('i18n-l8fybssesij'),
-        // })
-        this.openDeploymentContractSuccessModal();
-        this.props.useGetChaincodebuilds.mutate();
-      } catch (error) {
-        this.utils.notification.warnings({
-          message: this.i18n('i18n-ekujezos'),
-          errors: error?.response?.errors,
-        });
-      }
-    });
-  }
-
-  async confirmDeleteContractModal(e, payload) {
-    try {
-      await this.props.appHelper.utils.bff.deleteChaincodebuild({
-        name: this.state.contract?.record?.name,
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-5m5bdexs'),
-      });
-      await this.props.useGetChaincodebuilds.mutate();
-      setTimeout(() => {
-        this.formatContract(_, {
-          initVersions: true,
-        });
-      });
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-esbyfrwe'),
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
-  openDeleteStrategyModal(e, payload) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'deletestrategy',
-    });
-  }
-
-  openStrategyDetailModal(e, payload) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        record: payload.record,
-      },
-      isOpenModal: true,
-      modalType: 'strategydetail',
-    });
-  }
-
-  async confirmDeleteStrategyModal(e, payload) {
-    try {
-      await this.props.appHelper.utils.bff.deleteEpolicy({
-        name: this.state.strategy?.record?.name,
-      });
-      this.closeModal();
-      this.utils.notification.success({
-        message: this.i18n('i18n-u1byeit6'),
-      });
-      this.getEpolicies();
-    } catch (error) {
-      this.utils.notification.warnings({
-        message: this.i18n('i18n-ctwrr17g'),
-        errors: error?.response?.errors,
-      });
-    }
-  }
-
-  handleStrategySearchValueChange(e) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        searchValue: e.target.value,
-      },
-    });
-  }
-
-  handleStrategyPaginationChange(c, s) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        size: s,
-        current: c,
-      },
-    });
-  }
-
-  handleStrategyTableChange(pagination, filters, sorter, extra) {
-    this.setState({
-      strategy: {
-        ...this.state.strategy,
-        pagination,
-        filters,
-        sorter,
-      },
-    });
-  }
-
-  openAddStrategyModal() {
-    this.setState(
-      {
-        isOpenModal: true,
-        modalType: 'addstrategy',
-      },
-      () => {
-        setTimeout(() => {
-          const form = this.$('formily_create_strategy')?.formRef?.current
-            ?.form;
-          form &&
-            form.setValues({
-              content: {
-                value: [
-                  {
-                    item: [],
-                  },
-                ],
-              },
-            });
-        }, 200);
-      }
-    );
-    this.getChannelsForCreateEpolicy(() => {});
-  }
-
   confirmAddStrategyModal(e, payload) {
     const network = this.props.useGetNetwork?.data?.network || {};
     const form = this.$('formily_create_strategy')?.formRef?.current?.form;
@@ -1030,26 +391,438 @@ class NetworkDetail$$Page extends React.Component {
     });
   }
 
-  beforeUpload() {
-    return false;
+  async confirmDeleteChannelModal(e, payload) {
+    // const federation = this.props.useGetFederation?.data?.federation || {}
+    // try {
+    //   await this.props.appHelper.utils.bff.removeOrganizationToFederation({
+    //     name: federation?.name,
+    //     organization: this.state.channelRecord?.name,
+    //     initiator: federation?.initiator?.name
+    //   })
+    //   this.closeModal()
+    //   this.utils.notification.success({
+    //     message: this.i18n('i18n-yy3f9rxigm'),
+    //   })
+    //   this.props.useGetFederation.mutate()
+    // } catch (error) {
+    //   this.utils.notification.warnings({
+    //     message: this.i18n('i18n-p5gea1q7fem'),
+    //     errors: error?.response?.errors
+    //   })
+    // }
   }
 
-  onTabsChange(activeKey) {
-    this.history?.replace(
-      this.props.appHelper?.location?.pathname + '?tab=' + activeKey
-    );
-    this.setState({
-      activeKey,
+  async confirmDeleteContractModal(e, payload) {
+    try {
+      await this.props.appHelper.utils.bff.deleteChaincodebuild({
+        name: this.state.contract?.record?.name,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-5m5bdexs'),
+      });
+      await this.props.useGetChaincodebuilds.mutate();
+      setTimeout(() => {
+        this.formatContract(_, {
+          initVersions: true,
+        });
+      });
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-esbyfrwe'),
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  async confirmDeleteStrategyModal(e, payload) {
+    try {
+      await this.props.appHelper.utils.bff.deleteEpolicy({
+        name: this.state.strategy?.record?.name,
+      });
+      this.closeModal();
+      this.utils.notification.success({
+        message: this.i18n('i18n-u1byeit6'),
+      });
+      this.getEpolicies();
+    } catch (error) {
+      this.utils.notification.warnings({
+        message: this.i18n('i18n-ctwrr17g'),
+        errors: error?.response?.errors,
+      });
+    }
+  }
+
+  confirmDeploymentContractModal(e, payload) {
+    const form = this.$('formily_contract_deploy')?.formRef?.current?.form;
+    form.submit(async (v) => {
+      const chaincode = {
+        channel: JSON.parse(v.channel || '{}')?.name,
+        epolicy: v.epolicy,
+        name: v.name,
+        displayName: v.displayName,
+        // edit
+        // ibppeer: v.ibppeer
+      };
+
+      try {
+        const res = await this.props.appHelper.utils.bff.deployChaincode({
+          chaincode,
+        });
+        // this.closeModal()
+        // this.utils.notification.success({
+        //   message: this.i18n('i18n-l8fybssesij'),
+        // })
+        this.openDeploymentContractSuccessModal();
+        this.props.useGetChaincodebuilds.mutate();
+      } catch (error) {
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-ekujezos'),
+          errors: error?.response?.errors,
+        });
+      }
     });
   }
 
-  openNewPage(e, payload) {
-    this.history?.replace(payload?.url);
-    if (payload?.activeKey) {
+  confirmUpgradeContractModal(e, payload) {
+    const form = this.$('formily_contract_upgrade')?.formRef?.current?.form;
+    form.submit(async (v) => {
       this.setState({
-        activeKey: payload?.activeKey,
+        contractUpgradeLoading: true,
+      });
+      const { versoin, format, files, ...params } = v;
+      try {
+        const query = {
+          ...params,
+          network: this.match?.params?.id,
+        };
+        if (format === 'zip') {
+          query.file = v.files?.fileList?.[0]?.originFileObj;
+        } else {
+          query.files = v.files?.fileList?.map((item) => item.originFileObj);
+          query.fileRelativePaths = v.files?.fileList?.map((item) => {
+            const file = item.originFileObj;
+            return file.webkitRelativePath;
+          });
+        }
+        const res = await this.props.appHelper.utils.bff.upgradeChaincodebuild(
+          query
+        );
+        this.closeModal();
+        this.utils.notification.success({
+          message: this.i18n('i18n-a4rcftyd'),
+        });
+        // this.openAddChannelSuccessModal()
+        this.props.useGetChaincodebuilds.mutate();
+        this.setState({
+          contractUpgradeLoading: false,
+        });
+      } catch (error) {
+        this.setState({
+          contractUpgradeLoading: false,
+        });
+        this.utils.notification.warnings({
+          message: this.i18n('i18n-7fxj402s'),
+          errors: error?.response?.errors,
+        });
+      }
+    });
+  }
+
+  formatContract(e, payload) {
+    const list = (this.props.useGetChaincodebuilds?.data?.chaincodebuilds || [])
+      ?.filter((item) => {
+        return this.state.contract.searchValue
+          ? item.displayName?.includes(this.state.contract.searchValue)
+          : true;
+      })
+      ?.sort((a, b) => {
+        if (this.state.sorter?.order !== 'ascend') {
+          return (
+            new Date(b.creationTimestamp).getTime() -
+            new Date(a.creationTimestamp).getTime()
+          );
+        }
+        return (
+          new Date(a.creationTimestamp).getTime() -
+          new Date(b.creationTimestamp).getTime()
+        );
+      });
+    const result = {};
+    const initVersions = {};
+    list.forEach((item) => {
+      if (!result[item.displayName]) {
+        result[item.displayName] = {};
+      }
+      if (!result[item.displayName][item.name]) {
+        result[item.displayName][item.name] = item;
+      }
+    });
+    const formatList = Object.keys(result)?.map((displayName) => {
+      const versions = Object.values(result[displayName])?.sort((a, b) =>
+        b.version.localeCompare(a.version)
+      );
+      initVersions[displayName] = versions?.[0]?.name;
+      const record =
+        versions?.find(
+          (item) => item.name === this.state.initVersions?.[displayName]
+        ) || versions?.[0];
+      return {
+        displayName,
+        ...record,
+        versions: versions?.map((item) => ({
+          ...item,
+          label: item.version,
+          key: item.name,
+        })),
+      };
+    });
+    if (
+      !this.state.initVersions ||
+      Object.keys(this.state.initVersions || {})?.length !==
+        Object.keys(result || {})?.length ||
+      payload?.initVersions
+    ) {
+      this.setState({
+        initVersions,
       });
     }
+    return formatList;
+  }
+
+  async getChannelsForCreateEpolicy(callback) {
+    const res =
+      await this.props.appHelper.utils.bff.getChannelsForCreateEpolicy({
+        network: this.match?.params?.id,
+      });
+    this.setState(
+      {
+        strategy: {
+          ...this.state.strategy,
+          channels:
+            res?.channelsForCreateEpolicy?.map((item) => ({
+              value: JSON.stringify(item),
+              label: item.displayName || '-',
+            })) || [],
+        },
+      },
+      callback
+    );
+    const form = this.$('formily_create_strategy')?.formRef?.current?.form;
+    form.setFieldState('channel', {
+      dataSource:
+        res?.channelsForCreateEpolicy?.map((item) => ({
+          value: JSON.stringify(item),
+          label: item.displayName || '-',
+        })) || [],
+    });
+  }
+
+  getContractVersion(record) {
+    const name = this.state.initVersions?.[record?.displayName];
+    return record?.versions?.find((item) => item.name === name)?.version;
+  }
+
+  getContractVersions(record) {
+    return record?.versions || [];
+  }
+
+  async getEpolicies() {
+    const res = await this.props.appHelper.utils.bff.getEpolicies({
+      network: this.match?.params?.id,
+    });
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        list: res?.epolicies || [],
+      },
+    });
+  }
+
+  async getPeers(v, callback, usedPeers) {
+    const { initiator, organizations } = v;
+    const res =
+      await this.props.appHelper.utils.bff.getIbppeersForCreateChannel({
+        members: [initiator, ...(organizations || [])]?.filter((item) => item),
+      });
+    const allPeers = [];
+    res?.ibppeersForCreateChannel?.forEach((item) => {
+      item.ibppeers?.forEach((peer) => {
+        allPeers.push({
+          name: peer.name,
+          namespace: item.name,
+          key: item.name + peer.name,
+        });
+      });
+    });
+    const peers =
+      res?.ibppeersForCreateChannel
+        ?.map((item) => ({
+          key: item.name,
+          title: item.name,
+          children: item.ibppeers
+            ?.filter((item) => item.status === 'Deployed')
+            ?.map((peer) => ({
+              key: item.name + peer.name,
+              title: peer.name,
+            }))
+            ?.filter((peer) => {
+              return usedPeers?.length
+                ? usedPeers.every(
+                    (used) =>
+                      !(
+                        used.name === peer.title && used.namespace === item.name
+                      )
+                  )
+                : true;
+            }),
+        }))
+        ?.filter((item) => item?.children?.length > 0) || [];
+    this.setState(
+      {
+        peers,
+        allPeers,
+      },
+      callback
+    );
+  }
+
+  handleChannelPaginationChange(c, s) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleChannelSearchValueChange(e) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleChannelTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handleContractPaginationChange(c, s) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleContractSearchValueChange(e) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleContractTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handleFilterChange(e) {
+    this.setState({
+      filter: e.target.value,
+    });
+  }
+
+  handleOrganizationPaginationChange(c, s) {
+    this.setState({
+      organization: {
+        ...this.state.organization,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleOrganizationTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      organization: {
+        ...this.state.organization,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handlePaginationChange(c, s) {
+    this.setState({
+      size: s,
+      current: c,
+    });
+  }
+
+  handleSearchValueChange(e) {
+    this.setState({
+      searchValue: e.target.value,
+    });
+  }
+
+  handleStrategyPaginationChange(c, s) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        size: s,
+        current: c,
+      },
+    });
+  }
+
+  handleStrategySearchValueChange(e) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        searchValue: e.target.value,
+      },
+    });
+  }
+
+  handleStrategyTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        pagination,
+        filters,
+        sorter,
+      },
+    });
+  }
+
+  handleTableChange(pagination, filters, sorter, extra) {
+    this.setState({
+      pagination,
+      filters,
+      sorter,
+    });
   }
 
   onFilesChange(files, payload) {
@@ -1088,6 +861,241 @@ class NetworkDetail$$Page extends React.Component {
         },
       });
     });
+  }
+
+  onTabsChange(activeKey) {
+    this.history?.replace(
+      this.props.appHelper?.location?.pathname + '?tab=' + activeKey
+    );
+    this.setState({
+      activeKey,
+    });
+  }
+
+  openAddChannelModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannel',
+    });
+  }
+
+  openAddChannelOrganizationModal(e, payload) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'addchannelorganization',
+    });
+  }
+
+  openAddChannelOrganizationSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelorganizationsuccess',
+    });
+  }
+
+  openAddChannelPeerModal(e, payload) {
+    this.setState({
+      channel: {
+        ...this.state.channel,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'addchannelpeer',
+      peers: [],
+    });
+    this.getPeers(
+      {
+        organizations: payload?.record?.members?.map((item) => item.name) || [],
+      },
+      () => {},
+      payload.record.peers || []
+    );
+  }
+
+  openAddChannelSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addchannelsuccess',
+    });
+  }
+
+  openAddContractModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'addcontract',
+    });
+  }
+
+  openAddStrategyModal() {
+    this.setState(
+      {
+        isOpenModal: true,
+        modalType: 'addstrategy',
+      },
+      () => {
+        setTimeout(() => {
+          const form = this.$('formily_create_strategy')?.formRef?.current
+            ?.form;
+          form &&
+            form.setValues({
+              content: {
+                value: [
+                  {
+                    item: [],
+                  },
+                ],
+              },
+            });
+        }, 200);
+      }
+    );
+    this.getChannelsForCreateEpolicy(() => {});
+  }
+
+  openDeleteChannelModal(e, payload) {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'delete',
+      channel: {
+        ...this.state.channel,
+        record: payload?.record,
+      },
+    });
+  }
+
+  openDeleteContractModal(e, payload) {
+    this.setState({
+      contract: {
+        ...this.state.contract,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletecontract',
+    });
+  }
+
+  openDeleteStrategyModal(e, payload) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'deletestrategy',
+    });
+  }
+
+  openDeploymentContractModal(e, payload) {
+    this.setState(
+      {
+        contract: {
+          ...this.state.contract,
+          record: payload.record,
+        },
+        isOpenModal: true,
+        modalType: 'deploymentcontract',
+      },
+      () => {
+        setTimeout(() => {
+          const form = this.$('formily_contract_deploy')?.formRef?.current
+            ?.form;
+          form.setValues({
+            displayName: payload.record?.displayName,
+            // edit
+            version: payload.record?.version,
+            name: payload.record?.name,
+          });
+        }, 0);
+      }
+    );
+  }
+
+  openDeploymentContractSuccessModal() {
+    this.setState({
+      isOpenModal: true,
+      modalType: 'deploymentcontractsuccess',
+    });
+  }
+
+  openNewPage(e, payload) {
+    this.history?.replace(payload?.url);
+    if (payload?.activeKey) {
+      this.setState({
+        activeKey: payload?.activeKey,
+      });
+    }
+  }
+
+  openStrategyDetailModal(e, payload) {
+    this.setState({
+      strategy: {
+        ...this.state.strategy,
+        record: payload.record,
+      },
+      isOpenModal: true,
+      modalType: 'strategydetail',
+    });
+  }
+
+  openUpgradeContractModal(e, payload) {
+    this.setState(
+      {
+        contract: {
+          ...this.state.contract,
+          record: payload.record,
+        },
+        isOpenModal: true,
+        modalType: 'upgradecontract',
+      },
+      () => {
+        setTimeout(() => {
+          const form = this.$('formily_contract_upgrade')?.formRef?.current
+            ?.form;
+          form.setValues({
+            displayName: payload.record?.displayName,
+            // edit
+            version: payload.record?.version,
+          });
+        }, 0);
+      }
+    );
+  }
+
+  paginationShowTotal(total, range) {
+    return `${this.i18n('i18n-5xl7aihzcuy')} ${total} ${this.i18n(
+      'i18n-v7xu122b9o'
+    )}`;
+  }
+
+  async validatorChannelName(value) {
+    try {
+      const res = await this.props?.appHelper?.utils?.bff?.getChannel({
+        name: value,
+      });
+      return this.i18n('i18n-0imredkn');
+    } catch (error) {}
+  }
+
+  async validatorContractRepeat(value) {
+    const form = this.$('formily_create_contract')?.formRef?.current?.form;
+    const displayName =
+      this.state.modalType === 'addcontract'
+        ? form.getValuesIn('displayName')
+        : this.state.contract?.record?.displayName;
+    try {
+      const res = await this.props?.appHelper?.utils?.bff?.getChaincodebuilds({
+        network: this.match?.params?.id,
+        version: value,
+        displayName,
+      });
+      if (res?.chaincodebuilds?.length > 0) {
+        return this.i18n('i18n-wc70jk7n');
+      }
+    } catch (error) {}
   }
 
   componentDidMount() {
@@ -1246,7 +1254,6 @@ class NetworkDetail$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     type: 'disabled',
                     validator: function () {
@@ -1275,7 +1282,6 @@ class NetworkDetail$$Page extends React.Component {
                 enum: [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: this.i18n('i18n-9vjtx036') /* 文件夹 */,
                     type: 'disabled',
@@ -1283,7 +1289,6 @@ class NetworkDetail$$Page extends React.Component {
                   },
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: this.i18n('i18n-fhw8go0y') /* zip压缩包 */,
                     type: 'disabled',
@@ -1329,7 +1334,6 @@ class NetworkDetail$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message: this.i18n('i18n-9nvgrvip') /* 请上传文件 */,
                     type: 'disabled',
@@ -1345,11 +1349,9 @@ class NetworkDetail$$Page extends React.Component {
                 disabled={false}
                 ghost={false}
                 icon={
-                  <Icon
-                    __component_name="Icon"
-                    size={12}
-                    style={{ marginRight: 3 }}
-                    type="PlusOutlined"
+                  <AntdIconPlusOutlined
+                    __component_name="AntdIconPlusOutlined"
+                    style={{ marginRight: '3px' }}
                   />
                 }
                 shape="default"
@@ -1374,7 +1376,6 @@ class NetworkDetail$$Page extends React.Component {
                   {
                     _unsafe_MixedSetter_label_select: 'StringSetter',
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: 'Go',
                     type: 'disabled',
@@ -1383,7 +1384,6 @@ class NetworkDetail$$Page extends React.Component {
                   {
                     _unsafe_MixedSetter_label_select: 'StringSetter',
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: 'Java',
                     type: 'disabled',
@@ -1392,7 +1392,6 @@ class NetworkDetail$$Page extends React.Component {
                   {
                     _unsafe_MixedSetter_label_select: 'StringSetter',
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: 'Node',
                     type: 'disabled',
@@ -1487,7 +1486,6 @@ class NetworkDetail$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n('i18n-o3gly28f') /* 长度为 3- 20 个字符 */,
@@ -1496,7 +1494,6 @@ class NetworkDetail$$Page extends React.Component {
                   },
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n(
@@ -1523,7 +1520,6 @@ class NetworkDetail$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n(
@@ -2095,7 +2091,10 @@ class NetworkDetail$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -2596,7 +2595,10 @@ class NetworkDetail$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -2729,10 +2731,9 @@ class NetworkDetail$$Page extends React.Component {
                                       align="center"
                                       direction="horizontal"
                                     >
-                                      <Icon
-                                        color="#9b9b9b"
-                                        size={12}
-                                        type="EyeInvisibleOutlined"
+                                      <AntdIconEyeInvisibleOutlined
+                                        __component_name="AntdIconEyeInvisibleOutlined"
+                                        style={{ color: '#9b9b9b' }}
                                       />
                                       <Typography.Text
                                         disabled={false}
@@ -2858,10 +2859,10 @@ class NetworkDetail$$Page extends React.Component {
                                             ],
                                             eventList: [
                                               {
+                                                disabled: true,
                                                 name: 'onClick',
                                                 template:
                                                   "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
-                                                disabled: true,
                                               },
                                             ],
                                           }}
@@ -2891,7 +2892,7 @@ class NetworkDetail$$Page extends React.Component {
                                           {
                                             this.i18n(
                                               'i18n-pjvvvoe9'
-                                            ) /* undefined */
+                                            ) /* 通道管理 */
                                           }
                                         </Button>
                                         {!!false && (
@@ -2987,7 +2988,7 @@ class NetworkDetail$$Page extends React.Component {
                                           {
                                             this.i18n(
                                               'i18n-ni3p31po'
-                                            ) /* 只能合约是用户与区块 */
+                                            ) /* 智能合约是用户与区块 */
                                           }
                                         </Typography.Text>
                                       </Col>
@@ -3039,10 +3040,10 @@ class NetworkDetail$$Page extends React.Component {
                                             ],
                                             eventList: [
                                               {
+                                                disabled: true,
                                                 name: 'onClick',
                                                 template:
                                                   "onClick(event,${extParams}){\n// 点击按钮时的回调\nconsole.log('onClick', event);}",
-                                                disabled: true,
                                               },
                                             ],
                                           }}
@@ -3072,7 +3073,7 @@ class NetworkDetail$$Page extends React.Component {
                                           {
                                             this.i18n(
                                               'i18n-5wdi9bc5'
-                                            ) /* undefined */
+                                            ) /* 合约管理 */
                                           }
                                         </Button>
                                       </Col>
@@ -3341,7 +3342,7 @@ class NetworkDetail$$Page extends React.Component {
                                           {
                                             this.i18n(
                                               'i18n-gyh9gtql'
-                                            ) /* undefined */
+                                            ) /* 区块链浏览器 */
                                           }
                                         </Button>
                                       </Col>
@@ -3955,36 +3956,44 @@ class NetworkDetail$$Page extends React.Component {
                                   <Col span={24}>
                                     <Descriptions
                                       bordered={false}
+                                      borderedBottom={false}
+                                      borderedBottomDashed={false}
                                       colon={false}
                                       column={1}
                                       items={[
                                         {
-                                          children: __$$eval(
-                                            () =>
-                                              this.props.useGetNetwork?.data
-                                                ?.network?.name || '-'
-                                          ),
                                           key: 'qzw93o3a9x',
                                           label:
                                             this.i18n(
                                               'i18n-03e0p0acqmaf'
                                             ) /* 网络名称 */,
                                           span: 1,
-                                        },
-                                        {
                                           children: __$$eval(
                                             () =>
                                               this.props.useGetNetwork?.data
-                                                ?.network?.federation || '-'
+                                                ?.network?.name || '-'
                                           ),
+                                        },
+                                        {
                                           key: '8471pte3l38',
                                           label:
                                             this.i18n(
                                               'i18n-dlxiuotq6z4'
                                             ) /* 所属联盟 */,
                                           span: 1,
+                                          children: __$$eval(
+                                            () =>
+                                              this.props.useGetNetwork?.data
+                                                ?.network?.federation || '-'
+                                          ),
                                         },
                                         {
+                                          key: '1rtg8bikh7x',
+                                          label:
+                                            this.i18n(
+                                              'i18n-9ox4rx1wtwv'
+                                            ) /* 创建时间 */,
+                                          span: 1,
                                           children: (
                                             <Typography.Time
                                               __component_name="Typography.Time"
@@ -3997,14 +4006,14 @@ class NetworkDetail$$Page extends React.Component {
                                               )}
                                             />
                                           ),
-                                          key: '1rtg8bikh7x',
-                                          label:
-                                            this.i18n(
-                                              'i18n-9ox4rx1wtwv'
-                                            ) /* 创建时间 */,
-                                          span: 1,
                                         },
                                         {
+                                          key: 'kwee4p37z5',
+                                          label:
+                                            this.i18n(
+                                              'i18n-watjije0jk'
+                                            ) /* 更新时间 */,
+                                          span: 1,
                                           children: (
                                             <Typography.Time
                                               __component_name="Typography.Time"
@@ -4017,14 +4026,14 @@ class NetworkDetail$$Page extends React.Component {
                                               )}
                                             />
                                           ),
-                                          key: 'kwee4p37z5',
-                                          label:
-                                            this.i18n(
-                                              'i18n-watjije0jk'
-                                            ) /* 更新时间 */,
-                                          span: 1,
                                         },
                                         {
+                                          key: '63ec1gobtoj',
+                                          label:
+                                            this.i18n(
+                                              'i18n-bik6xl952y6'
+                                            ) /* 状态 */,
+                                          span: 1,
                                           children: (
                                             <Status
                                               __component_name="Status"
@@ -4038,8 +4047,10 @@ class NetworkDetail$$Page extends React.Component {
                                                   children:
                                                     this.i18n(
                                                       'i18n-zrowlr7zwx'
-                                                    ) /* 运行中 */,
-                                                  icon: 'CheckCircleFilled',
+                                                    ) /* 正常 */,
+                                                  icon: (
+                                                    <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                                  ),
                                                   id: 'NetworkCreated',
                                                   type: 'success',
                                                 },
@@ -4048,7 +4059,9 @@ class NetworkDetail$$Page extends React.Component {
                                                     this.i18n(
                                                       'i18n-j3czm9su41'
                                                     ) /* 已解散 */,
-                                                  icon: 'CloseCircleFilled',
+                                                  icon: (
+                                                    <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                                  ),
                                                   id: 'NetworkDissolved',
                                                   type: 'error',
                                                 },
@@ -4057,41 +4070,50 @@ class NetworkDetail$$Page extends React.Component {
                                                     this.i18n(
                                                       'i18n-xtno2l9qqog'
                                                     ) /* 异常 */,
-                                                  icon: 'CloseCircleFilled',
+                                                  icon: (
+                                                    <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                                  ),
                                                   id: 'Error',
                                                   type: 'error',
                                                 },
                                                 {
                                                   children:
                                                     this.i18n(
+                                                      'i18n-7xnyzmr7'
+                                                    ) /* 创建中 */,
+                                                  icon: (
+                                                    <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                                                  ),
+                                                  id: 'Created',
+                                                  type: 'warning',
+                                                },
+                                                {
+                                                  children:
+                                                    this.i18n(
                                                       'i18n-1vangoko4yf'
                                                     ) /* 正常 */,
-                                                  icon: 'CheckCircleFilled',
-                                                  id: 'Created',
+                                                  icon: (
+                                                    <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                                  ),
+                                                  id: 'Deployed',
                                                   type: 'success',
                                                 },
                                               ]}
                                             />
                                           ),
-                                          key: '63ec1gobtoj',
-                                          label:
-                                            this.i18n(
-                                              'i18n-bik6xl952y6'
-                                            ) /* 状态 */,
-                                          span: 1,
                                         },
                                         {
-                                          children: __$$eval(
-                                            () =>
-                                              this.props.useGetNetwork?.data
-                                                ?.network?.description || '-'
-                                          ),
                                           key: 't6buqal9rl7',
                                           label:
                                             this.i18n(
                                               'i18n-wlgvrke3jz9'
                                             ) /* 介绍 */,
                                           span: 1,
+                                          children: __$$eval(
+                                            () =>
+                                              this.props.useGetNetwork?.data
+                                                ?.network?.description || '-'
+                                          ),
                                         },
                                       ]}
                                       labelStyle={{ width: 100 }}
@@ -4195,8 +4217,10 @@ class NetworkDetail$$Page extends React.Component {
                                                 children:
                                                   this.i18n(
                                                     'i18n-zrowlr7zwx'
-                                                  ) /* 运行中 */,
-                                                icon: 'CheckCircleFilled',
+                                                  ) /* 正常 */,
+                                                icon: (
+                                                  <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                                ),
                                                 id: 'NetworkCreated',
                                                 type: 'success',
                                               },
@@ -4205,7 +4229,9 @@ class NetworkDetail$$Page extends React.Component {
                                                   this.i18n(
                                                     'i18n-j3czm9su41'
                                                   ) /* 已解散 */,
-                                                icon: 'CloseCircleFilled',
+                                                icon: (
+                                                  <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                                ),
                                                 id: 'NetworkDissolved',
                                                 type: 'error',
                                               },
@@ -4214,7 +4240,9 @@ class NetworkDetail$$Page extends React.Component {
                                                   this.i18n(
                                                     'i18n-xtno2l9qqog'
                                                   ) /* 异常 */,
-                                                icon: 'CloseCircleFilled',
+                                                icon: (
+                                                  <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                                ),
                                                 id: 'Error',
                                                 type: 'error',
                                               },
@@ -4223,7 +4251,9 @@ class NetworkDetail$$Page extends React.Component {
                                                   this.i18n(
                                                     'i18n-7xnyzmr7'
                                                   ) /* 创建中 */,
-                                                icon: 'ClockCircleFilled',
+                                                icon: (
+                                                  <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                                                ),
                                                 id: 'Created',
                                                 type: 'warning',
                                               },
@@ -4232,7 +4262,9 @@ class NetworkDetail$$Page extends React.Component {
                                                   this.i18n(
                                                     'i18n-1vangoko4yf'
                                                   ) /* 正常 */,
-                                                icon: 'CheckCircleFilled',
+                                                icon: (
+                                                  <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                                ),
                                                 id: 'Deployed',
                                                 type: 'success',
                                               },
@@ -4712,7 +4744,9 @@ class NetworkDetail$$Page extends React.Component {
                                           this.i18n(
                                             'i18n-1vangoko4yf'
                                           ) /* 正常 */,
-                                        icon: 'CheckCircleFilled',
+                                        icon: (
+                                          <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                        ),
                                         id: 'Deployed',
                                         type: 'success',
                                       },
@@ -4723,7 +4757,9 @@ class NetworkDetail$$Page extends React.Component {
                                           this.i18n(
                                             'i18n-xtno2l9qqog'
                                           ) /* 异常 */,
-                                        icon: 'CloseCircleFilled',
+                                        icon: (
+                                          <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                        ),
                                         id: 'Error',
                                         tooltip: __$$eval(() => record.reason),
                                         type: 'error',
@@ -4732,8 +4768,10 @@ class NetworkDetail$$Page extends React.Component {
                                         children:
                                           this.i18n(
                                             'i18n-5bhot42b'
-                                          ) /* 部署中 */,
-                                        icon: 'ClockCircleFilled',
+                                          ) /* 构建中 */,
+                                        icon: (
+                                          <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                                        ),
                                         id: 'Deploying',
                                         type: 'warning',
                                       },
@@ -4742,7 +4780,9 @@ class NetworkDetail$$Page extends React.Component {
                                           this.i18n(
                                             'i18n-1vangoko4yf'
                                           ) /* 正常 */,
-                                        icon: 'CheckCircleFilled',
+                                        icon: (
+                                          <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                        ),
                                         id: 'Created',
                                         type: 'success',
                                       },
@@ -4909,11 +4949,9 @@ class NetworkDetail$$Page extends React.Component {
                                 ghost={false}
                                 href=""
                                 icon={
-                                  <Icon
-                                    __component_name="Icon"
-                                    size={12}
-                                    style={{ marginRight: 3 }}
-                                    type="PlusOutlined"
+                                  <AntdIconPlusOutlined
+                                    __component_name="AntdIconPlusOutlined"
+                                    style={{ marginRight: '3px' }}
                                   />
                                 }
                                 onClick={function () {
@@ -5224,7 +5262,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-1vangoko4yf'
                                             ) /* 正常 */,
-                                          icon: 'CheckCircleFilled',
+                                          icon: (
+                                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                          ),
                                           id: 'Deployed',
                                           type: 'success',
                                         },
@@ -5233,7 +5273,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-1vangoko4yf'
                                             ) /* 正常 */,
-                                          icon: 'CheckCircleFilled',
+                                          icon: (
+                                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                          ),
                                           id: 'Deploying',
                                           type: 'success',
                                         },
@@ -5242,7 +5284,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-xtno2l9qqog'
                                             ) /* 异常 */,
-                                          icon: 'CloseCircleFilled',
+                                          icon: (
+                                            <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                          ),
                                           id: 'Error',
                                           type: 'error',
                                         },
@@ -5251,7 +5295,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-1vangoko4yf'
                                             ) /* 正常 */,
-                                          icon: 'CheckCircleFilled',
+                                          icon: (
+                                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                          ),
                                           id: 'ChannelCreated',
                                           type: 'success',
                                         },
@@ -5260,7 +5306,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-1vangoko4yf'
                                             ) /* 正常 */,
-                                          icon: 'CheckCircleFilled',
+                                          icon: (
+                                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                          ),
                                           id: 'ChannelArchived',
                                           type: 'success',
                                         },
@@ -5522,11 +5570,9 @@ class NetworkDetail$$Page extends React.Component {
                                 ghost={false}
                                 href=""
                                 icon={
-                                  <Icon
-                                    __component_name="Icon"
-                                    size={12}
-                                    style={{ marginRight: 3 }}
-                                    type="PlusOutlined"
+                                  <AntdIconPlusOutlined
+                                    __component_name="AntdIconPlusOutlined"
+                                    style={{ marginRight: '3px' }}
                                   />
                                 }
                                 onClick={function () {
@@ -5802,14 +5848,12 @@ class NetworkDetail$$Page extends React.Component {
                                               )
                                             )}
                                           </Typography.Text>,
-                                          <Icon
-                                            __component_name="Icon"
-                                            size={12}
+                                          <AntdIconDownOutlined
+                                            __component_name="AntdIconDownOutlined"
                                             style={{
-                                              marginLeft: 4,
+                                              marginLeft: '4px',
                                               verticalAlign: 'middle',
                                             }}
-                                            type="DownOutlined"
                                           />,
                                         ]}
                                       </Button>
@@ -5937,7 +5981,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-1vangoko4yf'
                                             ) /* 正常 */,
-                                          icon: 'CheckCircleFilled',
+                                          icon: (
+                                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                          ),
                                           id: 'Created',
                                           type: 'success',
                                         },
@@ -5948,7 +5994,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-xtno2l9qqog'
                                             ) /* 异常 */,
-                                          icon: 'CloseCircleFilled',
+                                          icon: (
+                                            <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                          ),
                                           id: 'Error',
                                           type: 'error',
                                         },
@@ -5957,7 +6005,9 @@ class NetworkDetail$$Page extends React.Component {
                                             this.i18n(
                                               'i18n-5bhot42b'
                                             ) /* 构建中 */,
-                                          icon: 'ClockCircleFilled',
+                                          icon: (
+                                            <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                                          ),
                                           id: 'Deploying',
                                           type: 'info',
                                         },
@@ -6227,11 +6277,9 @@ class NetworkDetail$$Page extends React.Component {
                                 ghost={false}
                                 href=""
                                 icon={
-                                  <Icon
-                                    __component_name="Icon"
-                                    size={12}
-                                    style={{ marginRight: 3 }}
-                                    type="PlusOutlined"
+                                  <AntdIconPlusOutlined
+                                    __component_name="AntdIconPlusOutlined"
+                                    style={{ marginRight: '3px' }}
                                   />
                                 }
                                 onClick={function () {
@@ -6327,7 +6375,9 @@ class NetworkDetail$$Page extends React.Component {
                                     );
                                   }.bind(this)}
                                   placeholder={
-                                    this.i18n('i18n-iz3eoa9s') /* undefined */
+                                    this.i18n(
+                                      'i18n-iz3eoa9s'
+                                    ) /* 请输入策略名称 */
                                   }
                                 />
                               </Space>
@@ -6928,7 +6978,6 @@ class NetworkDetail$$Page extends React.Component {
                       'x-validator': [
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           message:
                             this.i18n(
@@ -6941,7 +6990,6 @@ class NetworkDetail$$Page extends React.Component {
                         },
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           message:
                             this.i18n(
@@ -6954,7 +7002,6 @@ class NetworkDetail$$Page extends React.Component {
                         },
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
                           id: 'disabled',
                           type: 'disabled',
                           validator: function () {
@@ -7260,7 +7307,10 @@ class NetworkDetail$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -7504,7 +7554,6 @@ class NetworkDetail$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n('i18n-o3gly28f') /* 长度为 3- 20 个字符 */,
@@ -7513,7 +7562,6 @@ class NetworkDetail$$Page extends React.Component {
                   },
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n(
@@ -7542,7 +7590,6 @@ class NetworkDetail$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     type: 'disabled',
                     validator: function () {
@@ -7571,7 +7618,6 @@ class NetworkDetail$$Page extends React.Component {
                 enum: [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: this.i18n('i18n-9vjtx036') /* 文件夹 */,
                     type: 'disabled',
@@ -7579,7 +7625,6 @@ class NetworkDetail$$Page extends React.Component {
                   },
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: this.i18n('i18n-fhw8go0y') /* zip压缩包 */,
                     type: 'disabled',
@@ -7627,11 +7672,9 @@ class NetworkDetail$$Page extends React.Component {
                 disabled={false}
                 ghost={false}
                 icon={
-                  <Icon
-                    __component_name="Icon"
-                    size={12}
-                    style={{ marginRight: 3 }}
-                    type="PlusOutlined"
+                  <AntdIconPlusOutlined
+                    __component_name="AntdIconPlusOutlined"
+                    style={{ marginRight: '3px' }}
                   />
                 }
                 shape="default"
@@ -7692,7 +7735,6 @@ class NetworkDetail$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n(
@@ -7730,18 +7772,27 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetNetwork',
-          params: {
-            name: self.match?.params?.id,
-          },
+          params: function applyThis() {
+            return {
+              name: this.match?.params?.id,
+            };
+          }.apply(self),
         },
         {
           func: 'useGetChaincodebuilds',
-          params: {
-            network: self.match?.params?.id,
-          },
+          params: function applyThis() {
+            return {
+              network: this.match?.params?.id,
+            };
+          }.apply(self),
         },
       ]}
       render={(dataProps) => (

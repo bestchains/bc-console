@@ -14,7 +14,6 @@ import {
   FormilyTextArea,
   Alert,
   Button,
-  Icon,
   Row,
   Col,
   Radio,
@@ -24,9 +23,16 @@ import {
   Status,
 } from '@tenx-ui/materials';
 
+import {
+  AntdIconCheckCircleFilled,
+  AntdIconPlusOutlined,
+  AntdIconClockCircleFilled,
+  AntdIconCloseCircleFilled,
+} from '@tenx-ui/icon-materials';
+
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
-import * as qs from 'querystring';
+import qs from 'query-string';
 import { getUnifiedHistory } from '@tenx-ui/utils/es/UnifiedLink/index.prod';
 
 import utils, { RefsManager } from '../../utils/__utils';
@@ -384,7 +390,6 @@ class Federation$$Page extends React.Component {
                   },
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     type: 'disabled',
                     validator: function () {
@@ -505,7 +510,6 @@ class Federation$$Page extends React.Component {
                     _unsafe_MixedSetter_label_select: 'StringSetter',
                     _unsafe_MixedSetter_value_select: 'StringSetter',
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: 'All',
                     type: 'disabled',
@@ -514,7 +518,6 @@ class Federation$$Page extends React.Component {
                   {
                     _unsafe_MixedSetter_label_select: 'StringSetter',
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: 'Majority',
                     type: 'disabled',
@@ -523,7 +526,6 @@ class Federation$$Page extends React.Component {
                   {
                     _unsafe_MixedSetter_label_select: 'StringSetter',
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     label: 'OneVoteVeto',
                     type: 'disabled',
@@ -661,7 +663,10 @@ class Federation$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -792,7 +797,10 @@ class Federation$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -942,11 +950,9 @@ class Federation$$Page extends React.Component {
                   disabled={false}
                   ghost={false}
                   icon={
-                    <Icon
-                      __component_name="Icon"
-                      size={12}
-                      style={{ marginRight: 3 }}
-                      type="PlusOutlined"
+                    <AntdIconPlusOutlined
+                      __component_name="AntdIconPlusOutlined"
+                      style={{ marginRight: '3px' }}
                     />
                   }
                   onClick={function () {
@@ -1314,35 +1320,45 @@ class Federation$$Page extends React.Component {
                             {
                               children:
                                 this.i18n('i18n-1d5bt7sz4jb') /* 组建中 */,
-                              icon: 'ClockCircleFilled',
+                              icon: (
+                                <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                              ),
                               id: 'FederationPending',
                               type: 'warning',
                             },
                             {
                               children:
                                 this.i18n('i18n-2vzrxdpca5') /* 已激活 */,
-                              icon: 'CheckCircleFilled',
+                              icon: (
+                                <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                              ),
                               id: 'FederationActivated',
                               type: 'success',
                             },
                             {
                               children:
                                 this.i18n('i18n-ej048sy57c') /* 组建失败 */,
-                              icon: 'CloseCircleFilled',
+                              icon: (
+                                <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                              ),
                               id: 'FederationFailed',
                               type: 'error',
                             },
                             {
                               children:
                                 this.i18n('i18n-pev2ce1ut3l') /* 已解散 */,
-                              icon: 'CloseCircleFilled',
+                              icon: (
+                                <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                              ),
                               id: 'FederationDissolved',
                               type: 'error',
                             },
                             {
                               children:
                                 this.i18n('i18n-xtno2l9qqog') /* 异常 */,
-                              icon: 'CloseCircleFilled',
+                              icon: (
+                                <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                              ),
                               id: 'Error',
                               type: 'error',
                             },
@@ -1686,10 +1702,17 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetFederations',
-          params: {},
+          params: function applyThis() {
+            return {};
+          }.apply(self),
         },
       ]}
       render={(dataProps) => (
