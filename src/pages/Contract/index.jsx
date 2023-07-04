@@ -14,11 +14,12 @@ import {
   Radio,
   Input,
   Button,
-  Icon,
   List,
   Card,
   Tag,
 } from '@tenx-ui/materials';
+
+import { AntdIconReloadOutlined } from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -388,7 +389,6 @@ class Contract$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message: this.i18n('i18n-wrzfitnj') /* 请选择网络 */,
                     required: true,
@@ -556,11 +556,9 @@ class Contract$$Page extends React.Component {
                     disabled={false}
                     ghost={false}
                     icon={
-                      <Icon
-                        __component_name="Icon"
-                        size={12}
-                        style={{ marginRight: 3 }}
-                        type="ReloadOutlined"
+                      <AntdIconReloadOutlined
+                        __component_name="AntdIconReloadOutlined"
+                        style={{ marginRight: '3px' }}
                       />
                     }
                     onClick={function () {
@@ -644,7 +642,7 @@ class Contract$$Page extends React.Component {
                                 target="_self"
                                 type="link"
                               >
-                                {this.i18n('i18n-m6n5fnxybu') /* - */}
+                                {this.i18n('i18n-m6n5fnxybu') /* 详情 */}
                               </Button>
                               <Typography.Text
                                 __component_name="Typography.Text"
@@ -702,7 +700,7 @@ class Contract$$Page extends React.Component {
                                 style={{ fontSize: '' }}
                                 type="default"
                               >
-                                {this.i18n('i18n-o6jrqfvs') /* - */}
+                                {this.i18n('i18n-o6jrqfvs') /* 立即使用 */}
                               </Typography.Text>
                             </Space>
                           </Col>
@@ -841,6 +839,11 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetContracts',

@@ -12,7 +12,6 @@ import {
   Typography,
   Status,
   Tabs,
-  Icon,
   Space,
   Input,
   Table,
@@ -25,6 +24,15 @@ import {
   UnifiedLink,
   FormilyNumberPicker,
 } from '@tenx-ui/materials';
+
+import {
+  TenxIconCircle,
+  AntdIconClockCircleFilled,
+  AntdIconCloseCircleFilled,
+  AntdIconCheckCircleFilled,
+  AntdIconPlusOutlined,
+  AntdIconDownloadOutlined,
+} from '@tenx-ui/icon-materials';
 
 import { default as Logs } from '@tenx-ui/logs';
 
@@ -69,11 +77,12 @@ class OrganizationDetail$$Page extends React.Component {
     this._refsManager = new RefsManager();
 
     __$$i18n._inject2(this);
-    this.logs = []
+
     this.state = {
       current: 1,
       filter: 'ALL',
       isOpenModal: false,
+      logs: [],
       logsContainer: undefined,
       logsTotal: undefined,
       modalType: 'create',
@@ -230,8 +239,11 @@ class OrganizationDetail$$Page extends React.Component {
   }
 
   downloadLogs(e, payload) {
-      const logs = this.state.logs
-      ?.slice(this.state.logs?.length - (this.state.logsTotal || this.state.logs?.length))
+    const logs = this.state.logs
+      ?.slice(
+        this.state.logs?.length -
+          (this.state.logsTotal || this.state.logs?.length)
+      )
       ?.map((item) =>
         item?.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '')
       )
@@ -344,8 +356,8 @@ class OrganizationDetail$$Page extends React.Component {
       this.logRef.writelns(data);
       this.logs = this.logs.concat(data);
       this.setState({
-        logs: this.logs
-      })
+        logs: this.logs,
+      });
     };
     ws.onerror = (err) => {};
     ws.onclose = (err) => {};
@@ -477,15 +489,18 @@ class OrganizationDetail$$Page extends React.Component {
                 column={2}
                 items={[
                   {
+                    key: 'x6fzmf20wkg',
+                    label: this.i18n('i18n-ycr2zketd3o') /* 组织名称 */,
+                    span: 1,
                     children: __$$eval(
                       () =>
                         this.props.useGetOrganization?.data?.organization?.name
                     ),
-                    key: 'x6fzmf20wkg',
-                    label: this.i18n('i18n-ycr2zketd3o') /* 组织名称 */,
-                    span: 1,
                   },
                   {
+                    key: 'lu5nygtudhq',
+                    label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
+                    span: 1,
                     children: (
                       <Typography.Time
                         __component_name="Typography.Time"
@@ -498,11 +513,11 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       />
                     ),
-                    key: 'lu5nygtudhq',
-                    label: this.i18n('i18n-9ox4rx1wtwv') /* 创建时间 */,
-                    span: 1,
                   },
                   {
+                    key: 'bdr5go2aun',
+                    label: this.i18n('i18n-bik6xl952y6') /* 状态 */,
+                    span: 1,
                     children: (
                       <Status
                         __component_name="Status"
@@ -514,42 +529,52 @@ class OrganizationDetail$$Page extends React.Component {
                         types={[
                           {
                             children: '未知',
-                            icon: 'tenx-ui-icon:Circle',
+                            icon: (
+                              <TenxIconCircle __component_name="TenxIconCircle" />
+                            ),
                             id: 'disabled',
                             type: 'disabled',
                           },
                           {
                             children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
-                            icon: 'ClockCircleFilled',
+                            icon: (
+                              <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                            ),
                             id: 'Deploying',
                             type: 'warning',
                           },
                           {
                             children: this.i18n('i18n-xtno2l9qqog') /* 异常 */,
-                            icon: 'CloseCircleFilled',
+                            icon: (
+                              <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                            ),
                             id: 'Error',
                             type: 'error',
                           },
                           {
                             children: this.i18n('i18n-fifkprltibf') /* 正常 */,
-                            icon: 'CheckCircleFilled',
+                            icon: (
+                              <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                            ),
                             id: 'Deployed',
                             type: 'success',
                           },
                           {
                             children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
-                            icon: 'ClockCircleFilled',
+                            icon: (
+                              <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                            ),
                             id: 'Created',
                             type: 'warning',
                           },
                         ]}
                       />
                     ),
-                    key: 'bdr5go2aun',
-                    label: this.i18n('i18n-bik6xl952y6') /* 状态 */,
-                    span: 1,
                   },
                   {
+                    key: 'ub0bc25o7d',
+                    label: this.i18n('i18n-c0d66z03kpk') /* 加入时间 */,
+                    span: 1,
                     children: (
                       <Typography.Time
                         __component_name="Typography.Time"
@@ -563,22 +588,22 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       />
                     ),
-                    key: 'ub0bc25o7d',
-                    label: this.i18n('i18n-c0d66z03kpk') /* 加入时间 */,
-                    span: 1,
                   },
                   {
+                    key: '9yucmkfjfqg',
+                    label: this.i18n('i18n-dlxiuotq6z4') /* 所属联盟 */,
+                    span: 1,
                     children: __$$eval(
                       () =>
                         this.props.useGetOrganization?.data?.organization?.federations?.join(
                           ','
                         ) || '-'
                     ),
-                    key: '9yucmkfjfqg',
-                    label: this.i18n('i18n-dlxiuotq6z4') /* 所属联盟 */,
-                    span: 1,
                   },
                   {
+                    key: 'o0cvbxwkrj',
+                    label: this.i18n('i18n-5er0ayqzcp') /* 最近更新 */,
+                    span: 1,
                     children: (
                       <Typography.Time
                         __component_name="Typography.Time"
@@ -591,11 +616,11 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       />
                     ),
-                    key: 'o0cvbxwkrj',
-                    label: this.i18n('i18n-5er0ayqzcp') /* 最近更新 */,
-                    span: 1,
                   },
                   {
+                    key: 'r4gchd14zz',
+                    label: this.i18n('i18n-brhael1t') /* 所属网络 */,
+                    span: 1,
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
@@ -612,11 +637,11 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       </Typography.Text>
                     ),
-                    key: 'r4gchd14zz',
-                    label: this.i18n('i18n-brhael1t') /* 所属网络 */,
-                    span: 1,
                   },
                   {
+                    key: 'eleg9opa0dc',
+                    label: this.i18n('i18n-wlgvrke3jz9') /* 介绍 */,
+                    span: 1,
                     children: (
                       <Typography.Text
                         __component_name="Typography.Text"
@@ -632,31 +657,28 @@ class OrganizationDetail$$Page extends React.Component {
                         )}
                       </Typography.Text>
                     ),
-                    key: 'eleg9opa0dc',
-                    label: this.i18n('i18n-wlgvrke3jz9') /* 介绍 */,
-                    span: 1,
                   },
                   {
+                    key: '5gva0owfbf9',
+                    label: this.i18n('i18n-ci3cdwcy') /* 加入通道 */,
+                    span: 1,
                     children: __$$eval(
                       () =>
                         this.props.useGetOrganization?.data?.organization?.channels?.join(
                           ','
                         ) || '-'
                     ),
-                    key: '5gva0owfbf9',
-                    label: this.i18n('i18n-ci3cdwcy') /* 加入通道 */,
-                    span: 1,
                   },
-                  { children: null, key: 'k20atuz7jte', label: ' ', span: 1 },
+                  { key: 'k20atuz7jte', label: ' ', span: 1, children: null },
                   {
+                    key: 'ayb0txehyzf',
+                    label: this.i18n('i18n-kh6e0jr0i7b') /* 节点数量 */,
+                    span: 1,
                     children: __$$eval(
                       () =>
                         this.props.useGetOrganization?.data?.organization
                           ?.ibppeers?.length || '-'
                     ),
-                    key: 'ayb0txehyzf',
-                    label: this.i18n('i18n-kh6e0jr0i7b') /* 节点数量 */,
-                    span: 1,
                   },
                 ]}
                 labelStyle={{ width: 100 }}
@@ -711,31 +733,41 @@ class OrganizationDetail$$Page extends React.Component {
                       types={[
                         {
                           children: '未知',
-                          icon: 'tenx-ui-icon:Circle',
+                          icon: (
+                            <TenxIconCircle __component_name="TenxIconCircle" />
+                          ),
                           id: 'disabled',
                           type: 'disabled',
                         },
                         {
                           children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
-                          icon: 'ClockCircleFilled',
+                          icon: (
+                            <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                          ),
                           id: 'Deploying',
                           type: 'warning',
                         },
                         {
                           children: this.i18n('i18n-xtno2l9qqog') /* 异常 */,
-                          icon: 'CloseCircleFilled',
+                          icon: (
+                            <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                          ),
                           id: 'Error',
                           type: 'error',
                         },
                         {
                           children: this.i18n('i18n-fifkprltibf') /* 正常 */,
-                          icon: 'CheckCircleFilled',
+                          icon: (
+                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                          ),
                           id: 'Deployed',
                           type: 'success',
                         },
                         {
                           children: this.i18n('i18n-7xnyzmr7') /* 创建中 */,
-                          icon: 'ClockCircleFilled',
+                          icon: (
+                            <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                          ),
                           id: 'Created',
                           type: 'warning',
                         },
@@ -870,6 +902,7 @@ class OrganizationDetail$$Page extends React.Component {
           </Col>
           <Col __component_name="Col" span={24}>
             <Tabs
+              activeKey=""
               destroyInactiveTabPane="true"
               items={[
                 {
@@ -920,11 +953,9 @@ class OrganizationDetail$$Page extends React.Component {
                                 )}
                                 ghost={false}
                                 icon={
-                                  <Icon
-                                    __component_name="Icon"
-                                    size={12}
-                                    style={{ marginRight: 3 }}
-                                    type="PlusOutlined"
+                                  <AntdIconPlusOutlined
+                                    __component_name="AntdIconPlusOutlined"
+                                    style={{ marginRight: '3px' }}
                                   />
                                 }
                                 onClick={function () {
@@ -1147,7 +1178,9 @@ class OrganizationDetail$$Page extends React.Component {
                                       types={[
                                         {
                                           children: '未知',
-                                          icon: 'tenx-ui-icon:Circle',
+                                          icon: (
+                                            <TenxIconCircle __component_name="TenxIconCircle" />
+                                          ),
                                           id: 'disabled',
                                           type: 'disabled',
                                         },
@@ -1155,8 +1188,10 @@ class OrganizationDetail$$Page extends React.Component {
                                           children:
                                             this.i18n(
                                               'i18n-fifkprltibf'
-                                            ) /* - */,
-                                          icon: 'CheckCircleFilled',
+                                            ) /* 正常 */,
+                                          icon: (
+                                            <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                          ),
                                           id: 'zc',
                                           type: 'success',
                                         },
@@ -1225,7 +1260,11 @@ class OrganizationDetail$$Page extends React.Component {
                                         shape="default"
                                         type="link"
                                       >
-                                        {this.i18n('i18n-v10ihnkwhn') /* - */}
+                                        {
+                                          this.i18n(
+                                            'i18n-v10ihnkwhn'
+                                          ) /* 转移 */
+                                        }
                                       </Button>
                                     ),
                                     !!__$$eval(
@@ -1273,7 +1312,11 @@ class OrganizationDetail$$Page extends React.Component {
                                         shape="default"
                                         type="link"
                                       >
-                                        {this.i18n('i18n-ias68eipm18') /* - */}
+                                        {
+                                          this.i18n(
+                                            'i18n-ias68eipm18'
+                                          ) /* 删除 */
+                                        }
                                       </Button>
                                     ),
                                   ])(
@@ -1428,11 +1471,9 @@ class OrganizationDetail$$Page extends React.Component {
                             )}
                             ghost={false}
                             icon={
-                              <Icon
-                                __component_name="Icon"
-                                size={12}
-                                style={{ marginRight: 3 }}
-                                type="PlusOutlined"
+                              <AntdIconPlusOutlined
+                                __component_name="AntdIconPlusOutlined"
+                                style={{ marginRight: '3px' }}
                               />
                             }
                             onClick={function () {
@@ -1670,7 +1711,7 @@ class OrganizationDetail$$Page extends React.Component {
                                     strong={false}
                                     style={{ fontSize: '' }}
                                   >
-                                    {this.i18n('i18n-m8df8p4v') /* - */}
+                                    {this.i18n('i18n-m8df8p4v') /* 核CPU */}
                                   </Typography.Text>
                                   <Typography.Text
                                     __component_name="Typography.Text"
@@ -1692,7 +1733,7 @@ class OrganizationDetail$$Page extends React.Component {
                                     strong={false}
                                     style={{ fontSize: '' }}
                                   >
-                                    {this.i18n('i18n-3y2g20xr') /* - */}
+                                    {this.i18n('i18n-3y2g20xr') /* G内存 */}
                                   </Typography.Text>
                                 </Space>
                               ))(
@@ -1735,22 +1776,32 @@ class OrganizationDetail$$Page extends React.Component {
                                   types={[
                                     {
                                       children:
-                                        this.i18n('i18n-fifkprltibf') /* - */,
-                                      icon: 'CheckCircleFilled',
+                                        this.i18n(
+                                          'i18n-fifkprltibf'
+                                        ) /* 正常 */,
+                                      icon: (
+                                        <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                      ),
                                       id: 'Deployed',
                                       type: 'success',
                                     },
                                     {
                                       children:
-                                        this.i18n('i18n-7xnyzmr7') /* - */,
-                                      icon: 'ClockCircleFilled',
+                                        this.i18n('i18n-7xnyzmr7') /* 创建中 */,
+                                      icon: (
+                                        <AntdIconClockCircleFilled __component_name="AntdIconClockCircleFilled" />
+                                      ),
                                       id: 'Deploying',
                                       type: 'warning',
                                     },
                                     {
                                       children:
-                                        this.i18n('i18n-xtno2l9qqog') /* - */,
-                                      icon: 'CloseCircleFilled',
+                                        this.i18n(
+                                          'i18n-xtno2l9qqog'
+                                        ) /* 异常 */,
+                                      icon: (
+                                        <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                      ),
                                       id: 'Error',
                                       type: 'error',
                                     },
@@ -1810,7 +1861,7 @@ class OrganizationDetail$$Page extends React.Component {
                                   shape="default"
                                   type="link"
                                 >
-                                  {this.i18n('i18n-7zfzajob') /* - */}
+                                  {this.i18n('i18n-7zfzajob') /* 日志 */}
                                 </Button>,
                                 <Button
                                   __component_name="Button"
@@ -1833,7 +1884,7 @@ class OrganizationDetail$$Page extends React.Component {
                                   shape="default"
                                   type="link"
                                 >
-                                  {this.i18n('i18n-15rtqwxm') /* - */}
+                                  {this.i18n('i18n-15rtqwxm') /* 监控 */}
                                 </Button>,
                               ])(
                                 __$$createChildContext(__$$context, {
@@ -2155,11 +2206,9 @@ class OrganizationDetail$$Page extends React.Component {
                     disabled={false}
                     ghost={false}
                     icon={
-                      <Icon
-                        __component_name="Icon"
-                        size={12}
-                        style={{ marginRight: 3 }}
-                        type="DownloadOutlined"
+                      <AntdIconDownloadOutlined
+                        __component_name="AntdIconDownloadOutlined"
+                        style={{ marginRight: '3px' }}
                       />
                     }
                     loading={false}
@@ -2484,7 +2533,10 @@ class OrganizationDetail$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -2911,10 +2963,19 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetOrganization',
-          params: { name: self.match?.params?.id },
+          params: function applyThis() {
+            return {
+              name: this.match?.params?.id,
+            };
+          }.apply(self),
         },
       ]}
       render={(dataProps) => (

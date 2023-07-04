@@ -12,7 +12,6 @@ import {
   Typography,
   Button,
   Space,
-  Icon,
   Row,
   Col,
   Radio,
@@ -21,6 +20,12 @@ import {
   Table,
   Status,
 } from '@tenx-ui/materials';
+
+import {
+  AntdIconCheckCircleFilled,
+  AntdIconPlusOutlined,
+  AntdIconCloseCircleFilled,
+} from '@tenx-ui/icon-materials';
 
 import { useLocation, matchPath } from '@umijs/max';
 import DataProvider from '../../components/DataProvider';
@@ -141,24 +146,6 @@ class Organization$$Page extends React.Component {
         errors: error?.response?.errors,
       });
     }
-  }
-
-  getType(id, payload) {
-    if (payload?.id === 'Error') {
-      return {
-        children: this.i18n('i18n-xtno2l9qqog'),
-        icon: 'CloseCircleFilled',
-        tooltip: payload.tooltip,
-        id,
-        type: 'error',
-      };
-    }
-    return {
-      children: this.i18n('i18n-fifkprltibf'),
-      icon: 'CheckCircleFilled',
-      id,
-      type: 'success',
-    };
   }
 
   handleFilterChange(e) {
@@ -325,7 +312,6 @@ class Organization$$Page extends React.Component {
                 'x-validator': [
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n('i18n-wprl86g5wy') /* 字符长度为 3 ~ 20 */,
@@ -334,7 +320,6 @@ class Organization$$Page extends React.Component {
                   },
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     message:
                       this.i18n(
@@ -345,7 +330,6 @@ class Organization$$Page extends React.Component {
                   },
                   {
                     children: '未知',
-                    icon: 'tenx-ui-icon:Circle',
                     id: 'disabled',
                     type: 'disabled',
                     validator: function () {
@@ -384,7 +368,7 @@ class Organization$$Page extends React.Component {
               componentProps={{
                 'x-component-props': {
                   placeholder:
-                    this.i18n('i18n-1247x9lxlbkg') /* 请输入组织备注 */,
+                    this.i18n('i18n-1247x9lxlbkg') /* 请输入组织描述 */,
                 },
               }}
               fieldProps={{
@@ -558,7 +542,10 @@ class Organization$$Page extends React.Component {
           )}
           title={
             <Space align="center" direction="horizontal">
-              <Icon color="#5cb85c" size={12} type="CheckCircleFilled" />
+              <AntdIconCheckCircleFilled
+                __component_name="AntdIconCheckCircleFilled"
+                style={{ color: '#5cb85c' }}
+              />
               <Typography.Text
                 disabled={false}
                 ellipsis={true}
@@ -626,11 +613,9 @@ class Organization$$Page extends React.Component {
                   disabled={false}
                   ghost={false}
                   icon={
-                    <Icon
-                      __component_name="Icon"
-                      size={12}
-                      style={{ marginRight: 3 }}
-                      type="PlusOutlined"
+                    <AntdIconPlusOutlined
+                      __component_name="AntdIconPlusOutlined"
+                      style={{ marginRight: '3px' }}
                     />
                   }
                   onClick={function () {
@@ -786,6 +771,7 @@ class Organization$$Page extends React.Component {
               bordered={false}
               hoverable={false}
               loading={false}
+              ref={this._refsManager.linkRef('card-f042fe04')}
               size="default"
               type="default"
             >
@@ -961,58 +947,47 @@ class Organization$$Page extends React.Component {
                     dataIndex: 'status',
                     key: 'status',
                     render: /* 插槽容器*/ (text, record, index) =>
-                      ((__$$context) => (
-                        <Status
-                          __component_name="Status"
-                          getTypes={function () {
-                            return this.getType.apply(
-                              this,
-                              Array.prototype.slice.call(arguments).concat([
-                                {
-                                  id: text,
-                                  tooltip:
-                                    record?.reason &&
-                                    `reason: ${record?.reason}`,
-                                },
-                              ])
-                            );
-                          }.bind(__$$context)}
-                          id={__$$eval(() => text)}
-                          types={[
-                            {
-                              children:
-                                this.i18n('i18n-fifkprltibf') /* Deployed */,
-                              icon: 'CheckCircleFilled',
-                              id: 'Deployed',
-                              type: 'success',
-                            },
-                            {
-                              _unsafe_MixedSetter_tooltip_select:
-                                'VariableSetter',
-                              children:
-                                this.i18n('i18n-xtno2l9qqog') /* 失败 */,
-                              icon: 'CloseCircleFilled',
-                              id: 'Error',
-                              tooltip: __$$eval(() => record.reason),
-                              type: 'error',
-                            },
-                            {
-                              children:
-                                this.i18n('i18n-7xnyzmr7') /* 创建中 */,
-                              icon: 'ClockCircleFilled',
-                              id: 'Deploying',
-                              type: 'warning',
-                            },
-                            {
-                              children:
-                                this.i18n('i18n-7xnyzmr7') /* 创建中 */,
-                              icon: 'ClockCircleFilled',
-                              id: 'Created',
-                              type: 'warning',
-                            },
-                          ]}
-                        />
-                      ))(
+                      ((__$$context) => [
+                        !!__$$eval(() => text === 'Error') && (
+                          <Status
+                            __component_name="Status"
+                            id="Error"
+                            ref={this._refsManager.linkRef('status-220e2d29')}
+                            types={[
+                              {
+                                _unsafe_MixedSetter_tooltip_select:
+                                  'VariableSetter',
+                                children:
+                                  this.i18n('i18n-xtno2l9qqog') /* 异常 */,
+                                icon: (
+                                  <AntdIconCloseCircleFilled __component_name="AntdIconCloseCircleFilled" />
+                                ),
+                                id: 'Error',
+                                tooltip: __$$eval(() => record.reason),
+                                type: 'error',
+                              },
+                            ]}
+                          />
+                        ),
+                        !!__$$eval(() => text !== 'Error') && (
+                          <Status
+                            __component_name="Status"
+                            id="Created"
+                            ref={this._refsManager.linkRef('status-51a03fff')}
+                            types={[
+                              {
+                                children:
+                                  this.i18n('i18n-1vangoko4yf') /* 正常 */,
+                                icon: (
+                                  <AntdIconCheckCircleFilled __component_name="AntdIconCheckCircleFilled" />
+                                ),
+                                id: 'Created',
+                                type: 'success',
+                              },
+                            ]}
+                          />
+                        ),
+                      ])(
                         __$$createChildContext(__$$context, {
                           text,
                           record,
@@ -1050,7 +1025,7 @@ class Organization$$Page extends React.Component {
                             shape="default"
                             type="link"
                           >
-                            {this.i18n('i18n-m6n5fnxybu') /* 管理组织 */}
+                            {this.i18n('i18n-m6n5fnxybu') /* 详情 */}
                           </Button>
                           <Button
                             __component_name="Button"
@@ -1186,6 +1161,7 @@ class Organization$$Page extends React.Component {
                         })?.length || 0
                   ),
                 }}
+                ref={this._refsManager.linkRef('table-b7b1c394')}
                 rowKey="name"
                 scroll={{ scrollToFirstRowOnChange: true }}
                 showHeader={true}
@@ -1219,10 +1195,17 @@ const PageWrapper = () => {
   return (
     <DataProvider
       self={self}
+      sdkInitFunc={{
+        enabled: undefined,
+        func: 'undefined',
+        params: undefined,
+      }}
       sdkSwrFuncs={[
         {
           func: 'useGetOrganizations',
-          params: undefined,
+          params: function applyThis() {
+            return { admin: 'admin' };
+          }.apply(self),
         },
       ]}
       render={(dataProps) => (
